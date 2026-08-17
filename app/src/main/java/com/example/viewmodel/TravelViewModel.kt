@@ -21,6 +21,11 @@ import com.example.data.local.AppSettingsState
 import com.example.data.local.AvailableVoiceProfiles
 import com.example.data.local.SettingsManager
 import com.example.data.local.VoiceProfile
+import com.example.data.model.PreferenceWeights
+import com.example.data.model.UserPreferenceEntity
+import com.example.ui.model.ComfortTarget
+import com.example.ui.model.PreferenceConstants
+import com.example.ui.model.SelectedLoyaltyProgram
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,10 +33,17 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
+
+enum class OnboardingGate {
+    LOADING,
+    REQUIRED,
+    COMPLETE
+}
 
 class TravelViewModel(application: Application) : AndroidViewModel(application), TextToSpeech.OnInitListener {
 
@@ -137,8 +149,18 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     // Preference Learning & Traveler DNA
-    val userPreference: StateFlow<com.example.data.model.UserPreferenceEntity?> = repository.userPreferences
+    val userPreference: StateFlow<UserPreferenceEntity?> = repository.userPreferences
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    val onboardingGate: StateFlow<OnboardingGate> = repository.userPreferences
+        .map { pref ->
+            if (pref == null || !pref.onboardingCompleted) {
+                OnboardingGate.REQUIRED
+            } else {
+                OnboardingGate.COMPLETE
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), OnboardingGate.LOADING)
 
     val tripFeedbacks: StateFlow<List<com.example.data.model.TripFeedbackEntity>> = repository.allTripFeedbacks
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -344,13 +366,13 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
                         title = act.title,
                         category = act.category,
                         location = act.location,
-                        confirmationCode = "AI-RES-${(1000..9999).random()}",
+                        confirmationCode = "",
                         notes = act.notes,
                         cost = act.cost,
                         currency = currency,
                         accessibilityBadge = act.accessibilityBadge,
                         vendorName = destination,
-                        vendorPhone = "+1-800-VOYAGE-AI",
+                        vendorPhone = "",
                         isCompleted = false
                     )
                 }
@@ -476,7 +498,7 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
                             title = act.title,
                             category = act.category,
                             location = act.location,
-                            confirmationCode = "MARCO-${(1000..9999).random()}",
+                            confirmationCode = "",
                             notes = act.notes,
                             cost = act.cost,
                             currency = "USD",
@@ -753,7 +775,7 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
             val logEntity = VendorCallLogEntity(
                 tripId = _selectedTripId.value,
                 vendorName = vendorName,
-                vendorPhone = "+1-800-${(100..999).random()}-${(1000..9999).random()}",
+                vendorPhone = "",
                 inquiryTopic = inquiryTopic,
                 status = "COMPLETED",
                 audioTranscript = callResult.transcript,
@@ -909,7 +931,7 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
                 balanceValue = balance,
                 unitLabel = unit,
                 tierStatus = tier,
-                rewardsEstimatedValuationUsd = 500.0,
+                rewardsEstimatedValuationUsd = 0.0,
                 lastSyncTime = "Just now"
             )
             repository.insertAccount(account)
@@ -919,6 +941,12 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
     fun deleteConnectedAccount(accountId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteAccount(accountId)
+        }
+    }
+
+    fun updateConnectedAccount(account: ConnectedAccountEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateAccount(account)
         }
     }
 
@@ -1104,13 +1132,13 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
                             title = act.title,
                             category = act.category,
                             location = act.location,
-                            confirmationCode = "ADA-RES-${(1000..9999).random()}",
+                            confirmationCode = "",
                             notes = act.notes,
                             cost = act.cost,
                             currency = updatedTrip.primaryCurrency,
                             accessibilityBadge = act.accessibilityBadge,
                             vendorName = updatedTrip.destination,
-                            vendorPhone = "+1-800-VOYAGE-AI",
+                            vendorPhone = "",
                             isCompleted = false
                         )
                     }
@@ -1146,7 +1174,7 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
             vendorName = vendorName,
             vendorCategory = vendorCategory,
             inquiryTopic = requirementTopic,
-            reservationRef = "ADA-VERIF-${(100..999).random()}"
+            reservationRef = ""
         )
     }
 
@@ -1346,7 +1374,7 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
                 title = item.title,
                 category = item.category,
                 location = item.location,
-                confirmationCode = "AI-BOOK-${(1000..9999).random()}",
+                confirmationCode = "",
                 notes = "${item.rationale} • ${item.familySuitability} • ${item.dietaryMatch}",
                 cost = item.estimatedCost,
                 currency = item.currency,
@@ -1741,46 +1769,145 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
     }
 
     /**
-     * Complete Guided 3-Step Setup Wizard
+     * Complete Guided Setup Wizard.
+     *
+     * Motivation, travel style, pacing, and accessibility comfort are all weighted 1-7 groups —
+     * an absent key means the user never rated that option, never a manufactured 0 or 4. Loyalty
+     * programs carry an ordinal rank instead (list order per category = booking priority).
+     *
+     * The flat single-value fields on [UserPreferenceEntity] (travelMotivation,
+     * preferredTravelStyle, pacingPreference, wheelchairRequirements, sensoryAndMobilityNotes,
+     * dietaryPreferences) stay populated with each group's highest-weighted value so existing UI
+     * and planner code keep working unchanged; they stay empty if nothing in the group was rated.
+     * Full fidelity — every rating, not just the winner — lives in the *WeightsJson fields.
      */
     fun completeOnboarding(
-        travelStyle: String,
-        pacing: String,
-        activityLevel: String,
-        wheelchair: String,
-        dietary: String,
-        family: String,
-        sensory: String,
-        preferredAirlines: String,
-        preferredHotelTypes: String,
+        displayName: String,
+        homeAirport: String,
+        motivationWeights: Map<String, Int>, // key = MotivationItem.id
+        travelStyleWeights: Map<String, Int>, // key = PreferenceConstants.TRAVEL_STYLES title
+        signatureAspiration: String,
+        accessibilityOptIn: Boolean,
+        pacingWeights: Map<String, Int>, // key = PreferenceConstants.PACING_OPTIONS title
+        comfortWeights: Map<String, Int>, // key = ComfortOption.label
+        selectedLoyaltyPrograms: List<SelectedLoyaltyProgram>, // list order per category = rank
         onComplete: () -> Unit = {}
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            val summary = "Expedition DNA Profile: $travelStyle ($pacing pace). Accessibility & Dietary: ${listOfNotNull(wheelchair.takeIf { it.isNotBlank() }, dietary.takeIf { it.isNotBlank() }, family.takeIf { it.isNotBlank() }).joinToString(", ")}. Preferred Loyalty: ${listOfNotNull(preferredAirlines.takeIf { it.isNotBlank() }, preferredHotelTypes.takeIf { it.isNotBlank() }).joinToString(", ")}."
-            val updated = com.example.data.model.UserPreferenceEntity(
+            val motivationTopId = PreferenceWeights.topKey(motivationWeights)
+            val motivationTopLabel = motivationTopId
+                ?.let { id -> PreferenceConstants.MOTIVATIONS.find { it.id == id }?.label }
+                ?: ""
+            val travelStyleTop = PreferenceWeights.topKey(travelStyleWeights) ?: ""
+            val pacingTop = PreferenceWeights.topKey(pacingWeights) ?: ""
+
+            // Route by each option's own declared target rather than re-deriving intent from
+            // label substrings, so every option is routed somewhere instead of silently
+            // vanishing. Presence in comfortWeights (regardless of intensity) is what populates
+            // these flat multi-value fields; the intensity itself is expressed in the summary.
+            val comfortByLabel = PreferenceConstants.ACCESSIBILITY_COMFORT_OPTIONS.associateBy { it.label }
+            val wheelchairReq = if (accessibilityOptIn) {
+                comfortWeights.keys.filter { comfortByLabel[it]?.target == ComfortTarget.WHEELCHAIR }.joinToString("; ")
+            } else ""
+            val sensoryReq = if (accessibilityOptIn) {
+                comfortWeights.keys.filter {
+                    val target = comfortByLabel[it]?.target
+                    target == ComfortTarget.SENSORY || target == ComfortTarget.MOBILITY
+                }.joinToString("; ")
+            } else ""
+            val dietaryReq = if (accessibilityOptIn) {
+                comfortWeights.keys.filter { comfortByLabel[it]?.target == ComfortTarget.DIETARY }.joinToString("; ")
+            } else ""
+
+            val airlinesPref = selectedLoyaltyPrograms.filter { it.program.categoryType == "AIRLINE" }.joinToString(", ") { it.program.name }
+            val hotelsPref = selectedLoyaltyPrograms.filter { it.program.categoryType == "HOTEL" || it.program.categoryType == "TIMESHARE" }.joinToString(", ") { it.program.name }
+
+            // Gemini-facing summary: only groups the user actually rated appear, strongest first,
+            // and accessibility comfort is phrased by intensity (hard requirement vs. soft
+            // preference) instead of one flattened "prefers" sentence regardless of score.
+            val summary = buildString {
+                append("Traveler DNA")
+                if (displayName.isNotBlank()) append(": $displayName")
+                append(" ($homeAirport).")
+
+                val motivationLabeled = motivationWeights.mapKeys { (id, _) ->
+                    PreferenceConstants.MOTIVATIONS.find { it.id == id }?.label ?: id
+                }
+                PreferenceWeights.formatWeightsClause("Motivation", motivationLabeled)?.let { append(" $it.") }
+                PreferenceWeights.formatWeightsClause("Travel Style", travelStyleWeights)?.let { append(" $it.") }
+                PreferenceWeights.formatWeightsClause("Pacing", pacingWeights)?.let { append(" $it.") }
+
+                if (signatureAspiration.isNotBlank()) append(" Signature Aspiration: $signatureAspiration.")
+
+                if (accessibilityOptIn && comfortWeights.isNotEmpty()) {
+                    val phrased = comfortWeights.entries
+                        .sortedByDescending { it.value }
+                        .joinToString("; ") { (label, weight) -> PreferenceWeights.accessibilityIntensityPhrase(label, weight) }
+                    append(" Accessibility comfort: $phrased.")
+                }
+
+                if (selectedLoyaltyPrograms.isNotEmpty()) {
+                    val rankClause = selectedLoyaltyPrograms
+                        .groupBy { it.program.categoryType }
+                        .entries.joinToString("; ") { (cat, programs) -> "$cat priority: ${programs.joinToString(" > ") { it.program.name }}" }
+                    append(" Loyalty booking priority: $rankClause.")
+                }
+            }
+
+            val updated = UserPreferenceEntity(
                 id = 1,
-                preferredAirlines = preferredAirlines,
-                preferredHotelTypes = preferredHotelTypes,
-                activityLevel = activityLevel,
-                preferredTravelStyle = travelStyle,
-                dietaryPreferences = dietary,
-                wheelchairRequirements = wheelchair,
-                familyAgeBrackets = family,
-                sensoryAndMobilityNotes = sensory,
-                pacingPreference = pacing,
+                displayName = displayName,
+                homeAirport = homeAirport,
+                travelMotivation = motivationTopLabel,
+                signatureAspiration = signatureAspiration,
+                accessibilityVerificationOptIn = accessibilityOptIn,
+                preferredTravelStyle = travelStyleTop,
+                pacingPreference = pacingTop,
+                wheelchairRequirements = wheelchairReq,
+                sensoryAndMobilityNotes = sensoryReq,
+                dietaryPreferences = dietaryReq,
+                preferredAirlines = airlinesPref,
+                preferredHotelTypes = hotelsPref,
                 learnedInsightsSummary = summary,
+                motivationWeightsJson = PreferenceWeights.encodeWeights(motivationWeights),
+                travelStyleWeightsJson = PreferenceWeights.encodeWeights(travelStyleWeights),
+                pacingWeightsJson = PreferenceWeights.encodeWeights(pacingWeights),
+                comfortWeightsJson = PreferenceWeights.encodeWeights(comfortWeights),
+                loyaltyRankJson = PreferenceWeights.encodeRanks(
+                    selectedLoyaltyPrograms.groupBy({ it.program.categoryType }, { it.program.id })
+                ),
                 totalTripsAnalyzed = 0,
                 onboardingCompleted = true,
                 lastUpdatedTimestamp = System.currentTimeMillis()
             )
             repository.saveUserPreferences(updated)
 
-            // Add personalized greeting in chat
+            // Save connected loyalty accounts genuinely with zero fake valuation, whatever tier
+            // and balance the user actually entered (empty if they skipped either — never guess
+            // a specific product/status/amount they never claimed).
+            selectedLoyaltyPrograms.forEach { sel ->
+                val account = ConnectedAccountEntity(
+                    categoryType = sel.program.categoryType,
+                    providerName = sel.program.name,
+                    accountNumberMasked = "",
+                    balanceValue = sel.balance,
+                    unitLabel = sel.program.defaultUnit,
+                    tierStatus = sel.tier,
+                    rewardsEstimatedValuationUsd = 0.0,
+                    lastSyncTime = "Linked"
+                )
+                repository.insertAccount(account)
+            }
+
+            // Sync preferences to cloud if user is authenticated
+            cloudSyncManager.syncPreferencesToCloud(updated)
+
+            // Insert CARD_DNA Traveler Passport message into chat stream
             repository.insertChatMessage(
                 ChatMessageEntity(
                     tripId = 0,
-                    sender = "CONCIERGE_AI",
-                    text = "🧭 **Welcome to Marco Expeditions!**\nYour baseline Traveler DNA is initialized ($travelStyle • $pacing • $activityLevel).\n\nAsk me to plan a custom journey, optimize your rewards points, or review offline cartography.",
+                    sender = "CARD_DNA",
+                    text = "🧬 **Traveler Passport Initialized**\nWelcome, $displayName ($homeAirport). Your baseline DNA and loyalty accounts are linked and ready for AI concierge guidance.",
                     timestamp = System.currentTimeMillis(),
                     chatType = "PRIVATE",
                     authorName = "Marco Concierge"

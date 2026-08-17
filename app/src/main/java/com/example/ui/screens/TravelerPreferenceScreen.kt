@@ -74,6 +74,7 @@ import com.example.data.model.ProactiveSuggestionEntity
 import com.example.data.model.TripEntity
 import com.example.data.model.TripFeedbackEntity
 import com.example.data.model.UserPreferenceEntity
+import com.example.ui.components.TravelerPassportCard
 import com.example.ui.theme.*
 import com.example.viewmodel.TravelViewModel
 
@@ -85,6 +86,7 @@ fun TravelerPreferenceDialog(
     onSelectProactiveTrip: (ProactiveSuggestionEntity) -> Unit
 ) {
     val preference by viewModel.userPreference.collectAsState()
+    val connectedAccounts by viewModel.connectedAccounts.collectAsState()
     val feedbacks by viewModel.tripFeedbacks.collectAsState()
     val proactiveSuggestions by viewModel.proactiveSuggestions.collectAsState()
     val trips by viewModel.allTrips.collectAsState()
@@ -207,6 +209,7 @@ fun TravelerPreferenceDialog(
                         preference = preference,
                         feedbacksCount = feedbacks.size,
                         isAnalyzing = isAnalyzing,
+                        linkedProgramCount = connectedAccounts.size,
                         onReanalyze = { viewModel.reanalyzeTravelerPreferences() }
                     )
                     1 -> StatedPreferencesSection(
@@ -236,6 +239,7 @@ fun LearnedDnaSection(
     preference: UserPreferenceEntity?,
     feedbacksCount: Int,
     isAnalyzing: Boolean,
+    linkedProgramCount: Int = 0,
     onReanalyze: () -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -243,8 +247,16 @@ fun LearnedDnaSection(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(scrollState)
+            .verticalScroll(scrollState),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        // Official Traveler Passport Card
+        TravelerPassportCard(
+            preference = preference,
+            linkedProgramCount = linkedProgramCount,
+            onRefineDnaClick = null
+        )
+
         // AI Synthesis Card
         Card(
             shape = RoundedCornerShape(16.dp),

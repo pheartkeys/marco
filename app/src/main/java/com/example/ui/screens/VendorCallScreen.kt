@@ -461,7 +461,7 @@ fun CallLogCard(
                             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
                         )
                         Text(
-                            text = log.vendorPhone,
+                            text = log.vendorPhone.ifBlank { "No phone on file" },
                             style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                     }

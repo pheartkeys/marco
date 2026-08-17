@@ -108,6 +108,7 @@ import com.example.viewmodel.TravelViewModel
 fun SettingsScreen(
     viewModel: TravelViewModel,
     onNavigateToAuth: () -> Unit = {},
+    onOpenOnboarding: () -> Unit = {},
     onNavigateBack: () -> Unit
 ) {
     BackHandler(onBack = onNavigateBack)
@@ -533,6 +534,26 @@ fun SettingsScreen(
                                 style = MaterialTheme.typography.labelSmall,
                                 color = TextSecondary
                             )
+                        }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+                        OutlinedButton(
+                            onClick = onOpenOnboarding,
+                            shape = RoundedCornerShape(10.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary),
+                            border = BorderStroke(1.dp, LuxuryBorder),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("redo_onboarding_button")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.RestartAlt,
+                                contentDescription = null,
+                                tint = ChampagneGold,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Redo Traveler Setup Wizard", style = MaterialTheme.typography.labelMedium)
                         }
                     }
                 }

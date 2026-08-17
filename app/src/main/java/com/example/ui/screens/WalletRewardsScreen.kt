@@ -69,6 +69,7 @@ import androidx.compose.ui.window.Dialog
 import com.example.data.model.ConnectedAccountEntity
 import com.example.data.model.ExpenseEntity
 import com.example.ui.components.CategoryIconBadge
+import com.example.ui.model.PreferenceConstants
 import com.example.ui.theme.*
 import com.example.viewmodel.TravelViewModel
 
@@ -87,6 +88,7 @@ fun WalletRewardsScreen(
     var selectedTab by remember { mutableIntStateOf(0) } // 0 = Accounts & Rewards, 1 = Multi-Currency Expenses
     var isAddAccountDialogOpen by remember { mutableStateOf(false) }
     var isAddExpenseDialogOpen by remember { mutableStateOf(false) }
+    var accountBeingEdited by remember { mutableStateOf<ConnectedAccountEntity?>(null) }
 
     Column(
         modifier = modifier
@@ -188,7 +190,8 @@ fun WalletRewardsScreen(
                 optimizerResult = optimizerResult,
                 onRunOptimizer = { viewModel.runRewardsOptimizer() },
                 onAddAccount = { isAddAccountDialogOpen = true },
-                onDeleteAccount = { viewModel.deleteConnectedAccount(it) }
+                onDeleteAccount = { viewModel.deleteConnectedAccount(it) },
+                onEditAccount = { accountBeingEdited = it }
             )
         } else {
             // Multi-Currency Ledger tab
@@ -219,6 +222,17 @@ fun WalletRewardsScreen(
             }
         )
     }
+
+    accountBeingEdited?.let { account ->
+        EditAccountDialog(
+            account = account,
+            onDismiss = { accountBeingEdited = null },
+            onConfirm = { balance, tier ->
+                viewModel.updateConnectedAccount(account.copy(balanceValue = balance, tierStatus = tier))
+                accountBeingEdited = null
+            }
+        )
+    }
 }
 
 @Composable
@@ -228,7 +242,8 @@ fun AccountsAndRewardsView(
     optimizerResult: String?,
     onRunOptimizer: () -> Unit,
     onAddAccount: () -> Unit,
-    onDeleteAccount: (Long) -> Unit
+    onDeleteAccount: (Long) -> Unit,
+    onEditAccount: (ConnectedAccountEntity) -> Unit = {}
 ) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -360,7 +375,8 @@ fun AccountsAndRewardsView(
             items(accounts, key = { it.id }) { acc ->
                 AccountItemCard(
                     account = acc,
-                    onDelete = { onDeleteAccount(acc.id) }
+                    onDelete = { onDeleteAccount(acc.id) },
+                    onEdit = { onEditAccount(acc) }
                 )
             }
         } else {
@@ -405,14 +421,17 @@ fun AccountsAndRewardsView(
 @Composable
 fun AccountItemCard(
     account: ConnectedAccountEntity,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onEdit: () -> Unit = {}
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(1.dp, ContourBorder),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onEdit() }
     ) {
         Row(
             modifier = Modifier
@@ -430,31 +449,66 @@ fun AccountItemCard(
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     Text(
-                        text = "${account.accountNumberMasked} • ${account.tierStatus}",
+                        text = run {
+                            val tierLabel = account.tierStatus.ifBlank { "Tier not set" }
+                            if (account.accountNumberMasked.isBlank()) {
+                                tierLabel
+                            } else {
+                                "${account.accountNumberMasked} • $tierLabel"
+                            }
+                        },
                         style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                     )
-                    Text(
-                        text = "${account.balanceValue} ${account.unitLabel}",
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            color = WaypointCyan
+                    if (account.balanceValue.isNotBlank()) {
+                        Text(
+                            text = "${account.balanceValue} ${account.unitLabel}",
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                color = TextPrimary,
+                                fontWeight = FontWeight.SemiBold
+                            )
                         )
-                    )
+                    } else {
+                        Text(
+                            text = "Tap to add balance (${account.unitLabel})",
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                color = ChampagneGold
+                            )
+                        )
+                    }
                 }
             }
 
             Column(horizontalAlignment = Alignment.End) {
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = EmeraldGreen.copy(alpha = 0.12f)
-                ) {
-                    Text(
-                        text = "≈ $${account.rewardsEstimatedValuationUsd.toInt()}",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            color = EmeraldGreen,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                    )
+                if (account.rewardsEstimatedValuationUsd > 0.0) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = LuxuryCardElevated,
+                        border = BorderStroke(1.dp, LuxuryBorder)
+                    ) {
+                        Text(
+                            text = "≈ $${account.rewardsEstimatedValuationUsd.toInt()}",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                color = TextPrimary,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                } else {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = LuxuryCardElevated,
+                        border = BorderStroke(1.dp, LuxuryBorder)
+                    ) {
+                        Text(
+                            text = "Linked",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                color = TextSecondary,
+                                fontWeight = FontWeight.Medium
+                            ),
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 IconButton(
@@ -880,6 +934,109 @@ fun AddExpenseDialog(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Save Expense to Ledger", fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+    }
+}
+
+// -------------------------------------------------------------
+// EDIT CONNECTED ACCOUNT: BALANCE + REAL TIER (never a guessed default)
+// -------------------------------------------------------------
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun EditAccountDialog(
+    account: ConnectedAccountEntity,
+    onDismiss: () -> Unit,
+    onConfirm: (balance: String, tier: String) -> Unit
+) {
+    var balance by remember { mutableStateOf(account.balanceValue) }
+    var tier by remember { mutableStateOf(account.tierStatus) }
+
+    // If this provider matches a known loyalty catalog entry, offer its real tier list so we're
+    // never inventing a status name either — otherwise fall back to free text (manually-added
+    // accounts aren't in the catalog).
+    val catalogProgram = remember(account.providerName) {
+        PreferenceConstants.LOYALTY_CATALOG.find { it.name == account.providerName }
+    }
+
+    Dialog(onDismissRequest = onDismiss) {
+    Surface(
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 8.dp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(account.providerName, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+                IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, null) }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = balance,
+                onValueChange = { balance = it },
+                label = { Text("Balance (${account.unitLabel})") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("edit_account_balance_input")
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text("Your status:", style = MaterialTheme.typography.labelSmall)
+            Spacer(modifier = Modifier.height(4.dp))
+
+            if (catalogProgram != null) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    catalogProgram.tierOptions.forEach { option ->
+                        FilterChip(
+                            selected = tier == option,
+                            onClick = { tier = if (tier == option) "" else option },
+                            label = { Text(option, style = MaterialTheme.typography.labelSmall) }
+                        )
+                    }
+                }
+                if (tier.isBlank()) {
+                    Text(
+                        text = "Tier not set",
+                        style = MaterialTheme.typography.labelSmall.copy(color = TextMuted),
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            } else {
+                OutlinedTextField(
+                    value = tier,
+                    onValueChange = { tier = it },
+                    label = { Text("Tier / Status (leave blank if not set)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = { onConfirm(balance, tier) },
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = LuxuryCardElevated,
+                    contentColor = TextPrimary
+                ),
+                border = BorderStroke(1.dp, LuxuryBorder),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("edit_account_save_button")
+            ) {
+                Text("Save Changes", fontWeight = FontWeight.Bold, color = TextPrimary)
             }
         }
     }

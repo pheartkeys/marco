@@ -58,8 +58,7 @@ fun ConciergeChatScreen(
     onOpenVendorCall: (vendorName: String, question: String) -> Unit = { _, _ -> },
     onOpenPreferences: () -> Unit = {},
     onOpenPlanTrip: () -> Unit = {},
-    onOpenAuth: () -> Unit = {},
-    onOpenOnboarding: () -> Unit = {}
+    onOpenAuth: () -> Unit = {}
 ) {
     val messages by viewModel.chatMessages.collectAsState()
     val activeChatStreamTab by viewModel.activeChatStreamTab.collectAsState()
@@ -683,19 +682,8 @@ fun ConciergeChatScreen(
                         ChatTravelerDnaCard(
                             message = msg,
                             preference = userPref,
-                            onRatePastTrip = { rating, notes ->
-                                currentTrip?.let {
-                                    viewModel.submitTripFeedback(
-                                        tripId = it.id,
-                                        tripTitle = it.title,
-                                        destination = it.destination,
-                                        rating = rating,
-                                        likedAspects = "Spacious suite & morning pace",
-                                        dislikedAspects = "None",
-                                        notes = notes
-                                    )
-                                }
-                            },
+                            linkedProgramCount = connectedAccounts.size,
+                            onRefineDna = onOpenPreferences,
                             onPlayTts = { viewModel.playAudioTranscript(msg.text) }
                         )
                     }
@@ -1652,124 +1640,22 @@ fun ChatRewardsCard(
 }
 
 // -------------------------------------------------------------
-// INLINE RICH CARD: TRAVELER DNA & PREFERENCES
+// INLINE RICH CARD: TRAVELER DNA & PASSPORT
 // -------------------------------------------------------------
 @Composable
 fun ChatTravelerDnaCard(
     message: ChatMessageEntity,
     preference: UserPreferenceEntity?,
-    onRatePastTrip: (rating: Int, notes: String) -> Unit,
+    linkedProgramCount: Int = 0,
+    onRefineDna: () -> Unit,
     onPlayTts: () -> Unit
 ) {
-    var selectedRating by remember { mutableIntStateOf(5) }
-    var isFeedbackSubmitted by remember { mutableStateOf(false) }
-
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, ContourBorder),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            // Header
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape)
-                            .background(CompassLilac.copy(alpha = 0.2f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Default.Psychology, null, tint = CompassLilac, modifier = Modifier.size(18.dp))
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Column {
-                        Text(
-                            text = "AI Traveler DNA & Learning",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = CompassLilac)
-                        )
-                        Text(
-                            text = "${preference?.totalTripsAnalyzed ?: 0} Journeys Analyzed",
-                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        )
-                    }
-                }
-
-                IconButton(onClick = onPlayTts, modifier = Modifier.size(28.dp)) {
-                    Icon(Icons.Default.VolumeUp, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // AI Insights Highlight
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = CompassLilac.copy(alpha = 0.08f),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = preference?.learnedInsightsSummary ?: "Set up your preferences or plan your first journey to build your Traveler DNA profile.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(12.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Interactive 1-Tap Past Trip Training Rating
-            Text(
-                text = if (isFeedbackSubmitted) "AI Model Retrained from your Feedback!" else "Train AI: Rate Past Trip Experience",
-                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
-            )
-
-            if (!isFeedbackSubmitted) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row {
-                        for (i in 1..5) {
-                            Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = "$i Stars",
-                                tint = if (i <= selectedRating) AmberGold else ContourBorder,
-                                modifier = Modifier
-                                    .size(24.dp)
-                                    .clickable { selectedRating = i }
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                        }
-                    }
-
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = CompassLilac,
-                        modifier = Modifier
-                            .heightIn(min = 48.dp)
-                            .clickable {
-                                onRatePastTrip(selectedRating, "5-star rating recorded for quiet suite & morning activities.")
-                                isFeedbackSubmitted = true
-                            }
-                    ) {
-                        Text(
-                            text = "Submit Rating",
-                            style = MaterialTheme.typography.labelSmall.copy(color = Color.White, fontWeight = FontWeight.Bold),
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
-                    }
-                }
-            }
-        }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        TravelerPassportCard(
+            preference = preference,
+            linkedProgramCount = linkedProgramCount,
+            onRefineDnaClick = onRefineDna
+        )
     }
 }
 
@@ -2120,16 +2006,16 @@ fun ChatFamilyAccessibilityCard(
 ) {
     var isExpanded by remember { mutableStateOf(true) }
     var selectedDietary by remember {
-        mutableStateOf(trip?.dietaryRestrictions?.ifBlank { null } ?: userPref?.dietaryPreferences?.ifBlank { null } ?: "Gluten-Free & Nut-Free Aware")
+        mutableStateOf(trip?.dietaryRestrictions?.ifBlank { null } ?: userPref?.dietaryPreferences?.ifBlank { null } ?: "")
     }
     var selectedWheelchair by remember {
-        mutableStateOf(trip?.accessibilityRequirements?.ifBlank { null } ?: userPref?.wheelchairRequirements?.ifBlank { null } ?: "Step-Free Ramp & ADA Pool Lift")
+        mutableStateOf(trip?.accessibilityRequirements?.ifBlank { null } ?: userPref?.wheelchairRequirements?.ifBlank { null } ?: "")
     }
     var selectedFamilyAges by remember {
-        mutableStateOf(trip?.familyAgeBrackets?.ifBlank { null } ?: userPref?.familyAgeBrackets?.ifBlank { null } ?: "Toddler (2-3) & Teen (14-16)")
+        mutableStateOf(trip?.familyAgeBrackets?.ifBlank { null } ?: userPref?.familyAgeBrackets?.ifBlank { null } ?: "")
     }
     var customNotes by remember {
-        mutableStateOf(userPref?.sensoryAndMobilityNotes ?: "Requires quiet mid-afternoon recharge window & stroller parking")
+        mutableStateOf(userPref?.sensoryAndMobilityNotes ?: "")
     }
     var hasAppliedChanges by remember { mutableStateOf(false) }
 
@@ -2543,7 +2429,8 @@ fun ChatActivitySuggestionsCard(
                             )
                         )
                         Text(
-                            text = "Filtered for ${trip?.travelersCount ?: 3} travelers • ${userPref?.wheelchairRequirements?.ifBlank { "Step-Free" } ?: "Accessible"}",
+                            text = "Filtered for ${trip?.travelersCount ?: 3} travelers" +
+                                (userPref?.wheelchairRequirements?.ifBlank { null }?.let { " • $it" } ?: ""),
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant

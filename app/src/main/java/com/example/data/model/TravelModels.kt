@@ -184,6 +184,11 @@ data class ChatMessageEntity(
 @Entity(tableName = "user_preferences")
 data class UserPreferenceEntity(
     @PrimaryKey val id: Long = 1,
+    val displayName: String = "",
+    val homeAirport: String = "",
+    val travelMotivation: String = "",
+    val signatureAspiration: String = "",
+    val accessibilityVerificationOptIn: Boolean = false,
     val preferredAirlines: String = "",
     val preferredHotelTypes: String = "",
     val activityLevel: String = "Balanced",
@@ -194,11 +199,21 @@ data class UserPreferenceEntity(
     val sensoryAndMobilityNotes: String = "",
     val pacingPreference: String = "",
     val preferredTransit: String = "",
-    val preferredClimate: String = "",
     val learnedInsightsSummary: String = "Set up your preferences or plan your first journey to build your AI Traveler DNA profile.",
     val totalTripsAnalyzed: Int = 0,
     val onboardingCompleted: Boolean = false,
-    val lastUpdatedTimestamp: Long = System.currentTimeMillis()
+    val lastUpdatedTimestamp: Long = System.currentTimeMillis(),
+    // Full-fidelity 1-7 intensity weights (JSON-encoded via PreferenceWeights; option -> weight,
+    // absent = never rated). The flat fields above stay populated with each group's
+    // highest-weighted value so existing UI/planner code keeps working unchanged; these JSON
+    // fields carry the complete picture for anything that wants it (e.g. the Gemini prompt).
+    val motivationWeightsJson: String = "",
+    val travelStyleWeightsJson: String = "",
+    val pacingWeightsJson: String = "",
+    val comfortWeightsJson: String = "",
+    // categoryType -> ordered list of loyalty program ids, ranked by booking preference within
+    // that category (index 0 = book first).
+    val loyaltyRankJson: String = ""
 )
 
 @Entity(tableName = "trip_feedbacks")

@@ -516,7 +516,7 @@ class GeminiTravelService(
                         familySuitability = obj.optString("familySuitability", "All Ages • Kid & Senior Approved"),
                         dietaryMatch = obj.optString("dietaryMatch", "🥗 Allergen-Safe Onsite Cafe"),
                         bookingVendor = obj.optString("bookingVendor", "$destination Tours"),
-                        bookingPhone = obj.optString("bookingPhone", "+1-800-VOYAGE-AI")
+                        bookingPhone = obj.optString("bookingPhone", "")
                     )
                 )
             }

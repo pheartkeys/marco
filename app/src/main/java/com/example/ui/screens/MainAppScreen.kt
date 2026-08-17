@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,6 +20,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.data.model.ProactiveSuggestionEntity
+import com.example.viewmodel.OnboardingGate
 import com.example.viewmodel.TravelViewModel
 
 object AppRoutes {
@@ -42,10 +45,30 @@ object AppRoutes {
 fun MainAppScreen(
     viewModel: TravelViewModel = viewModel()
 ) {
+    val onboardingGate by viewModel.onboardingGate.collectAsState()
+
+    // Hold plain luxury dark surface while resolving gate to prevent any flash of chat screen
+    if (onboardingGate == OnboardingGate.LOADING) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {}
+        return
+    }
+
+    // Capture the start destination once for the lifetime of this NavHost. Navigation Compose
+    // keys the graph on startDestination and resets the back stack whenever it changes, so this
+    // must not be re-derived from onboardingGate on every recomposition — the gate flips
+    // REQUIRED -> COMPLETE mid-flight during completeOnboarding (before its own navigation runs),
+    // and re-deriving here would race that navigation and wipe the back stack.
+    val startDestination = remember {
+        if (onboardingGate == OnboardingGate.REQUIRED) AppRoutes.ONBOARDING else AppRoutes.CHAT
+    }
     val navController = rememberNavController()
     var vendorCallTarget by remember {
         mutableStateOf("Lodging Front Desk" to "Confirm reservation details and accessibility accommodations")
     }
+    var pendingInitialSuggestion by remember { mutableStateOf<ProactiveSuggestionEntity?>(null) }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -53,7 +76,7 @@ fun MainAppScreen(
     ) {
         NavHost(
             navController = navController,
-            startDestination = AppRoutes.CHAT,
+            startDestination = startDestination,
             modifier = Modifier.fillMaxSize(),
             enterTransition = {
                 slideIntoContainer(
@@ -84,10 +107,16 @@ fun MainAppScreen(
             composable(route = AppRoutes.ONBOARDING) {
                 OnboardingWizardScreen(
                     viewModel = viewModel,
-                    onOnboardingComplete = {
+                    onOnboardingComplete = { suggestion ->
+                        pendingInitialSuggestion = suggestion
+                        // Put CHAT under the planner in the back stack (popping ONBOARDING off)
+                        // so the CARD_DNA passport message that completeOnboarding wrote into the
+                        // chat stream is reachable by backing out of PlanTripScreen, instead of
+                        // being permanently orphaned behind an unreachable ONBOARDING entry.
                         navController.navigate(AppRoutes.CHAT) {
                             popUpTo(AppRoutes.ONBOARDING) { inclusive = true }
                         }
+                        navController.navigate(AppRoutes.PLAN_TRIP)
                     }
                 )
             }
@@ -107,9 +136,11 @@ fun MainAppScreen(
                         navController.navigate(AppRoutes.VENDOR_CALL)
                     },
                     onOpenPreferences = { navController.navigate(AppRoutes.PREFERENCES) },
-                    onOpenPlanTrip = { navController.navigate(AppRoutes.PLAN_TRIP) },
-                    onOpenAuth = { navController.navigate(AppRoutes.SIGN_IN) },
-                    onOpenOnboarding = { navController.navigate(AppRoutes.ONBOARDING) }
+                    onOpenPlanTrip = {
+                        pendingInitialSuggestion = null
+                        navController.navigate(AppRoutes.PLAN_TRIP)
+                    },
+                    onOpenAuth = { navController.navigate(AppRoutes.SIGN_IN) }
                 )
             }
 
@@ -173,6 +204,7 @@ fun MainAppScreen(
                 SettingsScreen(
                     viewModel = viewModel,
                     onNavigateToAuth = { navController.navigate(AppRoutes.SIGN_IN) },
+                    onOpenOnboarding = { navController.navigate(AppRoutes.ONBOARDING) },
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
@@ -243,7 +275,8 @@ fun MainAppScreen(
                     viewModel = viewModel,
                     modifier = Modifier.fillMaxSize(),
                     onNavigateBack = { navController.popBackStack() },
-                    onSelectProactiveTrip = { _ ->
+                    onSelectProactiveTrip = { proactiveSuggestion ->
+                        pendingInitialSuggestion = proactiveSuggestion
                         navController.navigate(AppRoutes.PLAN_TRIP)
                     }
                 )
@@ -254,8 +287,13 @@ fun MainAppScreen(
                 PlanTripScreen(
                     viewModel = viewModel,
                     modifier = Modifier.fillMaxSize(),
-                    onNavigateBack = { navController.popBackStack() },
+                    initialSuggestion = pendingInitialSuggestion,
+                    onNavigateBack = {
+                        pendingInitialSuggestion = null
+                        navController.popBackStack()
+                    },
                     onTripCreated = { _ ->
+                        pendingInitialSuggestion = null
                         navController.navigate(AppRoutes.ITINERARY) {
                             popUpTo(AppRoutes.CHAT)
                         }
