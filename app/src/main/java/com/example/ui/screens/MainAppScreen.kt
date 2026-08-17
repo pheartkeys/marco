@@ -43,7 +43,7 @@ fun MainAppScreen(
 ) {
     val navController = rememberNavController()
     var vendorCallTarget by remember {
-        mutableStateOf("Grand Champions Front Desk" to "Verify heated pool dates and ADA chair lift access")
+        mutableStateOf("Lodging Front Desk" to "Confirm reservation details and accessibility accommodations")
     }
 
     Surface(

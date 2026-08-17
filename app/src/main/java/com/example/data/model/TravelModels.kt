@@ -11,15 +11,15 @@ data class TripEntity(
     val countryCode: String = "US",
     val startDate: String,
     val endDate: String,
-    val budgetTotal: Double = 3500.0,
-    val budgetSpent: Double = 1420.0,
+    val budgetTotal: Double = 0.0,
+    val budgetSpent: Double = 0.0,
     val primaryCurrency: String = "USD",
-    val travelersCount: Int = 2,
+    val travelersCount: Int = 1,
     val childrenCount: Int = 0,
-    val accessibilityRequirements: String = "Wheelchair Step-Free & ADA Pool Lift",
-    val dietaryRestrictions: String = "Gluten-Free & Nut-Free Aware",
-    val familyAgeBrackets: String = "Toddler (2-3) & Teen (14-16), 2 Adults",
-    val travelStyle: String = "Smart Points & Luxury",
+    val accessibilityRequirements: String = "",
+    val dietaryRestrictions: String = "",
+    val familyAgeBrackets: String = "",
+    val travelStyle: String = "",
     val timeshareExchangeDetails: String = "",
     val isOfflineSynced: Boolean = true,
     val lastSyncedTimestamp: Long = System.currentTimeMillis(),
@@ -86,7 +86,7 @@ data class TripActivityEntity(
     val notes: String = "",
     val cost: Double = 0.0,
     val currency: String = "USD",
-    val accessibilityBadge: String = "Wheelchair & Stroller Accessible",
+    val accessibilityBadge: String = "",
     val vendorName: String = "",
     val vendorPhone: String = "",
     val isCompleted: Boolean = false,
@@ -161,14 +161,14 @@ data class GroupMemoryEntity(
     val timestamp: String,
     val mediaType: String = "PHOTO",
     val photoGradientColor: Long = 0xFF0284C7,
-    val likesCount: Int = 3,
-    val aiTag: String = "Sunset Vista"
+    val likesCount: Int = 0,
+    val aiTag: String = ""
 )
 
 @Entity(tableName = "chat_messages")
 data class ChatMessageEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val tripId: Long = 1,
+    val tripId: Long = 0,
     val sender: String, // USER, CONCIERGE_AI, VOICE_CALL_DISPATCHER
     val text: String,
     val timestamp: Long = System.currentTimeMillis(),
@@ -179,19 +179,19 @@ data class ChatMessageEntity(
 @Entity(tableName = "user_preferences")
 data class UserPreferenceEntity(
     @PrimaryKey val id: Long = 1,
-    val preferredAirlines: String = "Delta Air Lines, ANA, United",
-    val preferredHotelTypes: String = "Oceanfront Timeshare Villa, Boutique Luxury, Historic Ryokan",
-    val activityLevel: String = "Balanced & Moderate (Sensory & Rest Intervals)", // Relaxed / Slow-Paced, Balanced & Moderate, High Intensity & Adventurous
-    val preferredTravelStyle: String = "Smart Points Maximizer & Scenic Culture",
-    val dietaryPreferences: String = "Gluten-Free, Nut-Free, Child-Friendly Seating",
-    val wheelchairRequirements: String = "Step-Free Access, Roll-in Shower, ADA Pool Chair Lift",
-    val familyAgeBrackets: String = "Toddler (2-3) & Teen (14-16), 2 Adults",
-    val sensoryAndMobilityNotes: String = "Stroller accessible, quiet sensory rest zones, elevator guaranteed",
-    val pacingPreference: String = "Morning Activities (8am-12pm) with Leisure Afternoons",
-    val preferredTransit: String = "Accessible SUV & Scenic Rail",
-    val preferredClimate: String = "Tropical Coast & Alpine Scenic",
-    val learnedInsightsSummary: String = "AI Analysis: Traveler values quiet oceanfront views, priority family boarding on Delta flights, step-free access, and mid-afternoon pool breaks. Highly receptive to RCI timeshare upgrades and Chase UR transfers to Hyatt.",
-    val totalTripsAnalyzed: Int = 3,
+    val preferredAirlines: String = "",
+    val preferredHotelTypes: String = "",
+    val activityLevel: String = "Balanced",
+    val preferredTravelStyle: String = "",
+    val dietaryPreferences: String = "",
+    val wheelchairRequirements: String = "",
+    val familyAgeBrackets: String = "",
+    val sensoryAndMobilityNotes: String = "",
+    val pacingPreference: String = "",
+    val preferredTransit: String = "",
+    val preferredClimate: String = "",
+    val learnedInsightsSummary: String = "Set up your preferences or plan your first journey to build your AI Traveler DNA profile.",
+    val totalTripsAnalyzed: Int = 0,
     val lastUpdatedTimestamp: Long = System.currentTimeMillis()
 )
 
@@ -202,11 +202,11 @@ data class TripFeedbackEntity(
     val tripTitle: String,
     val destination: String,
     val rating: Int = 5, // 1 to 5 stars
-    val likedAspects: String = "Quiet oceanfront villa, Delta first class upgrade, stroller accessibility",
-    val dislikedAspects: String = "High altitude wind at summit",
-    val feedbackNotes: String = "The Grand Champions heated pool and early morning Haleakala sunrise were incredible highlights. Keep suggesting villas with full kitchens.",
-    val dateSubmitted: String = "Oct 20, 2026",
-    val learnedActionableTakeaway: String = "AI learned: Prioritize lodging with full kitchens and quiet heated pools."
+    val likedAspects: String = "",
+    val dislikedAspects: String = "",
+    val feedbackNotes: String = "",
+    val dateSubmitted: String = "",
+    val learnedActionableTakeaway: String = ""
 )
 
 @Entity(tableName = "proactive_suggestions")
@@ -234,7 +234,7 @@ data class ProactiveSuggestionEntity(
 @Entity(tableName = "wallet_balances")
 data class WalletBalanceEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val tripId: Long = 1,
+    val tripId: Long = 0,
     val currencyCode: String, // USD, EUR, JPY, GBP, CHF, CAD, AUD
     val currencySymbol: String = "$",
     val currencyName: String,
@@ -252,15 +252,15 @@ data class WalletBalanceEntity(
 @Entity(tableName = "wallet_transactions")
 data class WalletTransactionEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val tripId: Long = 1,
+    val tripId: Long = 0,
     val title: String,
     val category: String, // Lodging, Dining, Flights, Activities, Transit, Timeshare, Shopping, Groceries
     val amountOriginal: Double,
     val currencyCode: String,
     val amountUsd: Double,
     val exchangeRate: Double = 1.0,
-    val paymentMethod: String, // Chase Sapphire Reserve, Amex Platinum, Apple Pay, Cash, Loyalty Points
-    val loyaltyProgramApplied: String = "", // Delta SkyMiles, Marriott Bonvoy, RCI TPU, Chase UR
+    val paymentMethod: String, // Payment method or card
+    val loyaltyProgramApplied: String = "", // Loyalty program used
     val loyaltySavingsUsd: Double = 0.0, // Dollar value saved via points or certificates
     val dateString: String = "Today",
     val timestamp: Long = System.currentTimeMillis(),
@@ -280,5 +280,5 @@ data class CurrencyRateEntity(
     val inverseRate: Double,
     val dayChangePercent: Double = 0.0,
     val countryFlag: String,
-    val feeAvoidanceTip: String = "0% foreign transaction fees active via Chase Sapphire"
+    val feeAvoidanceTip: String = "Pay in local currency to avoid dynamic conversion fees"
 )

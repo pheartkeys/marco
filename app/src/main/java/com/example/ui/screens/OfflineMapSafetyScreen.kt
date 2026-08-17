@@ -333,7 +333,7 @@ fun OfflineMapSafetyScreen(
                                     color = AmberGold.copy(alpha = 0.8f)
                                 ) {
                                     Text(
-                                        text = "🏡 Grand Champions Villa",
+                                        text = "🏡 ${currentTrip?.title ?: "Expedition Lodging"}",
                                         color = Navy900,
                                         fontSize = 10.sp,
                                         fontWeight = FontWeight.Bold,

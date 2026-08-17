@@ -75,8 +75,8 @@ import com.example.viewmodel.TravelViewModel
 @Composable
 fun VendorCallScreen(
     viewModel: TravelViewModel,
-    initialVendor: String = "Grand Champions Front Desk",
-    initialQuestion: String = "Verify heated pool dates and ADA chair lift access",
+    initialVendor: String = "Lodging Front Desk",
+    initialQuestion: String = "Verify check-in time, pool hours, and ADA accessible accommodations",
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit = {}
 ) {
@@ -88,18 +88,18 @@ fun VendorCallScreen(
     var vendorName by remember { mutableStateOf(initialVendor) }
     var vendorCategory by remember { mutableStateOf("HOTEL") }
     var inquiryTopic by remember { mutableStateOf(initialQuestion) }
-    var reservationRef by remember { mutableStateOf("RCI-WAIL-8832") }
+    var reservationRef by remember { mutableStateOf("") }
 
     val presetVendors = listOf(
-        Pair("Grand Champions Resort Front Desk", "HOTEL"),
-        Pair("Delta Priority Reservations", "FLIGHT"),
-        Pair("Alamo Luxury Car Rental", "TRANSIT"),
-        Pair("Haleakalā National Park Campgrounds", "CAMPGROUND"),
-        Pair("Merriman's Kapalua Dining", "DINING")
+        Pair("Hotel / Villa Front Desk", "HOTEL"),
+        Pair("Airline Priority Reservations", "FLIGHT"),
+        Pair("Car Rental / Mobility Transit", "TRANSIT"),
+        Pair("National Park / Campgrounds Office", "CAMPGROUND"),
+        Pair("Restaurant Concierge Desk", "DINING")
     )
 
     val presetQuestions = listOf(
-        "Is the heated swimming pool open on XY dates and is there ADA ramp/lift access?",
+        "Is the heated swimming pool open and is there ADA ramp/lift access?",
         "Can we reserve toddler booster seats and stroller storage for our arrival?",
         "Are 50-amp RV hookups and potable water stations open at the campground?",
         "Can we guarantee adjoining quiet rooms with early check-in?",

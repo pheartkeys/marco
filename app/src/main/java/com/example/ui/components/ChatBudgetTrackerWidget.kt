@@ -751,14 +751,14 @@ fun QuickAddExpenseSheetContent(
     var category by remember { mutableStateOf("Dining") }
     var amountText by remember { mutableStateOf("") }
     var currency by remember { mutableStateOf("USD") }
-    var paymentMethod by remember { mutableStateOf("Chase Sapphire Reserve") }
-    var loyaltyProgram by remember { mutableStateOf("Chase Dining 10x Points") }
+    var paymentMethod by remember { mutableStateOf("Credit / Debit Card") }
+    var loyaltyProgram by remember { mutableStateOf("") }
     var loyaltySavingsText by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
 
     val categories = listOf("Dining", "Lodging", "Flights", "Activities", "Transit", "Groceries", "Shopping")
     val currencies = listOf("USD", "EUR", "JPY", "GBP", "CHF", "CAD")
-    val paymentMethods = listOf("Chase Sapphire Reserve", "Amex Platinum Card", "Apple Pay", "Delta SkyMiles", "Cash")
+    val paymentMethods = listOf("Credit / Debit Card", "Digital Wallet", "Loyalty Points / Certs", "Cash", "Bank Transfer")
 
     Column(
         modifier = Modifier

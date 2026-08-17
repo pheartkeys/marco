@@ -359,11 +359,46 @@ fun AccountsAndRewardsView(
         }
 
         // Account list
-        items(accounts, key = { it.id }) { acc ->
-            AccountItemCard(
-                account = acc,
-                onDelete = { onDeleteAccount(acc.id) }
-            )
+        if (accounts.isNotEmpty()) {
+            items(accounts, key = { it.id }) { acc ->
+                AccountItemCard(
+                    account = acc,
+                    onDelete = { onDeleteAccount(acc.id) }
+                )
+            }
+        } else {
+            item {
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            Icons.Default.CreditCard,
+                            contentDescription = null,
+                            tint = OceanBlue,
+                            modifier = Modifier.size(32.dp)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "No Connected Loyalty Accounts",
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Link your airline miles, hotel points, timeshare contracts, or credit cards to let Marco optimize your redemptions.",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                        )
+                    }
+                }
+            }
         }
 
         item { Spacer(modifier = Modifier.height(80.dp)) }
@@ -475,7 +510,7 @@ fun ExpensesAndWalletView(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "VoyageAI Multi-Currency Pass",
+                                text = "Marco Multi-Currency Pass",
                                 style = MaterialTheme.typography.titleSmall.copy(
                                     color = Color.White,
                                     fontWeight = FontWeight.Bold
@@ -555,8 +590,43 @@ fun ExpensesAndWalletView(
         }
 
         // Expense items
-        items(expenses, key = { it.id }) { exp ->
-            ExpenseItemCard(expense = exp, onDelete = { onDeleteExpense(exp.id) })
+        if (expenses.isNotEmpty()) {
+            items(expenses, key = { it.id }) { exp ->
+                ExpenseItemCard(expense = exp, onDelete = { onDeleteExpense(exp.id) })
+            }
+        } else {
+            item {
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            Icons.Default.Receipt,
+                            contentDescription = null,
+                            tint = OceanBlue,
+                            modifier = Modifier.size(32.dp)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "No Expenses Logged",
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Tap 'Log Expense' to track multi-currency expenses, exchange rates, and points savings on your trip.",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                        )
+                    }
+                }
+            }
         }
 
         item { Spacer(modifier = Modifier.height(80.dp)) }

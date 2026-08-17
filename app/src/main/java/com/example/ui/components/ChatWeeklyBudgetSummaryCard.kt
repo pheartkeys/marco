@@ -52,7 +52,7 @@ fun ChatWeeklyBudgetSummaryCard(
 
     val loyaltySavingsPercent = if (totalGrossTripValue > 0) {
         ((totalLoyaltySavings / totalGrossTripValue) * 100).toInt()
-    } else 62
+    } else 0
 
     val animatedSavingsPercent by animateFloatAsState(
         targetValue = loyaltySavingsPercent.toFloat(),
@@ -342,8 +342,13 @@ fun ChatWeeklyBudgetSummaryCard(
                                 color = Color(0xFF2E7D32)
                             )
                         )
+                        val takeawayText = if (totalLoyaltySavings > 0) {
+                            "Your loyalty points redemptions & membership benefits absorbed $loyaltySavingsPercent% of your primary expenses."
+                        } else {
+                            "Log expenses and apply loyalty points or timeshare weeks to track real-time savings arbitrage."
+                        }
                         Text(
-                            text = "Your RCI Timeshare swap & Delta SkyMiles upgrades absorbed 73% of your primary lodging and flight costs. You are currently tracking 18% under your weekly trip budget target.",
+                            text = takeawayText,
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = Color(0xFF1B5E20),
                                 fontSize = 11.sp,

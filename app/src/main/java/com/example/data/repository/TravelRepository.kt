@@ -98,6 +98,7 @@ class TravelRepository(private val travelDao: TravelDao) {
         travelDao.clearChatMessages()
         travelDao.clearTripFeedbacks()
         travelDao.clearProactiveSuggestions()
+        travelDao.clearUserPreferences()
         travelDao.clearAllWalletBalances()
         travelDao.clearAllWalletTransactions()
     }

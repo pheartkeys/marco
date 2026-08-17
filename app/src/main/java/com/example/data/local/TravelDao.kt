@@ -159,6 +159,9 @@ interface TravelDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateUserPreferences(preferences: UserPreferenceEntity)
 
+    @Query("DELETE FROM user_preferences")
+    suspend fun clearUserPreferences()
+
     // Trip Feedback
     @Query("SELECT * FROM trip_feedbacks ORDER BY id DESC")
     fun getAllTripFeedbacks(): Flow<List<TripFeedbackEntity>>

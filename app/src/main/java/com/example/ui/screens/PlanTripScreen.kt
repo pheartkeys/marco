@@ -118,26 +118,22 @@ fun PlanTripDialog(
             "Sensory Quiet Areas"
         )
     }
-    val selectedAccessibility = remember { mutableStateListOf("Stroller Friendly", "Wheelchair & Step-Free Access") }
+    val selectedAccessibility = remember { mutableStateListOf<String>() }
 
     val integrationOptions = listOf(
-        "Major Airlines Miles (Delta/United)",
-        "Hotel Points (Marriott/Hyatt)",
-        "Timeshare (RCI / Interval Int)",
-        "Credit Card Rewards (Chase/Amex)",
-        "Camping (Recreation.gov)",
-        "Local Bullet Trains / Transit"
+        "Major Airlines Miles",
+        "Hotel Points",
+        "Timeshare Programs",
+        "Credit Card Rewards",
+        "Camping / Recreation",
+        "Bullet Trains / Transit"
     )
     val selectedIntegrations = remember {
-        mutableStateListOf(
-            "Major Airlines Miles (Delta/United)",
-            "Hotel Points (Marriott/Hyatt)",
-            "Credit Card Rewards (Chase/Amex)"
-        )
+        mutableStateListOf<String>()
     }
 
     var travelStyle by remember {
-        mutableStateOf(initialSuggestion?.title ?: "Smart Points & Cultural Explorer")
+        mutableStateOf(initialSuggestion?.title ?: "")
     }
 
     Surface(
@@ -232,8 +228,13 @@ fun PlanTripDialog(
                                     color = Color(0xFF8B5CF6)
                                 )
                             )
+                            val dnaSummary = listOfNotNull(
+                                userPref?.preferredAirlines?.takeIf { it.isNotBlank() },
+                                userPref?.activityLevel?.takeIf { it.isNotBlank() },
+                                userPref?.dietaryPreferences?.takeIf { it.isNotBlank() }
+                            ).joinToString(" • ").ifBlank { "Configure your preferences & travel style" }
                             Text(
-                                text = "${userPref?.preferredAirlines ?: "Delta"} • ${userPref?.activityLevel?.substringBefore(" (") ?: "Balanced"} • ${userPref?.dietaryPreferences?.substringBefore(",") ?: "Farm-to-Table"}",
+                                text = dnaSummary,
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     fontSize = 11.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant

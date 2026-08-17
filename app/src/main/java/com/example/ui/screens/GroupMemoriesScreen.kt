@@ -79,15 +79,18 @@ fun GroupMemoriesScreen(
     val memories by viewModel.memories.collectAsState()
     val isGeneratingStory by viewModel.isGeneratingStory.collectAsState()
     val storyReel by viewModel.groupTripStoryReel.collectAsState()
+    val trips by viewModel.allTrips.collectAsState()
+    val selectedTripId by viewModel.selectedTripId.collectAsState()
+    val currentTrip = trips.find { it.id == selectedTripId } ?: trips.firstOrNull()
 
     var isAddDialogOpen by remember { mutableStateOf(false) }
 
-    val travelers = listOf(
-        Pair("Sarah J.", "Organizing (Host)"),
-        Pair("David K.", "Points Strategist"),
-        Pair("Alex R.", "Photographer"),
-        Pair("Emma & Leo (Kids)", "Junior Adventurers")
-    )
+    val distinctAuthors = memories.map { it.authorName }.filter { it.isNotBlank() }.distinct()
+    val travelers = if (distinctAuthors.isNotEmpty()) {
+        distinctAuthors.map { Pair(it, "Expedition Traveler") }
+    } else {
+        emptyList()
+    }
 
     LazyColumn(
         modifier = modifier
@@ -127,18 +130,19 @@ fun GroupMemoriesScreen(
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = "Group Memories & Reel Hub",
+                            text = "Group Memories & AI Story",
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 17.sp
                             )
                         )
                         Text(
-                            text = "Collaborative Photos, Highlights & AI Reels",
+                            text = currentTrip?.title ?: "Trip Crew Photos & Journal",
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 11.sp
-                            )
+                            ),
+                            maxLines = 1
                         )
                     }
                 }
@@ -146,29 +150,28 @@ fun GroupMemoriesScreen(
                 Button(
                     onClick = { isAddDialogOpen = true },
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = OceanBlue),
-                    modifier = Modifier.testTag("memories_top_add_button")
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEC4899))
                 ) {
                     Icon(Icons.Default.AddAPhoto, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("+ Moment", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text("Add Photo", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
 
-        // Hero Group Reel Card
+        // Shared AI Story Reel Generator Card
         item {
             Card(
-                shape = RoundedCornerShape(22.dp),
-                colors = CardDefaults.cardColors(containerColor = Navy900),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(22.dp))
+                        .clip(RoundedCornerShape(20.dp))
                         .background(Brush.horizontalGradient(listOf(Navy900, PurpleAccent, OceanBlue)))
-                        .padding(20.dp)
+                        .padding(18.dp)
                 ) {
                     Column {
                         Row(
@@ -179,17 +182,17 @@ fun GroupMemoriesScreen(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Box(
                                     modifier = Modifier
-                                        .size(36.dp)
+                                        .size(34.dp)
                                         .clip(CircleShape)
-                                        .background(Color.White.copy(alpha = 0.2f)),
+                                        .background(AmberGold.copy(alpha = 0.25f)),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Icon(Icons.Default.MovieCreation, null, tint = AmberGold, modifier = Modifier.size(20.dp))
+                                    Icon(Icons.Default.AutoAwesome, null, tint = AmberGold, modifier = Modifier.size(18.dp))
                                 }
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Text(
-                                    text = "AI Group Trip Story & Reel",
-                                    style = MaterialTheme.typography.titleMedium.copy(
+                                    text = "AI Vacation Story Reel",
+                                    style = MaterialTheme.typography.titleSmall.copy(
                                         color = Color.White,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -199,7 +202,7 @@ fun GroupMemoriesScreen(
 
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
-                            text = "VoyageAI compiles all group photos, journal logs, and itinerary milestones into a shared cinematic travel recap.",
+                            text = "Marco compiles all group photos, journal logs, and itinerary milestones into a shared cinematic travel recap.",
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = Color.White.copy(alpha = 0.85f),
                                 fontSize = 12.sp
@@ -289,28 +292,42 @@ fun GroupMemoriesScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        items(travelers) { (name, role) ->
-                            Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = MaterialTheme.colorScheme.surfaceVariant,
-                                modifier = Modifier.width(130.dp)
-                            ) {
-                                Column(modifier = Modifier.padding(10.dp)) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(28.dp)
-                                            .clip(CircleShape)
-                                            .background(OceanBlue.copy(alpha = 0.2f)),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(Icons.Default.Person, null, tint = OceanBlue, modifier = Modifier.size(16.dp))
+                    if (travelers.isNotEmpty()) {
+                        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            items(travelers) { (name, role) ->
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = MaterialTheme.colorScheme.surfaceVariant,
+                                    modifier = Modifier.width(130.dp)
+                                ) {
+                                    Column(modifier = Modifier.padding(10.dp)) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(28.dp)
+                                                .clip(CircleShape)
+                                                .background(OceanBlue.copy(alpha = 0.2f)),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(Icons.Default.Person, null, tint = OceanBlue, modifier = Modifier.size(16.dp))
+                                        }
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                        Text(name, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                        Text(role, style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp))
                                     }
-                                    Spacer(modifier = Modifier.height(6.dp))
-                                    Text(name, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                                    Text(role, style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp))
                                 }
                             }
+                        }
+                    } else {
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "No crew members added yet. Upload photos with author names to populate your active roster.",
+                                style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant),
+                                modifier = Modifier.padding(10.dp)
+                            )
                         }
                     }
                 }

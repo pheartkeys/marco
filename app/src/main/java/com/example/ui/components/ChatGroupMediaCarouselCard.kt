@@ -37,42 +37,7 @@ fun ChatGroupMediaCarouselCard(
     modifier: Modifier = Modifier,
     onOpenFullMemories: () -> Unit = {}
 ) {
-    val displayMemories = if (memories.isNotEmpty()) {
-        memories
-    } else {
-        listOf(
-            GroupMemoryEntity(
-                tripId = 1L,
-                authorName = "Elena & Kids",
-                caption = "Sunset over Wailea Beach • Stroller accessible path!",
-                locationTag = "Wailea Promenade",
-                timestamp = "Today 6:45 PM",
-                photoGradientColor = 0xFFF97316,
-                likesCount = 5,
-                aiTag = "🌅 Golden Sunset"
-            ),
-            GroupMemoryEntity(
-                tripId = 1L,
-                authorName = "Marco Concierge",
-                caption = "Living Reef turtle sanctuary visit with zero stairs",
-                locationTag = "Maui Ocean Center",
-                timestamp = "Today 2:15 PM",
-                photoGradientColor = 0xFF0284C7,
-                likesCount = 4,
-                aiTag = "🐢 Marine Discovery"
-            ),
-            GroupMemoryEntity(
-                tripId = 1L,
-                authorName = "David",
-                caption = "Gluten-free seafood grill dinner on the ocean terrace",
-                locationTag = "Seascape Restaurant",
-                timestamp = "Yesterday",
-                photoGradientColor = 0xFF10B981,
-                likesCount = 6,
-                aiTag = "🥗 Allergen Safe Dining"
-            )
-        )
-    }
+    val displayMemories = memories
 
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -104,14 +69,14 @@ fun ChatGroupMediaCarouselCard(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFFEC4899).copy(alpha = 0.15f)),
+                            .background(Color(0xFFEC4899).copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Default.PhotoLibrary,
+                            imageVector = Icons.Default.Collections,
                             contentDescription = null,
                             tint = Color(0xFFEC4899),
-                            modifier = Modifier.size(22.dp)
+                            modifier = Modifier.size(20.dp)
                         )
                     }
 
@@ -173,16 +138,30 @@ fun ChatGroupMediaCarouselCard(
             Spacer(modifier = Modifier.height(14.dp))
 
             // Carousel List
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                displayMemories.forEach { memory ->
-                    MediaCardItem(
-                        memory = memory,
-                        onLike = { onLikeClick(memory) }
+            if (displayMemories.isNotEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    displayMemories.forEach { memory ->
+                        MediaCardItem(
+                            memory = memory,
+                            onLike = { onLikeClick(memory) }
+                        )
+                    }
+                }
+            } else {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "No group photos added yet. Tap '+' above to capture and share moments with your travel crew.",
+                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant),
+                        modifier = Modifier.padding(12.dp)
                     )
                 }
             }

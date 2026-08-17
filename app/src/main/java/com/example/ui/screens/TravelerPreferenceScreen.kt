@@ -277,7 +277,7 @@ fun LearnedDnaSection(
                         color = OceanBlue.copy(alpha = 0.15f)
                     ) {
                         Text(
-                            text = "${preference?.totalTripsAnalyzed ?: 2} Data Points Learned",
+                            text = "${preference?.totalTripsAnalyzed ?: 0} Data Points Learned",
                             style = MaterialTheme.typography.labelSmall.copy(color = OceanBlue, fontWeight = FontWeight.Bold),
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                         )
@@ -287,7 +287,7 @@ fun LearnedDnaSection(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
-                    text = preference?.learnedInsightsSummary ?: "Analyzing your past journeys and ratings...",
+                    text = preference?.learnedInsightsSummary ?: "Set up your preferences or plan your first journey to build your Traveler DNA profile.",
                     style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 20.sp, fontSize = 13.sp)
                 )
 
@@ -324,17 +324,42 @@ fun LearnedDnaSection(
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        val affinities = listOf(
-            AffinityItem("Morning Outdoor Scenery & Ramps", 96, EmeraldGreen, "Highly favored in past itineraries"),
-            AffinityItem("Spacious Multi-Bedroom Timeshares", 94, OceanBlue, "Consistently higher rating than standard rooms"),
-            AffinityItem("Delta SkyMiles & Partner Upgrades", 92, AmberGold, "Primary airline points redemption synergy"),
-            AffinityItem("Scenic High-Speed Rail & Glacier Trains", 90, TealAccent, "Preferred over driving rental cars"),
-            AffinityItem("Organic Farm-to-Table & Kids Menus", 88, Color(0xFFEC4899), "High dietary satisfaction score")
-        )
+        val affinities = if (preference != null && preference.totalTripsAnalyzed > 0) {
+            val list = mutableListOf<AffinityItem>()
+            if (preference.pacingPreference.isNotBlank()) {
+                list.add(AffinityItem(preference.pacingPreference, 95, EmeraldGreen, "Learned pacing profile"))
+            }
+            if (preference.preferredHotelTypes.isNotBlank()) {
+                list.add(AffinityItem(preference.preferredHotelTypes, 92, OceanBlue, "Preferred accommodation style"))
+            }
+            if (preference.preferredAirlines.isNotBlank()) {
+                list.add(AffinityItem(preference.preferredAirlines, 90, AmberGold, "Target airline loyalty programs"))
+            }
+            if (preference.dietaryPreferences.isNotBlank()) {
+                list.add(AffinityItem(preference.dietaryPreferences, 88, Color(0xFFEC4899), "Dietary & allergen safety parameters"))
+            }
+            list
+        } else {
+            emptyList()
+        }
 
-        affinities.forEach { item ->
-            AffinityScoreRow(item)
-            Spacer(modifier = Modifier.height(8.dp))
+        if (affinities.isNotEmpty()) {
+            affinities.forEach { item ->
+                AffinityScoreRow(item)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        } else {
+            Surface(
+                shape = RoundedCornerShape(14.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "No behavioral affinity data yet. Complete trips or rate past journeys to build your Traveler DNA.",
+                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant),
+                    modifier = Modifier.padding(14.dp)
+                )
+            }
         }
     }
 }
@@ -634,15 +659,15 @@ fun FeedbackAndRatingsSection(
     val scrollState = rememberScrollState()
     var isAddingNewFeedback by remember { mutableStateOf(false) }
 
-    var selectedTripId by remember { mutableStateOf(trips.firstOrNull()?.id ?: 1L) }
+    var selectedTripId by remember { mutableStateOf(trips.firstOrNull()?.id ?: 0L) }
     var rating by remember { mutableIntStateOf(5) }
-    var likedTags = remember { mutableStateListOf("Quiet villa kitchen", "Morning peaceful walks", "Stroller ramps") }
-    var dislikedTags = remember { mutableStateListOf("Midday heat / rush") }
-    var notes by remember { mutableStateOf("Loved the heated pool and smooth Delta flight. Would prefer more spacious suites on next trip.") }
+    var likedTags = remember { mutableStateListOf<String>() }
+    var dislikedTags = remember { mutableStateListOf<String>() }
+    var notes by remember { mutableStateOf("") }
 
     val presetLikedOptions = listOf(
-        "Oceanfront villa", "Spacious kitchen", "Scenic rail", "Delta upgrades",
-        "Stroller ramps", "Morning quiet walks", "Heated pool", "Organic food"
+        "Scenic views", "Spacious kitchen", "Scenic rail", "Flight upgrades",
+        "Step-free ramps", "Morning quiet walks", "Heated pool", "Organic dining"
     )
     val presetDislikedOptions = listOf(
         "Midday rush", "Too many stairs", "Long car drive", "Crowded venue", "High altitude wind"
@@ -945,9 +970,26 @@ fun ProactiveSuggestionsSection(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        suggestions.forEach { sug ->
-            ProactiveSuggestionCard(suggestion = sug, onPlanNow = { onSelectSuggestion(sug) })
-            Spacer(modifier = Modifier.height(12.dp))
+        if (suggestions.isNotEmpty()) {
+            suggestions.forEach { sug ->
+                ProactiveSuggestionCard(suggestion = sug, onPlanNow = { onSelectSuggestion(sug) })
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+        } else {
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("No Proactive Proposals Yet", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        "As you plan trips and save preferences, Gemini will automatically synthesize tailored vacation proposals matching your travel style.",
+                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    )
+                }
+            }
         }
     }
 }

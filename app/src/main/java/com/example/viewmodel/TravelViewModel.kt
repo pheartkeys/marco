@@ -418,35 +418,40 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
                         "Preferred Airlines: ${it.preferredAirlines}, Lodging: ${it.preferredHotelTypes}, Pacing: ${it.pacingPreference}, Style: ${it.preferredTravelStyle}"
                     } ?: "Smart Points & Luxury Timeshare Villas"
 
+                    val pref = repository.getUserPreferencesSync()
+                    val accessNeeds = pref?.wheelchairRequirements?.ifBlank { pref.sensoryAndMobilityNotes } ?: "Standard Access"
+                    val style = pref?.preferredTravelStyle?.ifBlank { "Personalized Expedition" } ?: "Personalized Expedition"
+                    val loyalty = listOfNotNull(pref?.preferredAirlines?.takeIf { it.isNotBlank() }, pref?.preferredHotelTypes?.takeIf { it.isNotBlank() }).joinToString(", ").ifBlank { "Points & Rewards" }
+
                     val genResult = geminiService.generateCustomItinerary(
                         destination = dest,
                         durationDays = 5,
-                        budget = 4200.0,
+                        budget = 3500.0,
                         currency = "USD",
                         adults = 2,
-                        children = 1,
-                        accessibilityNeeds = "Stroller friendly & step-free",
-                        travelStyle = "Smart Points & Luxury",
-                        pointsOrTimeshares = "Delta SkyMiles & RCI Timeshares",
+                        children = 0,
+                        accessibilityNeeds = accessNeeds,
+                        travelStyle = style,
+                        pointsOrTimeshares = loyalty,
                         userPreferencesSummary = prefSummary
                     )
 
                     // Create trip
                     val newTripId = repository.insertTrip(
                         TripEntity(
-                            title = "$dest Tailored Journey",
+                            title = "$dest Expedition",
                             destination = dest,
-                            countryCode = "INTL",
-                            startDate = "Upcoming Season",
-                            endDate = "5 Days Later",
-                            budgetTotal = 4200.0,
+                            countryCode = "US",
+                            startDate = "Day 1",
+                            endDate = "Day 5",
+                            budgetTotal = 3500.0,
                             budgetSpent = 0.0,
                             primaryCurrency = "USD",
-                            travelersCount = 3,
-                            childrenCount = 1,
-                            accessibilityRequirements = "Stroller friendly & step-free",
-                            travelStyle = "Smart Points & Luxury",
-                            timeshareExchangeDetails = "RCI Exchange Available",
+                            travelersCount = 2,
+                            childrenCount = 0,
+                            accessibilityRequirements = accessNeeds,
+                            travelStyle = style,
+                            timeshareExchangeDetails = "",
                             isOfflineSynced = true
                         )
                     )
@@ -459,13 +464,13 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
                             title = act.title,
                             category = act.category,
                             location = act.location,
-                            confirmationCode = "AI-RES-${(1000..9999).random()}",
+                            confirmationCode = "MARCO-${(1000..9999).random()}",
                             notes = act.notes,
                             cost = act.cost,
                             currency = "USD",
                             accessibilityBadge = act.accessibilityBadge,
                             vendorName = dest,
-                            vendorPhone = "+1-800-VOYAGE-AI",
+                            vendorPhone = "",
                             isCompleted = false
                         )
                     }
@@ -477,7 +482,7 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
                         ChatMessageEntity(
                             tripId = newTripId,
                             sender = "CARD_ITINERARY",
-                            text = "✨ **New Tailored Itinerary Generated for $dest!**\nCreated a 5-day journey personalized to your Traveler DNA (Delta SkyMiles, oceanfront suites, stroller-accessible morning pace). Expand below to explore your activities.",
+                            text = "✨ **New Tailored Itinerary Generated for $dest!**\nCreated a 5-day personalized itinerary matching your preferences and pacing. Expand below to explore your schedule.",
                             timestamp = System.currentTimeMillis()
                         )
                     )
@@ -499,11 +504,13 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
                 // Voice Call Dispatcher Intent
                 lower.contains("call") || lower.contains("phone") || lower.contains("front desk") || lower.contains("dispatch") -> {
                     _isConciergeTyping.value = false
+                    val currentTrip = allTrips.value.find { it.id == _selectedTripId.value } ?: allTrips.value.firstOrNull()
+                    val targetVendor = currentTrip?.destination?.let { "$it Lodging Front Desk" } ?: "Lodging Front Desk"
                     triggerVendorVoiceCall(
-                        vendorName = "Grand Champions Resort Front Desk",
+                        vendorName = targetVendor,
                         vendorCategory = "Resort & Hotel",
-                        inquiryTopic = "Verify heated pool operating hours, ADA lift, and late checkout",
-                        reservationRef = "RCI-WAIL-8832"
+                        inquiryTopic = "Verify check-in time, heated pool hours, and ADA accessible accommodations",
+                        reservationRef = ""
                     )
                 }
 

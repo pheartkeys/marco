@@ -1508,7 +1508,7 @@ fun ChatVoiceCallCard(
                             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = AmberGold, fontSize = 13.sp)
                         )
                         Text(
-                            text = callLog?.vendorName ?: "Grand Champions Front Desk",
+                            text = callLog?.vendorName ?: "Lodging Front Desk",
                             style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp)
                         )
                     }
@@ -1639,12 +1639,13 @@ fun ChatRewardsCard(
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
+                        val totalValuation = accounts.sumOf { it.rewardsEstimatedValuationUsd }
                         Text(
                             text = "Rewards & Timeshare Portfolio",
                             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 13.sp)
                         )
                         Text(
-                            text = "${accounts.size} Connected Accounts • $10,480 Est. Value",
+                            text = if (accounts.isNotEmpty()) "${accounts.size} Connected Accounts • $${totalValuation.toInt()} Est. Value" else "0 Connected Accounts • Link points & timeshares",
                             style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                     }
@@ -1658,38 +1659,52 @@ fun ChatRewardsCard(
             Spacer(modifier = Modifier.height(10.dp))
 
             // Account Badges Grid
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                accounts.take(4).forEach { acc ->
-                    Surface(
-                        shape = RoundedCornerShape(10.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+            if (accounts.isNotEmpty()) {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    accounts.take(4).forEach { acc ->
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            Column {
-                                Text(acc.providerName, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                                Text(acc.accountNumberMasked, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                            Column(horizontalAlignment = Alignment.End) {
-                                Text(
-                                    text = "${acc.balanceValue} ${acc.unitLabel}",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 12.sp,
-                                    color = OceanBlue
-                                )
-                                Text(
-                                    text = "≈ $${acc.rewardsEstimatedValuationUsd.toInt()}",
-                                    fontSize = 10.sp,
-                                    color = EmeraldGreen,
-                                    fontWeight = FontWeight.Bold
-                                )
+                            Row(
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column {
+                                    Text(acc.providerName, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                    Text(acc.accountNumberMasked, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                                Column(horizontalAlignment = Alignment.End) {
+                                    Text(
+                                        text = "${acc.balanceValue} ${acc.unitLabel}",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp,
+                                        color = OceanBlue
+                                    )
+                                    Text(
+                                        text = "≈ $${acc.rewardsEstimatedValuationUsd.toInt()}",
+                                        fontSize = 10.sp,
+                                        color = EmeraldGreen,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             }
                         }
                     }
+                }
+            } else {
+                Surface(
+                    shape = RoundedCornerShape(10.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "No loyalty or timeshare accounts linked yet. Link your Delta, Marriott, Hilton, or RCI accounts to optimize points.",
+                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant),
+                        modifier = Modifier.padding(12.dp)
+                    )
                 }
             }
 
@@ -1760,7 +1775,7 @@ fun ChatTravelerDnaCard(
                             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color(0xFF8B5CF6))
                         )
                         Text(
-                            text = "${preference?.totalTripsAnalyzed ?: 3} Journeys Analyzed",
+                            text = "${preference?.totalTripsAnalyzed ?: 0} Journeys Analyzed",
                             style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                     }
@@ -1780,7 +1795,7 @@ fun ChatTravelerDnaCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = preference?.learnedInsightsSummary ?: "Traveler values morning outdoor activities, Delta SkyMiles upgrades, and quiet oceanfront multi-bedroom timeshares with stroller access.",
+                    text = preference?.learnedInsightsSummary ?: "Set up your preferences or plan your first journey to build your Traveler DNA profile.",
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, lineHeight = 17.sp),
                     modifier = Modifier.padding(12.dp)
                 )
@@ -1903,7 +1918,7 @@ fun ChatOfflineSafetyCard(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "🏥 Nearest Pediatric & Trauma ER: Maui Memorial Medical Center (+1-808-244-9056)",
+                        text = "🏥 Emergency Medical Care: 24/7 Local Trauma ER & Regional Citizen Consular Services",
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -2521,7 +2536,7 @@ fun ChatFamilyAccessibilityCard(
                             .fillMaxWidth()
                             .clickable {
                                 onVerifyVendorAda(
-                                    trip?.destination ?: "Grand Champions Resort Front Desk",
+                                    trip?.title ?: "Lodging Front Desk",
                                     "Resort & Culinary",
                                     "Verify step-free wheelchair ramp, hydraulic ADA pool chair lift, and celiac-safe dedicated gluten-free kitchen"
                                 )

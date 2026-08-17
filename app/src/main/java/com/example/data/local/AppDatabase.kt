@@ -36,7 +36,7 @@ import com.example.data.model.WalletTransactionEntity
         WalletTransactionEntity::class,
         CurrencyRateEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -51,7 +51,7 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "voyage_ai_travel.db"
+                    "marco_travel.db"
                 ).fallbackToDestructiveMigration().build()
                 INSTANCE = instance
                 instance
