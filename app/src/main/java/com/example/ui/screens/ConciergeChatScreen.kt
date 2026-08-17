@@ -1,25 +1,13 @@
 package com.example.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,57 +17,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.AccountBalanceWallet
-import androidx.compose.material.icons.filled.Accessible
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AirplanemodeActive
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.ChildCare
-import androidx.compose.material.icons.filled.CloudDownload
-import androidx.compose.material.icons.filled.DeleteSweep
-import androidx.compose.material.icons.filled.DirectionsBus
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FlightTakeoff
-import androidx.compose.material.icons.filled.Hotel
-import androidx.compose.material.icons.filled.NaturePeople
-import androidx.compose.material.icons.filled.PhoneInTalk
-import androidx.compose.material.icons.filled.Psychology
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Restaurant
-import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.filled.VolumeUp
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -96,43 +36,12 @@ import com.example.data.model.TripActivityEntity
 import com.example.data.model.TripEntity
 import com.example.data.model.isTripInProgress
 import com.example.data.model.TripStatus
-import androidx.compose.material.icons.filled.Explore
-import androidx.compose.material.icons.filled.Navigation
-import androidx.compose.material.icons.filled.Sailing
-import androidx.compose.material.icons.filled.Settings
 import com.example.data.model.UserPreferenceEntity
 import com.example.data.model.VendorCallLogEntity
-import com.example.ui.components.CaravelSailingLoadingIndicator
-import com.example.ui.components.ChatBudgetTrackerWidget
-import com.example.ui.components.ChatEmergencySosCard
-import com.example.ui.components.ChatGroupMediaCarouselCard
-import com.example.ui.components.ChatItinerarySnippetCard
-import com.example.ui.components.ChatTravelLogCard
-import com.example.ui.components.ChatVintageParchmentMapCard
-import com.example.ui.components.ChatWeeklyBudgetSummaryCard
-import com.example.ui.components.ExplorerVoyageLoadingCard
-import com.example.ui.components.FamousTravelersQuotes
-import com.example.ui.components.MarcoAstrolabeLoadingAnimation
-import com.example.ui.components.MarcoConciergeTypingIndicator
-import com.example.ui.components.ItinerarySnippetDetailSheet
+import com.example.ui.components.*
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.MicOff
-import androidx.compose.material.icons.filled.HealthAndSafety
-import com.example.ui.theme.AmberGold
-import com.example.ui.theme.AntiqueBrass
-import com.example.ui.theme.CelestialLapis
-import com.example.ui.theme.EmeraldGreen
-import com.example.ui.theme.OceanBlue
-import com.example.ui.theme.ParchmentSand
-import com.example.ui.theme.SunsetCoral
-import com.example.ui.theme.TealAccent
-import com.example.ui.theme.TerracottaMap
-import com.example.ui.theme.VenetianGold
-import com.example.ui.theme.VenetianGoldDeep
-import com.example.ui.theme.VenetianGoldLight
-
+import com.example.ui.theme.*
 import com.example.viewmodel.TravelViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -148,9 +57,11 @@ fun ConciergeChatScreen(
     onOpenVendorCall: (vendorName: String, question: String) -> Unit = { _, _ -> },
     onOpenPreferences: () -> Unit = {},
     onOpenPlanTrip: () -> Unit = {},
-    onOpenAuth: () -> Unit = {}
+    onOpenAuth: () -> Unit = {},
+    onOpenOnboarding: () -> Unit = {}
 ) {
     val messages by viewModel.chatMessages.collectAsState()
+    val activeChatStreamTab by viewModel.activeChatStreamTab.collectAsState()
     val isTyping by viewModel.isConciergeTyping.collectAsState()
     val tripsList by viewModel.allTrips.collectAsState()
     val selectedTripId by viewModel.selectedTripId.collectAsState()
@@ -744,6 +655,93 @@ fun ConciergeChatScreen(
             }
         }
 
+        // DUAL CHAT STREAM TABS (1-on-1 Marco Concierge vs Travel Crew Stream)
+        Surface(
+            color = CartographySurface,
+            border = BorderStroke(1.dp, ContourBorderSubtle),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp),
+            shape = RoundedCornerShape(10.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                // Tab 0: 1-on-1 Marco Concierge
+                Surface(
+                    color = if (activeChatStreamTab == 0) NavigationalGold else Color.Transparent,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable { viewModel.setActiveChatStreamTab(0) }
+                ) {
+                    Row(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Explore,
+                            contentDescription = "Marco Concierge",
+                            tint = if (activeChatStreamTab == 0) CartographyDarkBase else NavigationalGold,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Marco Concierge",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = if (activeChatStreamTab == 0) CartographyDarkBase else TextAtlasPrimary
+                            )
+                        )
+                    }
+                }
+
+                // Tab 1: Travel Crew Stream
+                Surface(
+                    color = if (activeChatStreamTab == 1) MaritimeBlue else Color.Transparent,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable { viewModel.setActiveChatStreamTab(1) }
+                ) {
+                    Row(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.NaturePeople,
+                            contentDescription = "Travel Crew",
+                            tint = if (activeChatStreamTab == 1) Color.White else WaypointCyan,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Travel Crew Stream",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = if (activeChatStreamTab == 1) Color.White else TextAtlasPrimary
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+        val displayedMessages = remember(messages, activeChatStreamTab) {
+            if (activeChatStreamTab == 1) {
+                messages.filter { it.chatType.equals("GROUP", ignoreCase = true) }
+            } else {
+                messages.filter { it.chatType.equals("PRIVATE", ignoreCase = true) || it.chatType.isBlank() }
+            }
+        }
+
         // CHAT MESSAGE STREAM
         LazyColumn(
             state = listState,
@@ -754,40 +752,63 @@ fun ConciergeChatScreen(
             contentPadding = PaddingValues(vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            if (messages.isEmpty()) {
+            if (displayedMessages.isEmpty()) {
                 item {
                     Card(
                         shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)
+                        colors = CardDefaults.cardColors(containerColor = CartographyCard),
+                        border = BorderStroke(1.dp, ContourBorder),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Box(
-                                    modifier = Modifier.size(36.dp).clip(CircleShape).background(OceanBlue),
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(CircleShape)
+                                        .background(if (activeChatStreamTab == 1) MaritimeBlue else NavigationalGold),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Icon(Icons.Default.Explore, contentDescription = null, tint = VenetianGold, modifier = Modifier.size(20.dp))
+                                    Icon(
+                                        imageVector = if (activeChatStreamTab == 1) Icons.Default.NaturePeople else Icons.Default.Explore,
+                                        contentDescription = null,
+                                        tint = if (activeChatStreamTab == 1) Color.White else CartographyDarkBase,
+                                        modifier = Modifier.size(20.dp)
+                                    )
                                 }
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Column {
-                                    Text("Welcome to Marco Expeditions", fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                                    Text("Your 24/7 AI Travel Concierge", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(
+                                        text = if (activeChatStreamTab == 1) "Travel Crew Expedition Stream" else "Welcome to Marco Expeditions",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 15.sp,
+                                        color = TextAtlasPrimary
+                                    )
+                                    Text(
+                                        text = if (activeChatStreamTab == 1) "Shared channel with fellow travelers" else "Your 24/7 AI Travel Concierge",
+                                        fontSize = 12.sp,
+                                        color = TextAtlasSecondary
+                                    )
                                 }
                             }
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
-                                "I can research destinations, optimize loyalty points, assemble ADA & family-friendly itineraries, generate custom maps, and coordinate travel safety.\n\nType a message below or tap 'Plan New Trip' to begin.",
+                                text = if (activeChatStreamTab == 1)
+                                    "This is your shared group stream with Marco and your travel party. Everyone can post photos, request group-voted activities, and coordinate live meetups.\n\nTap '+' below to share a group memory photo!"
+                                else
+                                    "I can research destinations, optimize loyalty points, assemble ADA & family-friendly itineraries, generate custom maps, and coordinate travel safety.\n\nType a message below or tap 'Plan New Trip' to begin.",
                                 fontSize = 13.sp,
                                 lineHeight = 18.sp,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = TextAtlasPrimary
                             )
                         }
                     }
                 }
             }
 
-            items(messages, key = { it.id }) { msg ->
+            items(displayedMessages, key = { it.id }) { msg ->
                 when (msg.sender) {
                     "USER" -> {
                         UserMessageBubble(text = msg.text)
@@ -1012,6 +1033,35 @@ fun ConciergeChatScreen(
                         ChatEmergencySosCard(
                             message = msg,
                             trip = currentTrip,
+                            onPlayTts = { viewModel.playAudioTranscript(msg.text) }
+                        )
+                    }
+                    "CARD_PROACTIVE_DISRUPTION" -> {
+                        ChatProactiveDisruptionCard(
+                            message = msg,
+                            trip = currentTrip,
+                            onAutoRebook = {
+                                viewModel.sendChatMessage("Auto-rebooking confirmed for verified accessible indoor alternative.")
+                            },
+                            onPlayTts = { viewModel.playAudioTranscript(msg.text) }
+                        )
+                    }
+                    "CARD_JOURNEY_COMPLETED" -> {
+                        ChatJourneyCompletedCard(
+                            message = msg,
+                            trip = currentTrip,
+                            onSubmitRating = { pacing, lodging, dining, notes ->
+                                currentTrip?.let {
+                                    viewModel.submitPostTripRating(
+                                        tripId = it.id,
+                                        pacingRating = pacing,
+                                        lodgingRating = lodging,
+                                        diningRating = dining,
+                                        feedbackNotes = notes
+                                    )
+                                }
+                            },
+                            onOpenStoryReel = onOpenMemories,
                             onPlayTts = { viewModel.playAudioTranscript(msg.text) }
                         )
                     }
@@ -3090,6 +3140,344 @@ fun ChatDynamicAdjustmentCard(
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun ChatProactiveDisruptionCard(
+    message: ChatMessageEntity,
+    trip: TripEntity?,
+    onAutoRebook: () -> Unit,
+    onPlayTts: () -> Unit
+) {
+    var isRebooked by remember { mutableStateOf(false) }
+
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = CartographyCard),
+        border = androidx.compose.foundation.BorderStroke(1.5.dp, WaxSealCrimson),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(CircleShape)
+                            .background(WaxSealCrimson.copy(alpha = 0.15f))
+                            .border(1.dp, WaxSealCrimson, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Default.Shield, contentDescription = null, tint = WaxSealCrimson, modifier = Modifier.size(16.dp))
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column {
+                        Text(
+                            text = "REAL-TIME DISRUPTION RADAR",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = FontWeight.Black,
+                                color = WaxSealCrimson,
+                                letterSpacing = 1.sp
+                            )
+                        )
+                        Text(
+                            text = "Weather Alert & AI Rebooking",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = TextAtlasPrimary
+                            )
+                        )
+                    }
+                }
+                IconButton(onClick = onPlayTts) {
+                    Icon(Icons.Default.VolumeUp, contentDescription = "Listen", tint = NavigationalGold, modifier = Modifier.size(18.dp))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = CartographyDarkBase,
+                border = androidx.compose.foundation.BorderStroke(1.dp, ContourBorderSubtle),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text(
+                        text = "⚡ Thunderstorm & Wave Advisory Impacting Outdoor Activities",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = TerracottaStamp
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "✨ Verified AI Alternative: Indoor Living Reef Discovery Center & Cultural Gallery\n♿ 100% Step-Free & Stroller Ramp Access • 🥗 Allergen-Safe Kitchen Verified",
+                        style = MaterialTheme.typography.bodySmall.copy(color = TextAtlasSecondary)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            if (!isRebooked) {
+                Button(
+                    onClick = {
+                        isRebooked = true
+                        onAutoRebook()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = NavigationalGold,
+                        contentColor = CartographyDarkBase
+                    ),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("1-Tap AI Auto-Rebook Alternative", fontWeight = FontWeight.Bold)
+                }
+            } else {
+                Surface(
+                    shape = RoundedCornerShape(10.dp),
+                    color = WayfinderEmerald.copy(alpha = 0.15f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, WayfinderEmerald),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(10.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.Check, contentDescription = null, tint = WayfinderEmerald, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Itinerary Successfully Auto-Rebooked & Synced!",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = WayfinderEmerald
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ChatJourneyCompletedCard(
+    message: ChatMessageEntity,
+    trip: TripEntity?,
+    onSubmitRating: (pacing: Int, lodging: Int, dining: Int, notes: String) -> Unit,
+    onOpenStoryReel: () -> Unit,
+    onPlayTts: () -> Unit
+) {
+    var pacingScore by remember { mutableIntStateOf(5) }
+    var lodgingScore by remember { mutableIntStateOf(5) }
+    var diningScore by remember { mutableIntStateOf(5) }
+    var feedbackNotes by remember { mutableStateOf("") }
+    var isSubmitted by remember { mutableStateOf(false) }
+
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = CartographyCard),
+        border = androidx.compose.foundation.BorderStroke(1.5.dp, NavigationalGold),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(NavigationalGold.copy(alpha = 0.2f))
+                            .border(1.dp, NavigationalGold, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "🏁", fontSize = 18.sp)
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column {
+                        Text(
+                            text = "EXPEDITION COMPLETED",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = FontWeight.Black,
+                                color = NavigationalGold,
+                                letterSpacing = 1.sp
+                            )
+                        )
+                        Text(
+                            text = "${trip?.destination ?: "Journey"} Celebration",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = TextAtlasPrimary
+                            )
+                        )
+                    }
+                }
+                IconButton(onClick = onPlayTts) {
+                    Icon(Icons.Default.VolumeUp, contentDescription = "Listen", tint = NavigationalGold, modifier = Modifier.size(18.dp))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Action: View AI Story Reel
+            OutlinedButton(
+                onClick = onOpenStoryReel,
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = WaypointCyan),
+                border = androidx.compose.foundation.BorderStroke(1.dp, WaypointCyan),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Default.Favorite, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("🎬 View AI Vacation Story Reel & Photos", fontWeight = FontWeight.Bold)
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+            Divider(color = ContourBorderSubtle)
+            Spacer(modifier = Modifier.height(14.dp))
+
+            Text(
+                text = "Evolve Traveler DNA (3-Question Rating)",
+                style = MaterialTheme.typography.titleSmall.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = NavigationalGold
+                )
+            )
+            Text(
+                text = "Your feedback automatically refines future pacing, lodging, and dietary choices.",
+                style = MaterialTheme.typography.bodySmall.copy(color = TextAtlasSecondary)
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Question 1: Daily Pacing
+            RatingRowSelector(
+                label = "1. Daily Pacing & Cadence",
+                score = pacingScore,
+                onScoreChange = { pacingScore = it }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Question 2: Lodging & Villa Quality
+            RatingRowSelector(
+                label = "2. Lodging & Accessibility",
+                score = lodgingScore,
+                onScoreChange = { lodgingScore = it }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Question 3: Dining & Culinary Safety
+            RatingRowSelector(
+                label = "3. Dining & Allergen Safety",
+                score = diningScore,
+                onScoreChange = { diningScore = it }
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            OutlinedTextField(
+                value = feedbackNotes,
+                onValueChange = { feedbackNotes = it },
+                placeholder = { Text("What did you love or what should Marco adjust?", fontSize = 12.sp, color = TextAtlasSubtle) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = NavigationalGold,
+                    unfocusedBorderColor = ContourBorder,
+                    focusedTextColor = TextAtlasPrimary,
+                    unfocusedTextColor = TextAtlasPrimary
+                ),
+                shape = RoundedCornerShape(8.dp),
+                maxLines = 3
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            if (!isSubmitted) {
+                Button(
+                    onClick = {
+                        isSubmitted = true
+                        onSubmitRating(pacingScore, lodgingScore, diningScore, feedbackNotes)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = NavigationalGold,
+                        contentColor = CartographyDarkBase
+                    ),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("🌟 Submit Ratings & Retrain AI DNA", fontWeight = FontWeight.Bold)
+                }
+            } else {
+                Surface(
+                    shape = RoundedCornerShape(10.dp),
+                    color = WayfinderEmerald.copy(alpha = 0.15f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, WayfinderEmerald),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(10.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.Check, contentDescription = null, tint = WayfinderEmerald, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Traveler DNA Successfully Updated!",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = WayfinderEmerald
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RatingRowSelector(
+    label: String,
+    score: Int,
+    onScoreChange: (Int) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = label, style = MaterialTheme.typography.bodySmall.copy(color = TextAtlasPrimary))
+        Row {
+            for (i in 1..5) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "$i Stars",
+                    tint = if (i <= score) NavigationalGold else ContourBorder,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clickable { onScoreChange(i) }
+                        .padding(2.dp)
+                )
             }
         }
     }

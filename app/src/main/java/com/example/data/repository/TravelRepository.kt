@@ -40,6 +40,8 @@ class TravelRepository(private val travelDao: TravelDao) {
     fun getFeedbacksForTrip(tripId: Long): Flow<List<TripFeedbackEntity>> = travelDao.getFeedbacksForTrip(tripId)
     fun getWalletBalancesForTrip(tripId: Long): Flow<List<WalletBalanceEntity>> = travelDao.getWalletBalancesForTrip(tripId)
     fun getWalletTransactionsForTrip(tripId: Long): Flow<List<WalletTransactionEntity>> = travelDao.getWalletTransactionsForTrip(tripId)
+    fun getChatMessagesByType(chatType: String): Flow<List<ChatMessageEntity>> = travelDao.getChatMessagesByType(chatType)
+    fun getChatMessagesByTripAndType(tripId: Long, chatType: String): Flow<List<ChatMessageEntity>> = travelDao.getChatMessagesByTripAndType(tripId, chatType)
 
     suspend fun getUserPreferencesSync(): UserPreferenceEntity? = travelDao.getUserPreferencesSync()
     suspend fun saveUserPreferences(preferences: UserPreferenceEntity) = travelDao.insertOrUpdateUserPreferences(preferences)

@@ -36,7 +36,7 @@ import com.example.data.model.WalletTransactionEntity
         WalletTransactionEntity::class,
         CurrencyRateEntity::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

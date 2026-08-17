@@ -21,6 +21,8 @@ data class TripEntity(
     val familyAgeBrackets: String = "",
     val travelStyle: String = "",
     val timeshareExchangeDetails: String = "",
+    val departureAirport: String = "",
+    val destinationAirport: String = "",
     val isOfflineSynced: Boolean = true,
     val lastSyncedTimestamp: Long = System.currentTimeMillis(),
     val heroThemeIndex: Int = 0,
@@ -173,7 +175,10 @@ data class ChatMessageEntity(
     val text: String,
     val timestamp: Long = System.currentTimeMillis(),
     val actionChipText: String = "",
-    val suggestedActionJson: String = ""
+    val suggestedActionJson: String = "",
+    val chatType: String = "PRIVATE", // "PRIVATE" (1-on-1 with Marco) or "GROUP" (Travel Crew stream)
+    val authorName: String = "Marco Concierge",
+    val mediaUrl: String = ""
 )
 
 @Entity(tableName = "user_preferences")
@@ -192,6 +197,7 @@ data class UserPreferenceEntity(
     val preferredClimate: String = "",
     val learnedInsightsSummary: String = "Set up your preferences or plan your first journey to build your AI Traveler DNA profile.",
     val totalTripsAnalyzed: Int = 0,
+    val onboardingCompleted: Boolean = false,
     val lastUpdatedTimestamp: Long = System.currentTimeMillis()
 )
 

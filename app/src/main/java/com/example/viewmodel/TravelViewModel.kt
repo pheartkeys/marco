@@ -124,6 +124,14 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
     private val _memories = MutableStateFlow<List<GroupMemoryEntity>>(emptyList())
     val memories: StateFlow<List<GroupMemoryEntity>> = _memories.asStateFlow()
 
+    // Dual Chat Streams (0 = Private 1-on-1 Marco, 1 = Travel Crew Group)
+    private val _activeChatStreamTab = MutableStateFlow(0)
+    val activeChatStreamTab: StateFlow<Int> = _activeChatStreamTab.asStateFlow()
+
+    fun setActiveChatStreamTab(tab: Int) {
+        _activeChatStreamTab.value = tab
+    }
+
     // Chat messages
     val chatMessages: StateFlow<List<ChatMessageEntity>> = repository.chatMessages
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -382,13 +390,17 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
             val tripId = _selectedTripId.value
             val lower = userText.lowercase().trim()
 
+            val targetChatType = if (_activeChatStreamTab.value == 1) "GROUP" else "PRIVATE"
+
             // 1. Insert user message
             repository.insertChatMessage(
                 ChatMessageEntity(
                     tripId = tripId,
                     sender = "USER",
                     text = userText,
-                    timestamp = System.currentTimeMillis()
+                    timestamp = System.currentTimeMillis(),
+                    chatType = targetChatType,
+                    authorName = "You"
                 )
             )
 
@@ -1644,6 +1656,18 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
             if (updated != null) {
                 cloudSyncManager.syncTripToCloud(updated)
             }
+            if (status.equals("IN_PROGRESS", ignoreCase = true)) {
+                repository.insertChatMessage(
+                    ChatMessageEntity(
+                        tripId = tripId,
+                        sender = "CONCIERGE_AI",
+                        text = "🧭 **Expedition to ${updated?.destination ?: "Destination"} is now LIVE!**\nEmergency SOS, offline safety radar, and live daily pacing cockpit are enabled.",
+                        timestamp = System.currentTimeMillis(),
+                        chatType = "PRIVATE",
+                        authorName = "Marco Concierge"
+                    )
+                )
+            }
         }
     }
 
@@ -1739,6 +1763,229 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
             withContext(Dispatchers.Main) {
                 onComplete?.invoke(success)
             }
+        }
+    }
+
+    /**
+     * Complete Guided 3-Step Setup Wizard
+     */
+    fun completeOnboarding(
+        travelStyle: String,
+        pacing: String,
+        activityLevel: String,
+        wheelchair: String,
+        dietary: String,
+        family: String,
+        sensory: String,
+        preferredAirlines: String,
+        preferredHotelTypes: String,
+        onComplete: () -> Unit = {}
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val summary = "Expedition DNA Profile: $travelStyle ($pacing pace). Accessibility & Dietary: ${listOfNotNull(wheelchair.takeIf { it.isNotBlank() }, dietary.takeIf { it.isNotBlank() }, family.takeIf { it.isNotBlank() }).joinToString(", ")}. Preferred Loyalty: ${listOfNotNull(preferredAirlines.takeIf { it.isNotBlank() }, preferredHotelTypes.takeIf { it.isNotBlank() }).joinToString(", ")}."
+            val updated = com.example.data.model.UserPreferenceEntity(
+                id = 1,
+                preferredAirlines = preferredAirlines,
+                preferredHotelTypes = preferredHotelTypes,
+                activityLevel = activityLevel,
+                preferredTravelStyle = travelStyle,
+                dietaryPreferences = dietary,
+                wheelchairRequirements = wheelchair,
+                familyAgeBrackets = family,
+                sensoryAndMobilityNotes = sensory,
+                pacingPreference = pacing,
+                learnedInsightsSummary = summary,
+                totalTripsAnalyzed = 0,
+                onboardingCompleted = true,
+                lastUpdatedTimestamp = System.currentTimeMillis()
+            )
+            repository.saveUserPreferences(updated)
+
+            // Add personalized greeting in chat
+            repository.insertChatMessage(
+                ChatMessageEntity(
+                    tripId = 0,
+                    sender = "CONCIERGE_AI",
+                    text = "🧭 **Welcome to Marco Expeditions!**\nYour baseline Traveler DNA is initialized ($travelStyle • $pacing • $activityLevel).\n\nAsk me to plan a custom journey, optimize your rewards points, or review offline cartography.",
+                    timestamp = System.currentTimeMillis(),
+                    chatType = "PRIVATE",
+                    authorName = "Marco Concierge"
+                )
+            )
+
+            withContext(Dispatchers.Main) {
+                onComplete()
+            }
+        }
+    }
+
+    /**
+     * Seamless On-Trip Status Transition (Date-aware + Proximity)
+     */
+    fun checkAndAutoTransitionTripStatus() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val tripsList = repository.allTrips.firstOrNull() ?: emptyList()
+            for (trip in tripsList) {
+                if (trip.status.equals("COMPLETED", ignoreCase = true)) continue
+                if (trip.isTripInProgress() && !trip.status.equals("IN_PROGRESS", ignoreCase = true)) {
+                    repository.updateTripStatus(trip.id, "IN_PROGRESS")
+                    repository.insertChatMessage(
+                        ChatMessageEntity(
+                            tripId = trip.id,
+                            sender = "CONCIERGE_AI",
+                            text = "🧭 **Live Expedition Mode Activated for ${trip.destination}!**\nToday's live schedule, emergency SOS beacon, and multi-currency ledger are now active in your top cockpit.",
+                            timestamp = System.currentTimeMillis(),
+                            chatType = "PRIVATE",
+                            authorName = "Marco Concierge"
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Proactive Disruption Rebooking Trigger
+     */
+    fun triggerProactiveDisruptionAlert(
+        tripId: Long,
+        triggerReason: String = "Severe weather / thunderstorm alert during afternoon outdoor activity",
+        impactedActivity: String = "Outdoor Snorkel / Summit Hike",
+        suggestedAlternative: String = "Indoor Cultural Discovery & Living Reef Aquarium (100% ADA Ramp & Sensory Friendly)",
+        costDiff: Double = -20.0
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val alertJson = """
+                {
+                    "triggerReason": "$triggerReason",
+                    "impactedActivity": "$impactedActivity",
+                    "suggestedAlternative": "$suggestedAlternative",
+                    "costDifference": $costDiff,
+                    "accessibility": "♿ 100% Step-Free & Stroller Ramp Access",
+                    "dietary": "🥗 Verified Dedicated Kitchen Safety"
+                }
+            """.trimIndent()
+
+            val targetChatType = if (_activeChatStreamTab.value == 1) "GROUP" else "PRIVATE"
+            repository.insertChatMessage(
+                ChatMessageEntity(
+                    tripId = tripId,
+                    sender = "CARD_PROACTIVE_DISRUPTION",
+                    text = "⚠️ **Real-Time Weather Disruption & Auto-Rebooking Proposal**\n$triggerReason impacted '$impactedActivity'. Tap below to 1-tap auto-rebook with verified accessible indoor alternative.",
+                    suggestedActionJson = alertJson,
+                    actionChipText = "1-Tap AI Auto-Rebook",
+                    timestamp = System.currentTimeMillis(),
+                    chatType = targetChatType,
+                    authorName = "Marco Concierge"
+                )
+            )
+        }
+    }
+
+    /**
+     * Post-Trip Celebration & 3-Question DNA Learning Loop
+     */
+    fun markTripCompleted(tripId: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val trip = repository.getTripById(tripId).firstOrNull() ?: return@launch
+            repository.updateTripStatus(tripId, "COMPLETED")
+
+            repository.insertChatMessage(
+                ChatMessageEntity(
+                    tripId = tripId,
+                    sender = "CARD_JOURNEY_COMPLETED",
+                    text = "🏁 **Expedition to ${trip.destination} Completed!**\nCongratulations on completing your journey! Review your shared vacation story reel and rate your experience below to refine your Traveler DNA for upcoming journeys.",
+                    timestamp = System.currentTimeMillis(),
+                    chatType = "PRIVATE",
+                    authorName = "Marco Concierge"
+                )
+            )
+        }
+    }
+
+    fun submitPostTripRating(
+        tripId: Long,
+        pacingRating: Int,
+        lodgingRating: Int,
+        diningRating: Int,
+        feedbackNotes: String
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val trip = repository.getTripById(tripId).firstOrNull()
+            val dest = trip?.destination ?: "Recent Expedition"
+            val title = trip?.title ?: "Past Trip"
+            val avgRating = ((pacingRating + lodgingRating + diningRating) / 3.0).toInt().coerceIn(1, 5)
+
+            val takeaway = buildString {
+                append("AI DNA Learned: ")
+                if (pacingRating >= 4) append("Pacing cadence confirmed optimal. ") else append("Adjust future days with longer recovery pauses. ")
+                if (lodgingRating >= 4) append("Accommodation style matched preferences. ") else append("Prioritize higher-tier suites/kitchens on next booking. ")
+                if (diningRating >= 4) append("Culinary & allergen standards verified safe.") else append("Expand allergen-safe screening radius.")
+            }
+
+            repository.insertTripFeedback(
+                com.example.data.model.TripFeedbackEntity(
+                    tripId = tripId,
+                    tripTitle = title,
+                    destination = dest,
+                    rating = avgRating,
+                    likedAspects = "Pacing: $pacingRating/5, Lodging: $lodgingRating/5, Dining: $diningRating/5",
+                    dislikedAspects = if (avgRating < 4) feedbackNotes else "",
+                    feedbackNotes = feedbackNotes,
+                    dateSubmitted = "Today",
+                    learnedActionableTakeaway = takeaway
+                )
+            )
+
+            // Retrain preferences
+            val currentPref = repository.getUserPreferencesSync() ?: com.example.data.model.UserPreferenceEntity()
+            val updatedCount = currentPref.totalTripsAnalyzed + 1
+            val updatedSummary = "AI Learned DNA ($updatedCount Expeditions): Traveler values verified step-free accessibility, optimal morning pacing, and rewards transfer sweet spots. $takeaway"
+            repository.saveUserPreferences(
+                currentPref.copy(
+                    totalTripsAnalyzed = updatedCount,
+                    learnedInsightsSummary = updatedSummary,
+                    lastUpdatedTimestamp = System.currentTimeMillis()
+                )
+            )
+
+            repository.insertChatMessage(
+                ChatMessageEntity(
+                    tripId = tripId,
+                    sender = "CONCIERGE_AI",
+                    text = "🌟 **Traveler DNA Model Retrained!**\nIncorporated your ratings ($takeaway) into all future proactive recommendations.",
+                    timestamp = System.currentTimeMillis(),
+                    chatType = "PRIVATE",
+                    authorName = "Marco Concierge"
+                )
+            )
+        }
+    }
+
+    fun sendGroupPhotoMemory(caption: String, locationTag: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val tripId = _selectedTripId.value
+            val memory = GroupMemoryEntity(
+                tripId = tripId,
+                authorName = "You",
+                caption = caption,
+                locationTag = locationTag,
+                timestamp = "Just now",
+                likesCount = 0,
+                aiTag = "📸 Shared Memory"
+            )
+            repository.insertMemory(memory)
+
+            repository.insertChatMessage(
+                ChatMessageEntity(
+                    tripId = tripId,
+                    sender = "USER",
+                    text = "📸 Posted memory: \"$caption\" at $locationTag",
+                    timestamp = System.currentTimeMillis(),
+                    chatType = "GROUP",
+                    authorName = "You"
+                )
+            )
         }
     }
 

@@ -23,6 +23,7 @@ import com.example.viewmodel.TravelViewModel
 
 object AppRoutes {
     const val CHAT = "chat"
+    const val ONBOARDING = "onboarding"
     const val SETTINGS = "settings"
     const val WALLET = "wallet"
     const val LOYALTY_MANAGEMENT = "loyalty_management"
@@ -79,6 +80,18 @@ fun MainAppScreen(
                 ) + fadeOut(animationSpec = tween(350))
             }
         ) {
+            // Guided Onboarding Setup Wizard
+            composable(route = AppRoutes.ONBOARDING) {
+                OnboardingWizardScreen(
+                    viewModel = viewModel,
+                    onOnboardingComplete = {
+                        navController.navigate(AppRoutes.CHAT) {
+                            popUpTo(AppRoutes.ONBOARDING) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
             // Main Chat Screen
             composable(route = AppRoutes.CHAT) {
                 ConciergeChatScreen(
@@ -95,7 +108,8 @@ fun MainAppScreen(
                     },
                     onOpenPreferences = { navController.navigate(AppRoutes.PREFERENCES) },
                     onOpenPlanTrip = { navController.navigate(AppRoutes.PLAN_TRIP) },
-                    onOpenAuth = { navController.navigate(AppRoutes.SIGN_IN) }
+                    onOpenAuth = { navController.navigate(AppRoutes.SIGN_IN) },
+                    onOpenOnboarding = { navController.navigate(AppRoutes.ONBOARDING) }
                 )
             }
 
@@ -130,8 +144,8 @@ fun MainAppScreen(
                         }
                     },
                     onAuthSuccess = {
-                        navController.navigate(AppRoutes.CHAT) {
-                            popUpTo(AppRoutes.CHAT) { inclusive = true }
+                        navController.navigate(AppRoutes.ONBOARDING) {
+                            popUpTo(AppRoutes.SIGN_UP) { inclusive = true }
                         }
                     },
                     onNavigateBack = {

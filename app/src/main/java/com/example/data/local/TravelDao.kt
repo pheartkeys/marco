@@ -143,6 +143,12 @@ interface TravelDao {
     @Query("SELECT * FROM chat_messages ORDER BY timestamp ASC")
     fun getChatMessages(): Flow<List<ChatMessageEntity>>
 
+    @Query("SELECT * FROM chat_messages WHERE chatType = :chatType ORDER BY timestamp ASC")
+    fun getChatMessagesByType(chatType: String): Flow<List<ChatMessageEntity>>
+
+    @Query("SELECT * FROM chat_messages WHERE tripId = :tripId AND chatType = :chatType ORDER BY timestamp ASC")
+    fun getChatMessagesByTripAndType(tripId: Long, chatType: String): Flow<List<ChatMessageEntity>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertChatMessage(message: ChatMessageEntity): Long
 
