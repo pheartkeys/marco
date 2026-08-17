@@ -196,47 +196,13 @@ fun ConciergeChatScreen(
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = "Marco",
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.ExtraBold,
-                                    fontSize = 18.sp,
-                                    letterSpacing = 0.5.sp,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Surface(
-                                shape = RoundedCornerShape(4.dp),
-                                color = VenetianGold.copy(alpha = 0.18f)
-                            ) {
-                                Text(
-                                    text = "EXPEDITIONS",
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        fontSize = 9.sp,
-                                        fontWeight = FontWeight.Black,
-                                        letterSpacing = 1.sp,
-                                        color = VenetianGold
-                                    ),
-                                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(5.dp))
-                            // Pulsing green live indicator
-                            Box(
-                                modifier = Modifier
-                                    .size(7.dp)
-                                    .clip(CircleShape)
-                                    .background(EmeraldGreen)
-                            )
-                        }
                         Text(
-                            text = if (firebaseUser != null) "Cloud Synced • Live" else "24/7 AI Concierge",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize = 10.sp,
-                                color = EmeraldGreen,
-                                fontWeight = FontWeight.SemiBold
+                            text = "Marco",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 18.sp,
+                                letterSpacing = 0.5.sp,
+                                color = TextAtlasPrimary
                             )
                         )
                     }
@@ -573,73 +539,6 @@ fun ConciergeChatScreen(
                     }
                 }
             }
-        } else {
-            Surface(
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Card(
-                    shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .clickable { onOpenPlanTrip() }
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 14.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(34.dp)
-                                    .clip(CircleShape)
-                                    .background(OceanBlue),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.FlightTakeoff,
-                                    contentDescription = null,
-                                    tint = VenetianGold,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-                            Column {
-                                Text(
-                                    text = "Plan Your Next Expedition",
-                                    style = MaterialTheme.typography.labelMedium.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 13.sp,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                )
-                                Text(
-                                    text = "Tap here to create a custom AI itinerary",
-                                    style = MaterialTheme.typography.bodySmall.copy(
-                                        fontSize = 11.sp,
-                                        color = OceanBlue
-                                    )
-                                )
-                            }
-                        }
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Plan Trip",
-                            tint = OceanBlue,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-            }
         }
 
         // Offline Banner if active
@@ -656,7 +555,7 @@ fun ConciergeChatScreen(
             }
         }
 
-        // DUAL CHAT STREAM TABS (1-on-1 Marco Concierge vs Travel Crew Stream)
+        // DUAL CHAT STREAM TABS (Marco vs Travel Crew)
         Surface(
             color = CartographySurface,
             border = BorderStroke(1.dp, ContourBorderSubtle),
@@ -671,7 +570,7 @@ fun ConciergeChatScreen(
                     .padding(4.dp),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                // Tab 0: 1-on-1 Marco Concierge
+                // Tab 0: Marco
                 Surface(
                     color = if (activeChatStreamTab == 0) NavigationalGold else Color.Transparent,
                     shape = RoundedCornerShape(8.dp),
@@ -687,13 +586,13 @@ fun ConciergeChatScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Explore,
-                            contentDescription = "Marco Concierge",
+                            contentDescription = "Marco",
                             tint = if (activeChatStreamTab == 0) CartographyDarkBase else NavigationalGold,
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "Marco Concierge",
+                            text = "Marco",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = if (activeChatStreamTab == 0) CartographyDarkBase else TextAtlasPrimary
@@ -702,7 +601,7 @@ fun ConciergeChatScreen(
                     }
                 }
 
-                // Tab 1: Travel Crew Stream
+                // Tab 1: Travel Crew
                 Surface(
                     color = if (activeChatStreamTab == 1) MaritimeBlue else Color.Transparent,
                     shape = RoundedCornerShape(8.dp),
@@ -724,7 +623,7 @@ fun ConciergeChatScreen(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "Travel Crew Stream",
+                            text = "Travel Crew",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = if (activeChatStreamTab == 1) Color.White else TextAtlasPrimary
@@ -782,24 +681,19 @@ fun ConciergeChatScreen(
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Column {
                                     Text(
-                                        text = if (activeChatStreamTab == 1) "Travel Crew Expedition Stream" else "Welcome to Marco Expeditions",
+                                        text = if (activeChatStreamTab == 1) "Travel Crew" else "Marco",
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 15.sp,
                                         color = TextAtlasPrimary
-                                    )
-                                    Text(
-                                        text = if (activeChatStreamTab == 1) "Shared channel with fellow travelers" else "Your 24/7 AI Travel Concierge",
-                                        fontSize = 12.sp,
-                                        color = TextAtlasSecondary
                                     )
                                 }
                             }
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
                                 text = if (activeChatStreamTab == 1)
-                                    "This is your shared group stream with Marco and your travel party. Everyone can post photos, request group-voted activities, and coordinate live meetups.\n\nTap '+' below to share a group memory photo!"
+                                    "Coordinate activities, share trip memories, and plan with your travel party.\n\nTap '+' below to share a group photo."
                                 else
-                                    "I can research destinations, optimize loyalty points, assemble ADA & family-friendly itineraries, generate custom maps, and coordinate travel safety.\n\nType a message below or tap 'Plan New Trip' to begin.",
+                                    "Research destinations, check loyalty rewards, arrange accessible itineraries, and coordinate travel safety.\n\nType a message or tap '+' below to begin.",
                                 fontSize = 13.sp,
                                 lineHeight = 18.sp,
                                 color = TextAtlasPrimary
@@ -1149,9 +1043,9 @@ fun ConciergeChatScreen(
                             if (inputText.isEmpty()) {
                                 Text(
                                     text = if (activeChatStreamTab == 1)
-                                        "Message crew or ask Marco for group ideas..."
+                                        "Message travel crew..."
                                     else
-                                        "Message AI or ask 'Plan trip to Tokyo'...",
+                                        "Message Marco or plan a trip...",
                                     style = MaterialTheme.typography.bodyMedium.copy(
                                         color = TextAtlasSubtle,
                                         fontSize = 14.sp
@@ -1290,7 +1184,7 @@ fun ConciergeChatScreen(
                     .padding(20.dp)
             ) {
                 Text(
-                    text = "Quick AI Travel Actions",
+                    text = "Quick Actions",
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -3226,7 +3120,7 @@ fun ChatProactiveDisruptionCard(
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
-                            text = "REAL-TIME DISRUPTION RADAR",
+                            text = "DISRUPTION ALERT",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Black,
                                 color = WaxSealCrimson,
@@ -3234,7 +3128,7 @@ fun ChatProactiveDisruptionCard(
                             )
                         )
                         Text(
-                            text = "Weather Alert & AI Rebooking",
+                            text = "Weather Advisory & Alternative",
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = TextAtlasPrimary
@@ -3265,7 +3159,7 @@ fun ChatProactiveDisruptionCard(
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = "✨ Verified AI Alternative: Indoor Living Reef Discovery Center & Cultural Gallery\n♿ 100% Step-Free & Stroller Ramp Access • 🥗 Allergen-Safe Kitchen Verified",
+                        text = "✨ Verified Alternative: Indoor Living Reef Discovery Center & Cultural Gallery\n♿ 100% Step-Free & Stroller Ramp Access • 🥗 Allergen-Safe Kitchen Verified",
                         style = MaterialTheme.typography.bodySmall.copy(color = TextAtlasSecondary)
                     )
                 }
@@ -3288,7 +3182,7 @@ fun ChatProactiveDisruptionCard(
                 ) {
                     Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("1-Tap AI Auto-Rebook Alternative", fontWeight = FontWeight.Bold)
+                    Text("Rebook Alternative", fontWeight = FontWeight.Bold)
                 }
             } else {
                 Surface(
@@ -3305,7 +3199,7 @@ fun ChatProactiveDisruptionCard(
                         Icon(Icons.Default.Check, contentDescription = null, tint = WayfinderEmerald, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "Itinerary Successfully Auto-Rebooked & Synced!",
+                            text = "Itinerary Successfully Rebooked & Synced!",
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = WayfinderEmerald
@@ -3358,7 +3252,7 @@ fun ChatJourneyCompletedCard(
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
-                            text = "EXPEDITION COMPLETED",
+                            text = "JOURNEY COMPLETED",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Black,
                                 color = NavigationalGold,
@@ -3366,7 +3260,7 @@ fun ChatJourneyCompletedCard(
                             )
                         )
                         Text(
-                            text = "${trip?.destination ?: "Journey"} Celebration",
+                            text = "${trip?.destination ?: "Trip"} Summary",
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = TextAtlasPrimary
@@ -3381,7 +3275,7 @@ fun ChatJourneyCompletedCard(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Action: View AI Story Reel
+            // Action: View Story Reel
             OutlinedButton(
                 onClick = onOpenStoryReel,
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = WaypointCyan),
@@ -3391,7 +3285,7 @@ fun ChatJourneyCompletedCard(
             ) {
                 Icon(Icons.Default.Favorite, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("🎬 View AI Vacation Story Reel & Photos", fontWeight = FontWeight.Bold)
+                Text("🎬 View Story Reel & Photos", fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -3399,14 +3293,14 @@ fun ChatJourneyCompletedCard(
             Spacer(modifier = Modifier.height(14.dp))
 
             Text(
-                text = "Evolve Traveler DNA (3-Question Rating)",
+                text = "Rate Your Experience",
                 style = MaterialTheme.typography.titleSmall.copy(
                     fontWeight = FontWeight.Bold,
                     color = NavigationalGold
                 )
             )
             Text(
-                text = "Your feedback automatically refines future pacing, lodging, and dietary choices.",
+                text = "Your feedback helps personalize future trip recommendations.",
                 style = MaterialTheme.typography.bodySmall.copy(color = TextAtlasSecondary)
             )
 
@@ -3442,7 +3336,7 @@ fun ChatJourneyCompletedCard(
             OutlinedTextField(
                 value = feedbackNotes,
                 onValueChange = { feedbackNotes = it },
-                placeholder = { Text("What did you love or what should Marco adjust?", fontSize = 12.sp, color = TextAtlasSubtle) },
+                placeholder = { Text("What did you love or what should be adjusted next time?", fontSize = 12.sp, color = TextAtlasSubtle) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = NavigationalGold,
@@ -3471,7 +3365,7 @@ fun ChatJourneyCompletedCard(
                 ) {
                     Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("🌟 Submit Ratings & Retrain AI DNA", fontWeight = FontWeight.Bold)
+                    Text("Submit Feedback", fontWeight = FontWeight.Bold)
                 }
             } else {
                 Surface(
@@ -3488,7 +3382,7 @@ fun ChatJourneyCompletedCard(
                         Icon(Icons.Default.Check, contentDescription = null, tint = WayfinderEmerald, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "Traveler DNA Successfully Updated!",
+                            text = "Feedback Saved!",
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = WayfinderEmerald
