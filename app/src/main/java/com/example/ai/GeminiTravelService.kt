@@ -607,74 +607,58 @@ class GeminiTravelService(
         accessibility: String,
         groupComposition: String
     ): List<AiSuggestedActivityItem> {
+        val dest = if (destination.isNotBlank()) destination else "Expedition Region"
         return listOf(
             AiSuggestedActivityItem(
                 id = "act-sug-1",
-                title = "Maui Ocean Center & 3D Humpback Dome Experience",
+                title = "$dest Cultural Discovery & Heritage Center",
                 category = "ATTRACTION",
-                location = "300 Maalaea Rd, Wailuku, HI",
+                location = "$dest Central Arts Quarter",
                 suggestedTimeSlot = "10:30 AM",
                 durationHours = 2.5,
-                estimatedCost = 42.0,
+                estimatedCost = 25.0,
                 currency = "USD",
-                matchScore = 99,
-                rationale = "Top family & accessibility match: Fully ADA-paved, tactile touch pools for toddlers, and air-conditioned sensory break areas.",
-                accessibilityBadge = "♿ 100% Roll-in Ramp & Loaner Wheelchairs",
-                familySuitability = "Toddler (2-3) Sensory Friendly & Teen 3D VR",
-                dietaryMatch = "🥗 Seascape Restaurant (Celiac Gluten-Free Certified)",
-                bookingVendor = "Maui Ocean Center Front Desk",
-                bookingPhone = "+1-808-270-7000"
+                matchScore = 98,
+                rationale = "Top accessibility and family match: Step-free elevators, tactile exhibits, and quiet rest zones.",
+                accessibilityBadge = "♿ 100% Roll-in Ramp & Step-Free",
+                familySuitability = "All Ages & Stroller Accessible",
+                dietaryMatch = "🥗 On-site Allergen-Safe Dining",
+                bookingVendor = "$dest Visitor Concierge",
+                bookingPhone = "+1-800-555-0199"
             ),
             AiSuggestedActivityItem(
                 id = "act-sug-2",
-                title = "Twin Falls Accessible Lower Rainforest & Eco-Boardwalk",
+                title = "$dest Botanical Gardens & Scenic Eco-Promenade",
                 category = "ATTRACTION",
-                location = "6300 Hana Hwy, Haiku, HI",
+                location = "$dest Nature Reserve Trailhead",
                 suggestedTimeSlot = "09:00 AM",
                 durationHours = 2.0,
                 estimatedCost = 15.0,
                 currency = "USD",
-                matchScore = 96,
-                rationale = "Gentle flat gravel and paved riverfront trail with organic fresh fruit stand and shaded seating benches.",
-                accessibilityBadge = "♿ Gentle Grade Trail & Stroller Accessible",
-                familySuitability = "Stroller Friendly & Safe Shallow Stream",
-                dietaryMatch = "🥗 Fresh Island Coconut & Gluten-Free Farm Stand",
-                bookingVendor = "Wailele Farm Eco Stewardship",
-                bookingPhone = "+1-808-579-9999"
+                matchScore = 95,
+                rationale = "Paved flat paths, shaded rest benches, and sensory flora gardens.",
+                accessibilityBadge = "♿ Gentle Grade Paved Walkways",
+                familySuitability = "Stroller Friendly & Safe Open Grounds",
+                dietaryMatch = "🥗 Organic Tea & Fruit Pavilion",
+                bookingVendor = "$dest Parks & Recreation",
+                bookingPhone = "+1-800-555-0198"
             ),
             AiSuggestedActivityItem(
                 id = "act-sug-3",
-                title = "Wailea Beach Path & Turtle Coastal Promenade Stroll",
+                title = "$dest Scenic Panoramic Overlook & Historic Promenade",
                 category = "FAMILY_KIDS",
-                location = "Wailea Oceanfront Trailhead",
+                location = "$dest Waterfront Promenade",
                 suggestedTimeSlot = "04:30 PM",
                 durationHours = 1.5,
                 estimatedCost = 0.0,
                 currency = "USD",
-                matchScore = 98,
-                rationale = "Paved 3-mile coastal scenic path connecting luxury resorts, gentle ocean breezes, and zero stairs.",
+                matchScore = 96,
+                rationale = "Continuous paved walkway with scenic vistas and zero stair obstacles.",
                 accessibilityBadge = "♿ 100% Concrete Step-Free Walkway",
-                familySuitability = "Stroller Friendly • Sunset Ice Cream Stops",
-                dietaryMatch = "🥗 Island Gourmet Allergen-Safe Treats",
-                bookingVendor = "Wailea Resort Association",
-                bookingPhone = "+1-808-879-1595"
-            ),
-            AiSuggestedActivityItem(
-                id = "act-sug-4",
-                title = "Accessible Catamaran Sunset Whale Watch & Coastal Cruise",
-                category = "ATTRACTION",
-                location = "Lahaina & Maalaea Harbor Slip 11",
-                suggestedTimeSlot = "05:00 PM",
-                durationHours = 2.0,
-                estimatedCost = 89.0,
-                currency = "USD",
-                matchScore = 94,
-                rationale = "Hydraulic gangway boarding, wide deck for wheelchairs, covered family lounge, and hydrophone whale song audio.",
-                accessibilityBadge = "♿ Hydraulic Gangway & Level Deck Boarding",
-                familySuitability = "Kids Hydrophone Audio & Lifejackets",
-                dietaryMatch = "🥗 Nut-free snack box & dairy-free beverages",
-                bookingVendor = "Pacific Whale Foundation Eco-Adventures",
-                bookingPhone = "+1-808-249-8811"
+                familySuitability = "Stroller Friendly • Relaxed Evening Pace",
+                dietaryMatch = "🥗 Local Farm-to-Table Options Nearby",
+                bookingVendor = "$dest Tourism Bureau",
+                bookingPhone = "+1-800-555-0197"
             )
         )
     }
@@ -683,20 +667,21 @@ class GeminiTravelService(
         destination: String,
         externalConditions: String
     ): DynamicAdjustmentResult {
+        val dest = if (destination.isNotBlank()) destination else "Expedition Destination"
         return DynamicAdjustmentResult(
             status = "ADJUSTMENT_RECOMMENDED",
-            triggerReason = if (externalConditions.isNotBlank()) externalConditions else "⚡ Weather Alert: Afternoon tropical squall & high ocean swell forecast.",
-            impactedActivityTitle = "Molokini Crater Eco-Snorkel Charter",
-            suggestedAlternativeTitle = "Maui Ocean Center & Living Reef Aquarium (Sheltered)",
+            triggerReason = if (externalConditions.isNotBlank()) externalConditions else "⚡ Weather Alert: Precipitation or wind advisory in $dest.",
+            impactedActivityTitle = "Outdoor Scenic Excursion in $dest",
+            suggestedAlternativeTitle = "$dest Sheltered Cultural Pavilion & Heritage Experience",
             category = "ATTRACTION",
             replacementTimeSlot = "01:30 PM",
-            location = "300 Maalaea Rd, Wailuku, HI",
+            location = "$dest Central District",
             accessibilityBadge = "♿ 100% Indoor ADA Ramp & Stroller Friendly",
-            dietaryBadge = "🥗 Seascape Restaurant (Celiac Certified Kitchen)",
-            costDifference = -35.0,
+            dietaryBadge = "🥗 Dedicated Dietary & Allergen Kitchen",
+            costDifference = 0.0,
             currency = "USD",
-            summaryExplanation = "Replaced windy outdoor ocean charter with sheltered world-class aquarium. Saves $35/person with zero cancellation penalty.",
-            actionPlan = "1-Tap Rebook: Auto-shifts calendar slot, applies refund credit, and verifies ADA roll-in access."
+            summaryExplanation = "Shifted to sheltered venue with verified accessibility and low-sensory rest zones.",
+            actionPlan = "1-Tap Rebook: Auto-updates itinerary schedule without cancellation fees."
         )
     }
 

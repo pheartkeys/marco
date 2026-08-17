@@ -13,6 +13,8 @@ import com.example.data.model.ExpenseEntity
 import com.example.data.model.GroupMemoryEntity
 import com.example.data.model.TripActivityEntity
 import com.example.data.model.TripEntity
+import com.example.data.model.TripStatus
+import com.example.data.model.isTripInProgress
 import com.example.data.model.VendorCallLogEntity
 import com.example.data.repository.TravelRepository
 import com.example.data.local.AppSettingsState
@@ -82,7 +84,7 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
     val allTrips: StateFlow<List<TripEntity>> = repository.allTrips
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    private val _selectedTripId = MutableStateFlow<Long>(1L)
+    private val _selectedTripId = MutableStateFlow<Long>(0L)
     val selectedTripId: StateFlow<Long> = _selectedTripId.asStateFlow()
 
     private val _selectedDayFilter = MutableStateFlow<Int>(0) // 0 = All Days
@@ -1594,20 +1596,59 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
     }
 
     /**
-     * Trigger Emergency SOS Beacon in chat and broadcast telemetry
+     * Trigger Emergency SOS Beacon in chat and broadcast telemetry.
+     * Note: SOS features are strictly active only when on an actual trip in progress.
      */
     fun triggerEmergencySos() {
         viewModelScope.launch(Dispatchers.IO) {
             val tripId = _selectedTripId.value
             val currentTrip = repository.getTripById(tripId).firstOrNull()
+            
+            if (currentTrip == null || !currentTrip.isTripInProgress()) {
+                repository.insertChatMessage(
+                    ChatMessageEntity(
+                        tripId = tripId,
+                        sender = "AI",
+                        text = "ℹ️ **Emergency SOS is Dormant During Planning Stage**\n\nLive GPS broadcast, telemetry dispatch, and 911 beacons are only active while on an actual trip in progress.\n\n**Pre-Trip Emergency Reference for ${currentTrip?.destination ?: "Your Destination"}**:\n- **Emergency Dispatch**: 911 (US/Canada) / 112 (Europe)\n- **Consular & Citizen Services**: 24/7 Traveler Safety Assistance Desk\n\n*Live SOS will automatically activate when your trip begins (${currentTrip?.startDate ?: "start date"}).*",
+                        timestamp = System.currentTimeMillis()
+                    )
+                )
+                return@launch
+            }
+
             repository.insertChatMessage(
                 ChatMessageEntity(
                     tripId = tripId,
                     sender = "CARD_EMERGENCY_SOS",
-                    text = "🚨 **EMERGENCY SOS BEACON DISPATCHED**\n- **Live GPS Telemetry**: 20.6903° N, 156.4422° W\n- **Expedition Destination**: ${currentTrip?.destination ?: "Active Expedition"}\n- **Emergency Dispatch**: 911 / Local Coast Guard & First Aid\n- **Nearest ER**: Maui Memorial Medical Center (24/7 Level III Trauma)",
+                    text = "🚨 **EMERGENCY SOS BEACON DISPATCHED**\n- **Expedition Destination**: ${currentTrip.destination}\n- **Emergency Dispatch**: 911 / Local Emergency Services & First Aid\n- **Safety Status**: Live telemetry broadcasted to emergency contacts",
                     timestamp = System.currentTimeMillis()
                 )
             )
+        }
+    }
+
+    /**
+     * Update trip status (PLANNING, IN_PROGRESS, COMPLETED)
+     */
+    fun setTripStatus(tripId: Long, status: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateTripStatus(tripId, status)
+            val updated = repository.getTripById(tripId).firstOrNull()
+            if (updated != null) {
+                cloudSyncManager.syncTripToCloud(updated)
+            }
+        }
+    }
+
+    fun toggleTripStatus(tripId: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val current = repository.getTripById(tripId).firstOrNull() ?: return@launch
+            val newStatus = if (current.isTripInProgress()) TripStatus.PLANNING.value else TripStatus.IN_PROGRESS.value
+            repository.updateTripStatus(tripId, newStatus)
+            val updated = repository.getTripById(tripId).firstOrNull()
+            if (updated != null) {
+                cloudSyncManager.syncTripToCloud(updated)
+            }
         }
     }
 
@@ -1632,14 +1673,25 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
         }
     }
 
-    fun signUpWithEmail(email: String, pass: String, onResult: (Boolean, String?) -> Unit) {
+    fun signUpWithEmail(email: String, pass: String, displayName: String? = null, onResult: (Boolean, String?) -> Unit) {
         viewModelScope.launch {
-            val result = cloudSyncManager.signUpWithEmail(email, pass)
+            val result = cloudSyncManager.signUpWithEmail(email, pass, displayName)
             result.onSuccess { user ->
-                onResult(true, "Account created for ${user.email}")
+                onResult(true, "Account created for ${user.displayName ?: user.email}")
                 syncAllToFirebase()
             }.onFailure { error ->
                 onResult(false, error.localizedMessage ?: "Account creation failed")
+            }
+        }
+    }
+
+    fun sendPasswordResetEmail(email: String, onResult: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            val result = cloudSyncManager.sendPasswordResetEmail(email)
+            result.onSuccess {
+                onResult(true, "Password reset email sent")
+            }.onFailure { error ->
+                onResult(false, error.localizedMessage ?: "Failed to send reset email")
             }
         }
     }
@@ -1680,6 +1732,21 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
             withContext(Dispatchers.Main) {
                 onComplete?.invoke(success)
             }
+        }
+    }
+
+    /**
+     * Clear all local trips, chats, and cached data
+     */
+    fun clearAllLocalData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.clearAllLocalData()
+            _selectedTripId.value = 0L
+            _activities.value = emptyList()
+            _expenses.value = emptyList()
+            _memories.value = emptyList()
+            _walletBalances.value = emptyList()
+            _walletTransactions.value = emptyList()
         }
     }
 

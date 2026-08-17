@@ -39,6 +39,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
@@ -69,6 +70,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.TripActivityEntity
 import com.example.data.model.TripEntity
+import com.example.data.model.isTripInProgress
 import com.example.ui.components.AccessibilityTagChip
 import com.example.ui.components.CategoryIconBadge
 import com.example.ui.components.HeroGradientBanner
@@ -214,6 +216,7 @@ fun ItineraryDetailScreen(
                             viewModel.selectTrip(it)
                             isTripMenuExpanded = false
                         },
+                        onToggleTripStatus = { viewModel.toggleTripStatus(currentTrip.id) },
                         onToggleOfflineSync = { viewModel.toggleOfflineSync() },
                         onNewTripClick = onOpenPlanDialog
                     )
@@ -426,10 +429,12 @@ fun TripHeroCard(
     isMenuExpanded: Boolean,
     onMenuToggle: () -> Unit,
     onSelectTrip: (Long) -> Unit,
+    onToggleTripStatus: () -> Unit = {},
     onToggleOfflineSync: () -> Unit,
     onNewTripClick: () -> Unit
 ) {
     val progress = (trip.budgetSpent / trip.budgetTotal).coerceIn(0.0, 1.0).toFloat()
+    val isTripActive = trip.isTripInProgress()
 
     Card(
         shape = RoundedCornerShape(22.dp),
@@ -479,12 +484,38 @@ fun TripHeroCard(
                             ) {
                                 tripsList.forEach { t ->
                                     DropdownMenuItem(
-                                        text = { Text(t.title, fontSize = 13.sp) },
+                                        text = {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Text(t.title, fontSize = 13.sp)
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Text(
+                                                    text = if (t.isTripInProgress()) "🧭 Live" else "📋 Plan",
+                                                    fontSize = 10.sp,
+                                                    color = if (t.isTripInProgress()) EmeraldGreen else OceanBlue,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        },
                                         onClick = { onSelectTrip(t.id) }
                                     )
                                 }
+                                Divider()
                                 DropdownMenuItem(
-                                    text = { Text("✨ Plan New AI Trip...", fontWeight = FontWeight.Bold, color = OceanBlue) },
+                                    text = {
+                                        Text(
+                                            text = if (isTripActive) "📋 Set to Planning Mode (Hide SOS)" else "🧭 Start Trip / On-Trip Mode (Activate SOS)",
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (isTripActive) OceanBlue else EmeraldGreen,
+                                            fontSize = 12.sp
+                                        )
+                                    },
+                                    onClick = {
+                                        onToggleTripStatus()
+                                        onMenuToggle()
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("✨ Plan New AI Trip...", fontWeight = FontWeight.Bold, color = OceanBlue, fontSize = 12.sp) },
                                     onClick = {
                                         onMenuToggle()
                                         onNewTripClick()
@@ -493,30 +524,54 @@ fun TripHeroCard(
                             }
                         }
 
-                        // Offline sync status icon
-                        Surface(
-                            shape = RoundedCornerShape(20.dp),
-                            color = if (trip.isOfflineSynced) EmeraldGreen.copy(alpha = 0.25f) else Color.White.copy(alpha = 0.2f),
-                            modifier = Modifier.clickable { onToggleOfflineSync() }
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            // Trip Status Badge Pill
+                            Surface(
+                                shape = RoundedCornerShape(20.dp),
+                                color = if (isTripActive) EmeraldGreen.copy(alpha = 0.3f) else Color.White.copy(alpha = 0.2f),
+                                modifier = Modifier.clickable { onToggleTripStatus() }
                             ) {
-                                Icon(
-                                    imageVector = if (trip.isOfflineSynced) Icons.Default.CloudDone else Icons.Default.CloudOff,
-                                    contentDescription = null,
-                                    tint = if (trip.isOfflineSynced) EmeraldGreen else Color.White,
-                                    modifier = Modifier.size(14.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = if (trip.isOfflineSynced) "Offline Synced" else "Syncing...",
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        color = Color.White,
-                                        fontWeight = FontWeight.SemiBold
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = if (isTripActive) "🧭 ON-TRIP" else "📋 PLANNING",
+                                        style = MaterialTheme.typography.labelSmall.copy(
+                                            color = Color.White,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 10.sp
+                                        )
                                     )
-                                )
+                                }
+                            }
+
+                            // Offline sync status icon
+                            Surface(
+                                shape = RoundedCornerShape(20.dp),
+                                color = if (trip.isOfflineSynced) EmeraldGreen.copy(alpha = 0.25f) else Color.White.copy(alpha = 0.2f),
+                                modifier = Modifier.clickable { onToggleOfflineSync() }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = if (trip.isOfflineSynced) Icons.Default.CloudDone else Icons.Default.CloudOff,
+                                        contentDescription = null,
+                                        tint = if (trip.isOfflineSynced) EmeraldGreen else Color.White,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(3.dp))
+                                    Text(
+                                        text = if (trip.isOfflineSynced) "Synced" else "Syncing...",
+                                        style = MaterialTheme.typography.labelSmall.copy(
+                                            color = Color.White,
+                                            fontWeight = FontWeight.SemiBold,
+                                            fontSize = 10.sp
+                                        )
+                                    )
+                                }
                             }
                         }
                     }

@@ -82,18 +82,42 @@ class CloudSyncManager(private val context: Context) {
     /**
      * Create Account with Email and Password
      */
-    suspend fun signUpWithEmail(email: String, pass: String): Result<FirebaseUser> = withContext(Dispatchers.IO) {
+    suspend fun signUpWithEmail(email: String, pass: String, displayName: String? = null): Result<FirebaseUser> = withContext(Dispatchers.IO) {
         try {
             _syncStatus.value = SyncStatus.SYNCING
             val authResult = auth.createUserWithEmailAndPassword(email.trim(), pass).await()
             val user = authResult.user ?: throw Exception("Account creation returned empty user profile")
+            if (!displayName.isNullOrBlank()) {
+                try {
+                    val profileUpdates = com.google.firebase.auth.UserProfileChangeRequest.Builder()
+                        .setDisplayName(displayName.trim())
+                        .build()
+                    user.updateProfile(profileUpdates).await()
+                } catch (pe: Exception) {
+                    Log.w("CloudSyncManager", "Note setting displayName: ${pe.message}")
+                }
+            }
             _currentUser.value = user
             _syncStatus.value = SyncStatus.SYNCED_CLOUD
-            _syncMessage.value = "Account created for ${user.email}"
+            _syncMessage.value = "Account created for ${user.displayName ?: user.email}"
             Result.success(user)
         } catch (e: Exception) {
             _syncStatus.value = SyncStatus.OFFLINE_LOCAL
             _syncMessage.value = "Registration error: ${e.localizedMessage ?: e.message}"
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Send Password Reset Email
+     */
+    suspend fun sendPasswordResetEmail(email: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            auth.sendPasswordResetEmail(email.trim()).await()
+            _syncMessage.value = "Password reset instructions sent to ${email.trim()}"
+            Result.success(Unit)
+        } catch (e: Exception) {
+            _syncMessage.value = "Reset error: ${e.localizedMessage ?: e.message}"
             Result.failure(e)
         }
     }
@@ -143,6 +167,7 @@ class CloudSyncManager(private val context: Context) {
                 "dietaryRestrictions" to trip.dietaryRestrictions,
                 "familyAgeBrackets" to trip.familyAgeBrackets,
                 "travelStyle" to trip.travelStyle,
+                "status" to trip.status,
                 "lastSyncedTimestamp" to System.currentTimeMillis()
             )
 

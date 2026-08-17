@@ -32,6 +32,9 @@ object AppRoutes {
     const val VENDOR_CALL = "vendor_call"
     const val PREFERENCES = "preferences"
     const val PLAN_TRIP = "plan_trip"
+    const val SIGN_IN = "sign_in"
+    const val SIGN_UP = "sign_up"
+    const val FORGOT_PASSWORD = "forgot_password"
 }
 
 @Composable
@@ -91,7 +94,63 @@ fun MainAppScreen(
                         navController.navigate(AppRoutes.VENDOR_CALL)
                     },
                     onOpenPreferences = { navController.navigate(AppRoutes.PREFERENCES) },
-                    onOpenPlanTrip = { navController.navigate(AppRoutes.PLAN_TRIP) }
+                    onOpenPlanTrip = { navController.navigate(AppRoutes.PLAN_TRIP) },
+                    onOpenAuth = { navController.navigate(AppRoutes.SIGN_IN) }
+                )
+            }
+
+            // Dedicated Sign In Screen
+            composable(route = AppRoutes.SIGN_IN) {
+                SignInScreen(
+                    viewModel = viewModel,
+                    modifier = Modifier.fillMaxSize(),
+                    onNavigateToSignUp = {
+                        navController.navigate(AppRoutes.SIGN_UP)
+                    },
+                    onNavigateToForgotPassword = {
+                        navController.navigate(AppRoutes.FORGOT_PASSWORD)
+                    },
+                    onAuthSuccess = {
+                        navController.popBackStack()
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            // Dedicated Sign Up Screen
+            composable(route = AppRoutes.SIGN_UP) {
+                SignUpScreen(
+                    viewModel = viewModel,
+                    modifier = Modifier.fillMaxSize(),
+                    onNavigateToSignIn = {
+                        navController.navigate(AppRoutes.SIGN_IN) {
+                            popUpTo(AppRoutes.SIGN_IN) { inclusive = true }
+                        }
+                    },
+                    onAuthSuccess = {
+                        navController.navigate(AppRoutes.CHAT) {
+                            popUpTo(AppRoutes.CHAT) { inclusive = true }
+                        }
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            // Dedicated Forgot Password Screen
+            composable(route = AppRoutes.FORGOT_PASSWORD) {
+                ForgotPasswordScreen(
+                    viewModel = viewModel,
+                    modifier = Modifier.fillMaxSize(),
+                    onNavigateToSignIn = {
+                        navController.popBackStack()
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
                 )
             }
 
@@ -99,6 +158,7 @@ fun MainAppScreen(
             composable(route = AppRoutes.SETTINGS) {
                 SettingsScreen(
                     viewModel = viewModel,
+                    onNavigateToAuth = { navController.navigate(AppRoutes.SIGN_IN) },
                     onNavigateBack = { navController.popBackStack() }
                 )
             }

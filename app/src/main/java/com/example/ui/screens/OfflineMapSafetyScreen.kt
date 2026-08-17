@@ -63,6 +63,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.EmergencyAlertEntity
+import com.example.data.model.isTripInProgress
 import com.example.ui.components.CategoryIconBadge
 import com.example.ui.theme.AmberGold
 import com.example.ui.theme.EmeraldGreen
@@ -122,16 +123,17 @@ fun OfflineMapSafetyScreen(
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
+                val isTripActive = currentTrip?.isTripInProgress() == true
                 Column {
                     Text(
-                        text = "Safety Radar & Offline Maps",
+                        text = if (isTripActive) "Safety Radar & Offline Maps" else "Pre-Trip Safety & Offline Guide",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 17.sp
                         )
                     )
                     Text(
-                        text = "Live GPS, Geofence Telemetry & SOS Protocols",
+                        text = if (isTripActive) "Live GPS, Geofence Telemetry & SOS Protocols" else "Destination Emergency Contacts & Preparation",
                         style = MaterialTheme.typography.bodySmall.copy(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 11.sp
@@ -143,6 +145,7 @@ fun OfflineMapSafetyScreen(
 
         // Offline Sync Status Banner
         item {
+            val isTripActive = currentTrip?.isTripInProgress() == true
             Card(
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -173,7 +176,7 @@ fun OfflineMapSafetyScreen(
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 15.sp)
                             )
                             Text(
-                                text = "Full vector maps, vouchers & SOS bundle ready",
+                                text = if (isTripActive) "Full vector maps, vouchers & SOS bundle ready" else "Full vector maps, emergency guide & offline documents cached",
                                 style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
                             )
                         }
@@ -317,7 +320,7 @@ fun OfflineMapSafetyScreen(
                                     color = SunsetCoral.copy(alpha = 0.8f)
                                 ) {
                                     Text(
-                                        text = "🏥 Maui Memorial ER (25m)",
+                                        text = "🏥 Emergency Care Ready",
                                         color = Color.White,
                                         fontSize = 10.sp,
                                         fontWeight = FontWeight.Bold,
@@ -344,68 +347,199 @@ fun OfflineMapSafetyScreen(
             }
         }
 
-        // Emergency SOS Quick Dispatchers
+        // Emergency SOS Quick Dispatchers (Active Trip) vs Pre-Trip Safety Directory (Planning Stage)
         item {
-            Card(
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = SunsetCoral.copy(alpha = 0.08f)),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(34.dp)
-                                .clip(CircleShape)
-                                .background(SunsetCoral.copy(alpha = 0.2f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Default.HealthAndSafety, null, tint = SunsetCoral, modifier = Modifier.size(20.dp))
+            val isTripActive = currentTrip?.isTripInProgress() == true
+            if (isTripActive) {
+                Card(
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = SunsetCoral.copy(alpha = 0.08f)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(34.dp)
+                                    .clip(CircleShape)
+                                    .background(SunsetCoral.copy(alpha = 0.2f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(Icons.Default.HealthAndSafety, null, tint = SunsetCoral, modifier = Modifier.size(20.dp))
+                            }
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Column {
+                                Text(
+                                    text = "24/7 Emergency SOS & Safety Radar",
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = SunsetCoral,
+                                        fontSize = 16.sp
+                                    )
+                                )
+                                Text(
+                                    text = "Live telemetry & emergency dispatch active",
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                )
+                            }
                         }
-                        Spacer(modifier = Modifier.width(10.dp))
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Button(
+                                onClick = {
+                                    val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:911"))
+                                    context.startActivity(intent)
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = SunsetCoral),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.Call, null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Emergency (911)", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            }
+
+                            Button(
+                                onClick = {
+                                    val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:+18082449056"))
+                                    context.startActivity(intent)
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = OceanBlue),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.LocalHospital, null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Hospital ER", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            }
+                        }
+                    }
+                }
+            } else {
+                Card(
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(34.dp)
+                                        .clip(CircleShape)
+                                        .background(OceanBlue.copy(alpha = 0.15f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(Icons.Default.Security, null, tint = OceanBlue, modifier = Modifier.size(20.dp))
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Text(
+                                        text = "Destination Safety Directory",
+                                        style = MaterialTheme.typography.titleMedium.copy(
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 15.sp
+                                        )
+                                    )
+                                    Text(
+                                        text = "Pre-cached contacts for ${currentTrip?.destination ?: "Upcoming Trip"}",
+                                        style = MaterialTheme.typography.bodySmall.copy(
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            fontSize = 11.sp
+                                        )
+                                    )
+                                }
+                            }
+
+                            Surface(
+                                shape = RoundedCornerShape(6.dp),
+                                color = OceanBlue.copy(alpha = 0.12f)
+                            ) {
+                                Text(
+                                    text = "PRE-TRIP GUIDE",
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        color = OceanBlue,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 9.sp
+                                    ),
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
+                                    .padding(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("🚨", fontSize = 16.sp)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column {
+                                    Text("Local Emergency Dispatch", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                    Text("Dial 911 (USA / Canada) • 112 (Europe)", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
+                                    .padding(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("🏥", fontSize = 16.sp)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column {
+                                    Text("Nearest Trauma & Pediatric ER", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                    Text("${currentTrip?.destination ?: "Local Destination"} Emergency Medical Center & Trauma Care", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
+                                    .padding(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("🏛️", fontSize = 16.sp)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column {
+                                    Text("Consular & Citizen Assistance", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                    Text("${currentTrip?.countryCode ?: "Global"} Regional Traveler Assistance Hub • 24/7", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
                         Text(
-                            text = "24/7 Emergency SOS & Safety Radar",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = SunsetCoral,
-                                fontSize = 16.sp
+                            text = "ℹ️ Live Emergency SOS Beacon & 1-tap dispatch protocols will automatically become available once this vacation is in progress.",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontSize = 10.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
                             )
                         )
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Button(
-                            onClick = {
-                                val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:911"))
-                                context.startActivity(intent)
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = SunsetCoral),
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Icon(Icons.Default.Call, null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Emergency (911)", fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                        }
-
-                        Button(
-                            onClick = {
-                                val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:+18082449056"))
-                                context.startActivity(intent)
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = OceanBlue),
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Icon(Icons.Default.LocalHospital, null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Hospital ER", fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                        }
                     }
                 }
             }
@@ -413,8 +547,9 @@ fun OfflineMapSafetyScreen(
 
         // Live Alerts Feed
         item {
+            val isTripActive = currentTrip?.isTripInProgress() == true
             Text(
-                text = "Active Trip Safety Advisories & Real-Time Alerts (${alerts.size})",
+                text = if (isTripActive) "Active Trip Safety Advisories & Real-Time Alerts (${alerts.size})" else "Destination Health & Safety Advisories (${alerts.size})",
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp

@@ -40,8 +40,17 @@ interface TravelDao {
     @Update
     suspend fun updateTrip(trip: TripEntity)
 
+    @Query("UPDATE trips SET status = :status WHERE id = :tripId")
+    suspend fun updateTripStatus(tripId: Long, status: String)
+
     @Query("DELETE FROM trips WHERE id = :tripId")
     suspend fun deleteTrip(tripId: Long)
+
+    @Query("DELETE FROM trips")
+    suspend fun clearAllTrips()
+
+    @Query("DELETE FROM trip_activities")
+    suspend fun clearAllActivities()
 
     // Activities
     @Query("SELECT * FROM trip_activities WHERE tripId = :tripId ORDER BY dayNumber ASC, id ASC")
@@ -78,6 +87,9 @@ interface TravelDao {
     @Query("DELETE FROM connected_accounts WHERE id = :accountId")
     suspend fun deleteAccount(accountId: Long)
 
+    @Query("DELETE FROM connected_accounts")
+    suspend fun clearAccounts()
+
     // Expenses
     @Query("SELECT * FROM expenses WHERE tripId = :tripId ORDER BY id DESC")
     fun getExpensesForTrip(tripId: Long): Flow<List<ExpenseEntity>>
@@ -88,12 +100,18 @@ interface TravelDao {
     @Query("DELETE FROM expenses WHERE id = :expenseId")
     suspend fun deleteExpense(expenseId: Long)
 
+    @Query("DELETE FROM expenses")
+    suspend fun clearExpenses()
+
     // Vendor Call Logs
     @Query("SELECT * FROM vendor_call_logs ORDER BY dateTimestamp DESC")
     fun getAllVendorCalls(): Flow<List<VendorCallLogEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertVendorCall(callLog: VendorCallLogEntity): Long
+
+    @Query("DELETE FROM vendor_call_logs")
+    suspend fun clearVendorCalls()
 
     // Emergency Alerts & Safety
     @Query("SELECT * FROM emergency_alerts ORDER BY id DESC")
@@ -105,6 +123,9 @@ interface TravelDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAlerts(alerts: List<EmergencyAlertEntity>)
 
+    @Query("DELETE FROM emergency_alerts")
+    suspend fun clearAlerts()
+
     // Group Memories
     @Query("SELECT * FROM group_memories WHERE tripId = :tripId ORDER BY id DESC")
     fun getMemoriesForTrip(tripId: Long): Flow<List<GroupMemoryEntity>>
@@ -114,6 +135,9 @@ interface TravelDao {
 
     @Query("UPDATE group_memories SET likesCount = likesCount + 1 WHERE id = :memoryId")
     suspend fun incrementMemoryLikes(memoryId: Long)
+
+    @Query("DELETE FROM group_memories")
+    suspend fun clearMemories()
 
     // Chat Messages
     @Query("SELECT * FROM chat_messages ORDER BY timestamp ASC")
@@ -148,6 +172,9 @@ interface TravelDao {
     @Query("DELETE FROM trip_feedbacks WHERE id = :feedbackId")
     suspend fun deleteTripFeedback(feedbackId: Long)
 
+    @Query("DELETE FROM trip_feedbacks")
+    suspend fun clearTripFeedbacks()
+
     // Proactive Suggestions
     @Query("SELECT * FROM proactive_suggestions ORDER BY matchScorePercent DESC, id ASC")
     fun getAllProactiveSuggestions(): Flow<List<ProactiveSuggestionEntity>>
@@ -177,6 +204,9 @@ interface TravelDao {
     @Query("DELETE FROM wallet_balances WHERE tripId = :tripId")
     suspend fun clearWalletBalancesForTrip(tripId: Long)
 
+    @Query("DELETE FROM wallet_balances")
+    suspend fun clearAllWalletBalances()
+
     // Marco Wallet Transactions & Expense Attribution
     @Query("SELECT * FROM wallet_transactions WHERE tripId = :tripId ORDER BY timestamp DESC")
     fun getWalletTransactionsForTrip(tripId: Long): Flow<List<WalletTransactionEntity>>
@@ -192,6 +222,9 @@ interface TravelDao {
 
     @Query("DELETE FROM wallet_transactions WHERE id = :transactionId")
     suspend fun deleteWalletTransaction(transactionId: Long)
+
+    @Query("DELETE FROM wallet_transactions")
+    suspend fun clearAllWalletTransactions()
 
     // Currency Exchange Rates
     @Query("SELECT * FROM currency_rates")

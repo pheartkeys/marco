@@ -473,9 +473,9 @@ fun AddMemoryDialog(
     onDismiss: () -> Unit,
     onConfirm: (author: String, caption: String, location: String) -> Unit
 ) {
-    var author by remember { mutableStateOf("Sarah J.") }
+    var author by remember { mutableStateOf("") }
     var caption by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("Makena Beach, Maui") }
+    var location by remember { mutableStateOf("") }
 
     Surface(
         shape = RoundedCornerShape(20.dp),

@@ -38,9 +38,8 @@ fun ChatEmergencySosCard(
     val context = LocalContext.current
     var isDispatched by remember { mutableStateOf(false) }
 
-    val destination = trip?.destination ?: "Maui, Hawaii"
-    val gpsCoordinates = "20.6903° N, 156.4422° W"
-    val emergencyContactPhone = "+1-808-555-0199"
+    val destination = trip?.destination ?: "Active Expedition"
+    val emergencyContactPhone = "911"
 
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -64,68 +63,47 @@ fun ChatEmergencySosCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(38.dp)
+                            .size(36.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFFEF4444).copy(alpha = 0.25f)),
+                            .background(Color(0xFFDC2626)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.HealthAndSafety,
                             contentDescription = null,
-                            tint = Color(0xFFFCA5A5),
-                            modifier = Modifier.size(24.dp)
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
-
+                    Spacer(modifier = Modifier.width(10.dp))
                     Column {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Text(
-                                text = "Emergency SOS Beacon",
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.ExtraBold,
-                                    fontSize = 16.sp,
-                                    color = Color(0xFFFEE2E2)
-                                )
-                            )
-                            Surface(
-                                shape = RoundedCornerShape(6.dp),
-                                color = Color(0xFFDC2626)
-                            ) {
-                                Text(
-                                    text = "RADAR ACTIVE",
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        color = Color.White,
-                                        fontWeight = FontWeight.Black,
-                                        fontSize = 9.sp
-                                    )
-                                )
-                            }
-                        }
                         Text(
-                            text = "Offline safety telemetry & instant alert broadcast",
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                color = Color(0xFFFCA5A5),
-                                fontSize = 12.sp
-                            )
+                            text = "EMERGENCY SOS BEACON",
+                            color = Color(0xFFFCA5A5),
+                            fontWeight = FontWeight.Black,
+                            fontSize = 13.sp,
+                            letterSpacing = 0.5.sp
+                        )
+                        Text(
+                            text = "Live Active Trip Safety Network",
+                            color = Color(0xFFD1D5DB),
+                            fontSize = 11.sp
                         )
                     }
                 }
 
-                IconButton(onClick = onPlayTts) {
+                IconButton(
+                    onClick = onPlayTts,
+                    modifier = Modifier.size(32.dp)
+                ) {
                     Icon(
                         imageVector = Icons.Default.VolumeUp,
-                        contentDescription = "Listen to safety instructions",
-                        tint = Color(0xFFFCA5A5)
+                        contentDescription = "Read Alert",
+                        tint = Color(0xFFFCA5A5),
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }
@@ -134,8 +112,8 @@ fun ChatEmergencySosCard(
 
             // Telemetry summary
             Surface(
-                shape = RoundedCornerShape(14.dp),
-                color = Color(0xFF1F0606),
+                shape = RoundedCornerShape(12.dp),
+                color = Color(0xFF1F2937).copy(alpha = 0.7f),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(12.dp)) {
@@ -144,29 +122,12 @@ fun ChatEmergencySosCard(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "📍 Live Coordinates:",
+                            text = "📍 Expedition:",
                             color = Color(0xFF9CA3AF),
                             fontSize = 11.sp
                         )
                         Text(
-                            text = gpsCoordinates,
-                            color = Color(0xFFFDE68A),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 11.sp
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "🏥 Nearest Trauma ER:",
-                            color = Color(0xFF9CA3AF),
-                            fontSize = 11.sp
-                        )
-                        Text(
-                            text = "Maui Memorial ER (12 min)",
+                            text = destination,
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 11.sp
@@ -178,12 +139,29 @@ fun ChatEmergencySosCard(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "🏛️ U.S. Consular Agency:",
+                            text = "🏥 Emergency Support:",
                             color = Color(0xFF9CA3AF),
                             fontSize = 11.sp
                         )
                         Text(
-                            text = "Honolulu Hub • 24/7 Desk",
+                            text = "Local 911/112 Dispatch & Trauma ER",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "🏛️ Consular Assistance:",
+                            color = Color(0xFF9CA3AF),
+                            fontSize = 11.sp
+                        )
+                        Text(
+                            text = "24/7 Citizen Traveler Safety Desk",
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 11.sp
@@ -219,7 +197,7 @@ fun ChatEmergencySosCard(
                             data = Uri.parse("smsto:$emergencyContactPhone")
                             putExtra(
                                 "sms_body",
-                                "EMERGENCY SOS from Marco Travel App: I need immediate assistance at $gpsCoordinates ($destination). Trip: ${trip?.title}"
+                                "EMERGENCY SOS from Marco Travel App: I need immediate assistance in $destination. Expedition: ${trip?.title ?: "Active Journey"}"
                             )
                         }
                         try {

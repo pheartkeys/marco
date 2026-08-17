@@ -46,7 +46,7 @@ fun ChatVintageParchmentMapCard(
     modifier: Modifier = Modifier,
     onOpenFullSafetyMap: () -> Unit = {}
 ) {
-    val destination = trip?.destination ?: "Maui Archipelago"
+    val destination = trip?.destination ?: "Expedition Region"
 
     Card(
         shape = RoundedCornerShape(20.dp),

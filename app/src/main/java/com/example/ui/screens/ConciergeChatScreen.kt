@@ -3,6 +3,8 @@ package com.example.ui.screens
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +29,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Accessible
 import androidx.compose.material.icons.filled.Add
@@ -55,6 +58,7 @@ import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -90,6 +94,8 @@ import com.example.data.model.ConnectedAccountEntity
 import com.example.data.model.GroupMemoryEntity
 import com.example.data.model.TripActivityEntity
 import com.example.data.model.TripEntity
+import com.example.data.model.isTripInProgress
+import com.example.data.model.TripStatus
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Navigation
 import androidx.compose.material.icons.filled.Sailing
@@ -141,7 +147,8 @@ fun ConciergeChatScreen(
     onOpenMemories: () -> Unit = {},
     onOpenVendorCall: (vendorName: String, question: String) -> Unit = { _, _ -> },
     onOpenPreferences: () -> Unit = {},
-    onOpenPlanTrip: () -> Unit = {}
+    onOpenPlanTrip: () -> Unit = {},
+    onOpenAuth: () -> Unit = {}
 ) {
     val messages by viewModel.chatMessages.collectAsState()
     val isTyping by viewModel.isConciergeTyping.collectAsState()
@@ -153,6 +160,7 @@ fun ConciergeChatScreen(
     val vendorCalls by viewModel.vendorCalls.collectAsState()
     val memoriesList by viewModel.memories.collectAsState()
     val offlineMsg by viewModel.offlineSyncBannerMessage.collectAsState()
+    val firebaseUser by viewModel.firebaseUser.collectAsState()
     val suggestedActivities by viewModel.suggestedActivities.collectAsState()
     val isGeneratingSuggestions by viewModel.isGeneratingSuggestions.collectAsState()
     val activeAdjustment by viewModel.activeDynamicAdjustment.collectAsState()
@@ -190,26 +198,37 @@ fun ConciergeChatScreen(
         }
     }
 
-    val suggestionChips = listOf(
-        "🧭 Antique Parchment Map",
-        "📜 Daily Travel Log",
-        "📸 Group Photo Reel",
-        "📋 Itinerary Snippets",
-        "🚨 Emergency SOS Beacon",
-        "💰 Real-Time Budget & FX Tracker",
-        "📊 Weekly Budget Arbitrage Report",
-        "⚙️ Settings & Voices",
-        "♿ Family & Accessibility Planner",
-        "🎯 AI Activity & Excursion Radar",
-        "⚡ Dynamic Weather Rebooking",
-        "🥗 Dietary & Allergen Safety",
-        "✈️ Plan Trip to Tokyo & Kyoto",
-        "📋 Show Current Maui Itinerary",
-        "📞 Call Hotel for Heated Pool & ADA",
-        "💳 My Points & Timeshares Wallet",
-        "🧬 My Traveler DNA & Profile",
-        "🛡️ Offline Safety & Local SOS"
-    )
+    val isTripActive = currentTrip?.isTripInProgress() == true
+    val suggestionChips = remember(isTripActive) {
+        buildList {
+            add("🧭 Antique Parchment Map")
+            add("📜 Daily Travel Log")
+            add("📸 Group Photo Reel")
+            add("📋 Itinerary Snippets")
+            if (isTripActive) {
+                add("🚨 Emergency SOS Beacon")
+            }
+            add("💰 Real-Time Budget & FX Tracker")
+            add("📊 Weekly Budget Arbitrage Report")
+            add("⚙️ Settings & Voices")
+            add("♿ Family & Accessibility Planner")
+            add("🎯 AI Activity & Excursion Radar")
+            add("⚡ Dynamic Weather Rebooking")
+            add("🥗 Dietary & Allergen Safety")
+            add("✈️ Plan New Trip")
+            if (currentTrip != null) {
+                add("📋 Show Current Itinerary")
+                add("📞 Vendor & Accommodation Concierge")
+            }
+            add("💳 My Points & Timeshares Wallet")
+            add("🧬 My Traveler DNA & Profile")
+            if (isTripActive) {
+                add("🛡️ Live Safety Radar & SOS")
+            } else {
+                add("🛡️ Pre-Trip Safety & Offline Pack")
+            }
+        }
+    }
 
     LaunchedEffect(messages.size, isTyping) {
         if (messages.isNotEmpty()) {
@@ -301,7 +320,7 @@ fun ConciergeChatScreen(
                             )
                         }
                         Text(
-                            text = "24/7 AI Concierge • Offline & Cloud Synced",
+                            text = if (firebaseUser != null) "Cloud Synced • Live" else "24/7 AI Concierge",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontSize = 10.sp,
                                 color = EmeraldGreen,
@@ -326,7 +345,7 @@ fun ConciergeChatScreen(
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                val destLabel = currentTrip?.destination?.split(",")?.firstOrNull()?.trim() ?: "Maui"
+                                val destLabel = currentTrip?.destination?.split(",")?.firstOrNull()?.trim() ?: "Plan Trip"
                                 Text(
                                     text = destLabel,
                                     style = MaterialTheme.typography.labelSmall.copy(
@@ -349,17 +368,74 @@ fun ConciergeChatScreen(
                             expanded = isTripMenuExpanded,
                             onDismissRequest = { isTripMenuExpanded = false }
                         ) {
-                            tripsList.forEach { trip ->
+                            if (tripsList.isEmpty()) {
                                 DropdownMenuItem(
                                     text = {
-                                        Column {
-                                            Text(trip.title, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                                            Text("${trip.destination} • ${trip.startDate}", fontSize = 11.sp, color = Color.Gray)
-                                        }
+                                        Text("✨ Plan New AI Trip...", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = OceanBlue)
                                     },
                                     onClick = {
-                                        viewModel.selectTrip(trip.id)
                                         isTripMenuExpanded = false
+                                        onOpenPlanTrip()
+                                    }
+                                )
+                            } else {
+                                tripsList.forEach { trip ->
+                                    val active = trip.isTripInProgress()
+                                    DropdownMenuItem(
+                                        text = {
+                                            Column {
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Text(trip.title, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                                    Spacer(modifier = Modifier.width(6.dp))
+                                                    Surface(
+                                                        shape = RoundedCornerShape(4.dp),
+                                                        color = if (active) EmeraldGreen.copy(alpha = 0.15f) else OceanBlue.copy(alpha = 0.15f)
+                                                    ) {
+                                                        Text(
+                                                            text = if (active) "ON-TRIP" else "PLANNING",
+                                                            style = MaterialTheme.typography.labelSmall.copy(
+                                                                color = if (active) EmeraldGreen else OceanBlue,
+                                                                fontWeight = FontWeight.Bold,
+                                                                fontSize = 9.sp
+                                                            ),
+                                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                                        )
+                                                    }
+                                                }
+                                                Text("${trip.destination} • ${trip.startDate}", fontSize = 11.sp, color = Color.Gray)
+                                            }
+                                        },
+                                        onClick = {
+                                            viewModel.selectTrip(trip.id)
+                                            isTripMenuExpanded = false
+                                        }
+                                    )
+                                }
+                                currentTrip?.let { trip ->
+                                    Divider()
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = if (trip.isTripInProgress()) "📋 Switch to Planning Mode (Hide SOS)" else "🧭 Start Vacation / On-Trip Mode (Activate SOS)",
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = if (trip.isTripInProgress()) OceanBlue else EmeraldGreen
+                                            )
+                                        },
+                                        onClick = {
+                                            viewModel.toggleTripStatus(trip.id)
+                                            isTripMenuExpanded = false
+                                        }
+                                    )
+                                }
+                                Divider()
+                                DropdownMenuItem(
+                                    text = {
+                                        Text("✨ Plan Another Trip...", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = OceanBlue)
+                                    },
+                                    onClick = {
+                                        isTripMenuExpanded = false
+                                        onOpenPlanTrip()
                                     }
                                 )
                             }
@@ -368,24 +444,48 @@ fun ConciergeChatScreen(
 
                     Spacer(modifier = Modifier.width(4.dp))
 
-                    // Emergency SOS Beacon Button
+                    // Emergency SOS Beacon Button (Strictly only visible while actively on an actual trip)
+                    if (isTripActive) {
+                        IconButton(
+                            onClick = { viewModel.triggerEmergencySos() },
+                            modifier = Modifier
+                                .size(34.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFDC2626).copy(alpha = 0.15f))
+                                .testTag("sos_beacon_top_button")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.HealthAndSafety,
+                                contentDescription = "Emergency SOS",
+                                tint = Color(0xFFEF4444),
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(2.dp))
+                    }
+
+                    // Account / Profile Button
                     IconButton(
-                        onClick = { viewModel.triggerEmergencySos() },
+                        onClick = {
+                            if (firebaseUser != null) {
+                                onOpenSettings()
+                            } else {
+                                onOpenAuth()
+                            }
+                        },
                         modifier = Modifier
                             .size(34.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFDC2626).copy(alpha = 0.15f))
-                            .testTag("sos_beacon_top_button")
+                            .testTag("top_bar_account_button")
                     ) {
                         Icon(
-                            imageVector = Icons.Default.HealthAndSafety,
-                            contentDescription = "Emergency SOS",
-                            tint = Color(0xFFEF4444),
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = if (firebaseUser != null) "Account: ${firebaseUser?.displayName ?: firebaseUser?.email}" else "Sign In",
+                            tint = if (firebaseUser != null) VenetianGold else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp)
                         )
                     }
 
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(2.dp))
 
                     // Settings Button
                     IconButton(
@@ -494,23 +594,22 @@ fun ConciergeChatScreen(
                                                     ),
                                                     maxLines = 1
                                                 )
-                                                if (isSelected) {
-                                                    Spacer(modifier = Modifier.width(6.dp))
-                                                    Surface(
-                                                        shape = RoundedCornerShape(4.dp),
-                                                        color = EmeraldGreen.copy(alpha = 0.15f)
-                                                    ) {
-                                                        Text(
-                                                            text = "ACTIVE",
-                                                            style = MaterialTheme.typography.labelSmall.copy(
-                                                                color = EmeraldGreen,
-                                                                fontWeight = FontWeight.Black,
-                                                                fontSize = 8.sp,
-                                                                letterSpacing = 0.5.sp
-                                                            ),
-                                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
-                                                        )
-                                                    }
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                val inProgress = trip.isTripInProgress()
+                                                Surface(
+                                                    shape = RoundedCornerShape(4.dp),
+                                                    color = if (inProgress) EmeraldGreen.copy(alpha = 0.15f) else OceanBlue.copy(alpha = 0.15f)
+                                                ) {
+                                                    Text(
+                                                        text = if (inProgress) "ON-TRIP LIVE" else "PLANNING",
+                                                        style = MaterialTheme.typography.labelSmall.copy(
+                                                            color = if (inProgress) EmeraldGreen else OceanBlue,
+                                                            fontWeight = FontWeight.Black,
+                                                            fontSize = 8.sp,
+                                                            letterSpacing = 0.5.sp
+                                                        ),
+                                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                                    )
                                                 }
                                             }
                                             Text(
@@ -562,6 +661,73 @@ fun ConciergeChatScreen(
                     }
                 }
             }
+        } else {
+            Surface(
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Card(
+                    shape = RoundedCornerShape(14.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .clickable { onOpenPlanTrip() }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(34.dp)
+                                    .clip(CircleShape)
+                                    .background(OceanBlue),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.FlightTakeoff,
+                                    contentDescription = null,
+                                    tint = VenetianGold,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                            Column {
+                                Text(
+                                    text = "Plan Your Next Expedition",
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 13.sp,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                )
+                                Text(
+                                    text = "Tap here to create a custom AI itinerary",
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        fontSize = 11.sp,
+                                        color = OceanBlue
+                                    )
+                                )
+                            }
+                        }
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Plan Trip",
+                            tint = OceanBlue,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+            }
         }
 
         // Offline Banner if active
@@ -588,6 +754,39 @@ fun ConciergeChatScreen(
             contentPadding = PaddingValues(vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
+            if (messages.isEmpty()) {
+                item {
+                    Card(
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier.size(36.dp).clip(CircleShape).background(OceanBlue),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(Icons.Default.Explore, contentDescription = null, tint = VenetianGold, modifier = Modifier.size(20.dp))
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Text("Welcome to Marco Expeditions", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                    Text("Your 24/7 AI Travel Concierge", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Text(
+                                "I can research destinations, optimize loyalty points, assemble ADA & family-friendly itineraries, generate custom maps, and coordinate travel safety.\n\nType a message below or tap 'Plan New Trip' to begin.",
+                                fontSize = 13.sp,
+                                lineHeight = 18.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                }
+            }
+
             items(messages, key = { it.id }) { msg ->
                 when (msg.sender) {
                     "USER" -> {
@@ -991,6 +1190,7 @@ fun ConciergeChatScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
                     .padding(20.dp)
             ) {
                 Text(
@@ -999,23 +1199,30 @@ fun ConciergeChatScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                val actions = listOf(
-                    Triple("🧭 Antique Parchment Map", "Historical wind rose vectors, rhumb lines, and GPS route", "Show antique parchment map"),
-                    Triple("📜 Marco's Daily Travel Log", "AI-penned literary expedition chronicle and highlights", "Show daily travel log and expedition chronicle"),
-                    Triple("📸 Group Photo Reel", "Collaborative photo reel with AI scene tags & 1-tap likes", "Show group photo carousel"),
-                    Triple("📋 Structured Itinerary Snippets", "Quick-scan cards for flights, hotels, and vouchers", "Show itinerary snippets and cards"),
-                    Triple("🚨 Emergency SOS Beacon", "Transmit live GPS telemetry to contacts and 911 dispatch", "Broadcast emergency SOS beacon"),
-                    Triple("💰 Budget & Currency Tracker", "Live balances, encrypted tokens, and zero-fee FX converter", "Check my budget, expenses, and currency conversion"),
-                    Triple("📊 Weekly Budget & Arbitrage Summary", "Spend vs loyalty savings comparison & category breakdown", "Show weekly budget summary and savings vs spend"),
-                    Triple("♿ Family & Accessibility Planner", "Dietary restrictions, wheelchair needs, and family age pacing", "Open family and accessibility planner studio"),
-                    Triple("✈️ Plan New Itinerary", "Generate tailored 5-day trip with points & pacing", "Plan trip to Tokyo & Kyoto, Japan"),
-                    Triple("📞 Call Hotel Front Desk", "Simulate live phone inquiry for pool hours & check-in", "Call hotel front desk for heated pool hours & ADA access"),
-                    Triple("💳 Rewards & Timeshare Wallet", "View SkyMiles, Bonvoy, and RCI Trading Power", "Check my points and timeshare wallet"),
-                    Triple("🧬 My Traveler DNA", "View learned preferences and rate past trips", "Show my traveler DNA and learned profile"),
-                    Triple("🛡️ Offline Safety & SOS", "Emergency contacts, hospital, and offline maps", "Show offline safety, hospital and emergency info"),
-                    Triple("📸 Vacation Memories", "View shared photos and vacation notes", "Show vacation memories and moments"),
-                    Triple("⚙️ Settings & Voice Concierge", "Switch narrator voice, BYOK API keys, and model parameters", "__OPEN_SETTINGS__")
-                )
+                val actions = buildList {
+                    add(Triple("🧭 Antique Parchment Map", "Historical wind rose vectors, rhumb lines, and GPS route", "Show antique parchment map"))
+                    add(Triple("📜 Marco's Daily Travel Log", "AI-penned literary expedition chronicle and highlights", "Show daily travel log and expedition chronicle"))
+                    add(Triple("📸 Group Photo Reel", "Collaborative photo reel with AI scene tags & 1-tap likes", "Show group photo carousel"))
+                    add(Triple("📋 Structured Itinerary Snippets", "Quick-scan cards for flights, hotels, and vouchers", "Show itinerary snippets and cards"))
+                    if (isTripActive) {
+                        add(Triple("🚨 Emergency SOS Beacon", "Transmit live GPS telemetry to contacts and 911 dispatch", "Broadcast emergency SOS beacon"))
+                    }
+                    add(Triple("💰 Budget & Currency Tracker", "Live balances, encrypted tokens, and zero-fee FX converter", "Check my budget, expenses, and currency conversion"))
+                    add(Triple("📊 Weekly Budget & Arbitrage Summary", "Spend vs loyalty savings comparison & category breakdown", "Show weekly budget summary and savings vs spend"))
+                    add(Triple("♿ Family & Accessibility Planner", "Dietary restrictions, wheelchair needs, and family age pacing", "Open family and accessibility planner studio"))
+                    add(Triple("✈️ Plan New Itinerary", "Generate tailored 5-day trip with points & pacing", "Plan trip to Tokyo & Kyoto, Japan"))
+                    add(Triple("📞 Call Hotel Front Desk", "Simulate live phone inquiry for pool hours & check-in", "Call hotel front desk for heated pool hours & ADA access"))
+                    add(Triple("💳 Rewards & Timeshare Wallet", "View SkyMiles, Bonvoy, and RCI Trading Power", "Check my points and timeshare wallet"))
+                    add(Triple("🧬 My Traveler DNA", "View learned preferences and rate past trips", "Show my traveler DNA and learned profile"))
+                    if (isTripActive) {
+                        add(Triple("🛡️ Offline Safety & Live SOS", "Live GPS telemetry, hospital ER & emergency dispatch", "Show offline safety, hospital and emergency info"))
+                    } else {
+                        add(Triple("🛡️ Pre-Trip Safety & Preparation", "Emergency directory, hospital & consular guide", "Show offline safety, hospital and emergency info"))
+                    }
+                    add(Triple("🔐 Cloud Account & Sign In", "Sign in to sync itineraries, wallet, and traveler DNA", "__OPEN_AUTH__"))
+                    add(Triple("📸 Vacation Memories", "View shared photos and vacation notes", "Show vacation memories and moments"))
+                    add(Triple("⚙️ Settings & Voice Concierge", "Switch narrator voice, BYOK API keys, and model parameters", "__OPEN_SETTINGS__"))
+                }
 
                 actions.forEach { (title, subtitle, prompt) ->
                     Surface(
@@ -1028,6 +1235,8 @@ fun ConciergeChatScreen(
                                 isQuickActionSheetOpen = false
                                 if (prompt == "__OPEN_SETTINGS__") {
                                     onOpenSettings()
+                                } else if (prompt == "__OPEN_AUTH__") {
+                                    onOpenAuth()
                                 } else {
                                     viewModel.sendChatMessage(prompt)
                                 }

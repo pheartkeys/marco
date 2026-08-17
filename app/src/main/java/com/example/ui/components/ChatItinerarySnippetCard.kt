@@ -37,54 +37,7 @@ fun ChatItinerarySnippetCard(
     modifier: Modifier = Modifier,
     onOpenFullItinerary: () -> Unit = {}
 ) {
-    val displayActivities = if (activities.isNotEmpty()) {
-        activities.take(6)
-    } else {
-        listOf(
-            TripActivityEntity(
-                tripId = trip?.id ?: 1L,
-                dayNumber = 1,
-                timeSlot = "09:15 AM",
-                title = "Delta DL 492 • Nonstop Flight to ${trip?.destination ?: "Maui"}",
-                category = "FLIGHT",
-                location = "Gate B22 • Priority Boarding",
-                confirmationCode = "DL-77291A",
-                notes = "First Class upgrade confirmed via SkyMiles",
-                cost = 620.0,
-                accessibilityBadge = "♿ Wheelchair Aisle & Stroller Gate Check",
-                vendorName = "Delta Air Lines",
-                vendorPhone = "+1-800-221-1212"
-            ),
-            TripActivityEntity(
-                tripId = trip?.id ?: 1L,
-                dayNumber = 1,
-                timeSlot = "03:00 PM",
-                title = "Grand Champions Villas • Accessible Ocean Suite",
-                category = "TIMESHARE",
-                location = "Wailea Resort District",
-                confirmationCode = "RCI-994208",
-                notes = "RCI Trading Power swap confirmed • Ground floor roll-in bath",
-                cost = 240.0,
-                accessibilityBadge = "♿ Ground Floor & ADA Heated Pool Lift",
-                vendorName = "Wailea Villas Front Desk",
-                vendorPhone = "+1-808-879-1595"
-            ),
-            TripActivityEntity(
-                tripId = trip?.id ?: 1L,
-                dayNumber = 2,
-                timeSlot = "10:30 AM",
-                title = "Living Reef & Whale Marine Pavilion",
-                category = "ATTRACTION",
-                location = "Maalaea Harbor Boardwalk",
-                confirmationCode = "MOC-4019",
-                notes = "Tactile touch pool & shaded rest terrace",
-                cost = 45.0,
-                accessibilityBadge = "👶 Toddler Stroller Paved & Quiet Sensory Zone",
-                vendorName = "Ocean Center Concierge",
-                vendorPhone = "+1-808-270-7000"
-            )
-        )
-    }
+    val displayActivities = activities.take(6)
 
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -176,19 +129,36 @@ fun ChatItinerarySnippetCard(
             Spacer(modifier = Modifier.height(14.dp))
 
             // Horizontal Scrollable Cards
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                displayActivities.forEach { activity ->
-                    ItinerarySnippetItem(
-                        activity = activity,
-                        onClick = {
-                            onActivityClick(activity)
-                            onOpenFullItinerary()
-                        }
+            if (displayActivities.isNotEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    displayActivities.forEach { activity ->
+                        ItinerarySnippetItem(
+                            activity = activity,
+                            onClick = {
+                                onActivityClick(activity)
+                                onOpenFullItinerary()
+                            }
+                        )
+                    }
+                }
+            } else {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "No activities added yet. Tap below to build or customize this itinerary.",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        modifier = Modifier.padding(12.dp)
                     )
                 }
             }

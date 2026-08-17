@@ -117,6 +117,7 @@ import com.example.viewmodel.TravelViewModel
 @Composable
 fun SettingsScreen(
     viewModel: TravelViewModel,
+    onNavigateToAuth: () -> Unit = {},
     onNavigateBack: () -> Unit
 ) {
     BackHandler(onBack = onNavigateBack)
@@ -159,10 +160,6 @@ fun SettingsScreen(
     val syncMessage by viewModel.syncMessage.collectAsState()
     val lastSyncTimestamp by viewModel.lastSyncTimestamp.collectAsState()
 
-    var authEmail by remember { mutableStateOf("") }
-    var authPassword by remember { mutableStateOf("") }
-    var showAuthPassword by remember { mutableStateOf(false) }
-    var isSignUpMode by remember { mutableStateOf(false) }
     var isSyncingNow by remember { mutableStateOf(false) }
 
     val availableModels = listOf(
@@ -284,7 +281,7 @@ fun SettingsScreen(
             item { Spacer(modifier = Modifier.height(6.dp)) }
 
             // ==========================================
-            // SECTION 0: FIREBASE CLOUD SYNC & AUTHENTICATION
+            // SECTION 0: FIREBASE CLOUD SYNC & ACCOUNT
             // ==========================================
             item {
                 Card(
@@ -321,7 +318,7 @@ fun SettingsScreen(
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Column {
                                     Text(
-                                        text = "Firebase Cloud Sync",
+                                        text = "Cloud Sync & Account",
                                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                                     )
                                     Text(
@@ -381,20 +378,30 @@ fun SettingsScreen(
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.weight(1f)
+                                        ) {
                                             Icon(
                                                 imageVector = Icons.Default.AccountCircle,
                                                 contentDescription = null,
                                                 tint = VenetianGold,
-                                                modifier = Modifier.size(24.dp)
+                                                modifier = Modifier.size(28.dp)
                                             )
                                             Spacer(modifier = Modifier.width(8.dp))
                                             Column {
                                                 Text(
-                                                    text = firebaseUser?.email ?: "Authenticated Traveler",
+                                                    text = firebaseUser?.displayName ?: firebaseUser?.email ?: "Authenticated Traveler",
                                                     fontWeight = FontWeight.SemiBold,
                                                     fontSize = 13.sp
                                                 )
+                                                if (firebaseUser?.displayName != null && firebaseUser?.email != null) {
+                                                    Text(
+                                                        text = firebaseUser?.email ?: "",
+                                                        fontSize = 11.sp,
+                                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                    )
+                                                }
                                                 Text(
                                                     text = "UID: ${firebaseUser?.uid?.take(12)}...",
                                                     fontSize = 10.sp,
@@ -415,9 +422,9 @@ fun SettingsScreen(
                                         }
                                     }
 
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(10.dp))
                                     Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(10.dp))
 
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
@@ -477,139 +484,53 @@ fun SettingsScreen(
                                 }
                             }
                         } else {
-                            // Not Logged In Auth Form
-                            Column(modifier = Modifier.fillMaxWidth()) {
-                                Text(
-                                    text = if (isSignUpMode) "Create Marco Firebase Account" else "Sign in to Marco (go-marco)",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                OutlinedTextField(
-                                    value = authEmail,
-                                    onValueChange = { authEmail = it },
-                                    placeholder = { Text("traveler@example.com", fontSize = 12.sp) },
-                                    leadingIcon = {
-                                        Icon(Icons.Default.Email, contentDescription = null, modifier = Modifier.size(18.dp))
-                                    },
-                                    singleLine = true,
-                                    shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .testTag("firebase_email_input"),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedContainerColor = MaterialTheme.colorScheme.surface,
-                                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                            // Signed Out Clean View with Link to Dedicated Auth Screens
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = MaterialTheme.colorScheme.surface,
+                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(modifier = Modifier.padding(14.dp)) {
+                                    Text(
+                                        text = "Cloud Account Not Connected",
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 13.sp,
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
-                                )
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                OutlinedTextField(
-                                    value = authPassword,
-                                    onValueChange = { authPassword = it },
-                                    placeholder = { Text("Password (min 6 characters)", fontSize = 12.sp) },
-                                    leadingIcon = {
-                                        Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(18.dp))
-                                    },
-                                    trailingIcon = {
-                                        IconButton(onClick = { showAuthPassword = !showAuthPassword }) {
-                                            Icon(
-                                                imageVector = if (showAuthPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                                contentDescription = "Toggle password visibility",
-                                                modifier = Modifier.size(18.dp)
-                                            )
-                                        }
-                                    },
-                                    visualTransformation = if (showAuthPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                                    singleLine = true,
-                                    shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .testTag("firebase_password_input"),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedContainerColor = MaterialTheme.colorScheme.surface,
-                                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = "Sign in to back up your custom itineraries, sync wallet points across devices, and share memories.",
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        lineHeight = 16.sp
                                     )
-                                )
-
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
+                                    Spacer(modifier = Modifier.height(12.dp))
                                     Button(
-                                        onClick = {
-                                            if (authEmail.isBlank() || authPassword.isBlank()) {
-                                                Toast.makeText(context, "Please enter email and password", Toast.LENGTH_SHORT).show()
-                                                return@Button
-                                            }
-                                            if (isSignUpMode) {
-                                                viewModel.signUpWithEmail(authEmail, authPassword) { success, msg ->
-                                                    Toast.makeText(context, msg ?: "Registration completed", Toast.LENGTH_SHORT).show()
-                                                }
-                                            } else {
-                                                viewModel.signInWithEmail(authEmail, authPassword) { success, msg ->
-                                                    Toast.makeText(context, msg ?: "Sign in completed", Toast.LENGTH_SHORT).show()
-                                                }
-                                            }
-                                        },
-                                        shape = RoundedCornerShape(12.dp),
-                                        colors = ButtonDefaults.buttonColors(containerColor = CelestialLapis),
+                                        onClick = onNavigateToAuth,
+                                        shape = RoundedCornerShape(10.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = CelestialLapis,
+                                            contentColor = Color.White
+                                        ),
                                         modifier = Modifier
-                                            .weight(1f)
-                                            .testTag("firebase_auth_submit_button")
+                                            .fillMaxWidth()
+                                            .testTag("settings_open_auth_button")
                                     ) {
+                                        Icon(
+                                            imageVector = Icons.Default.AccountCircle,
+                                            contentDescription = null,
+                                            tint = VenetianGold,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
                                         Text(
-                                            text = if (isSignUpMode) "Register" else "Sign In",
+                                            text = "Sign In or Register",
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 12.sp,
-                                            color = Color.White
+                                            color = VenetianGoldLight
                                         )
                                     }
-
-                                    OutlinedButton(
-                                        onClick = { isSignUpMode = !isSignUpMode },
-                                        shape = RoundedCornerShape(12.dp),
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Text(
-                                            text = if (isSignUpMode) "Switch to Sign In" else "New Account",
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                // Google Auth Quick Button
-                                OutlinedButton(
-                                    onClick = {
-                                        // Quick Google Sign-In helper
-                                        val testGoogleEmail = "traveler.explorer@gmail.com"
-                                        viewModel.signInWithEmail(testGoogleEmail, "GoogleAuthPass123!") { success, msg ->
-                                            if (!success) {
-                                                viewModel.signUpWithEmail(testGoogleEmail, "GoogleAuthPass123!") { s2, m2 ->
-                                                    Toast.makeText(context, m2 ?: "Google Auth Account linked", Toast.LENGTH_SHORT).show()
-                                                }
-                                            } else {
-                                                Toast.makeText(context, "Signed in with Google Auth", Toast.LENGTH_SHORT).show()
-                                            }
-                                        }
-                                    },
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = OceanBlue),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .testTag("google_signin_button")
-                                ) {
-                                    Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.size(16.dp))
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Sign In with Google Auth", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                                 }
                             }
                         }
@@ -1386,15 +1307,15 @@ fun SettingsScreen(
                         ) {
                             OutlinedButton(
                                 onClick = {
-                                    viewModel.reseedSampleTrips()
-                                    Toast.makeText(context, "Sample trips and rewards reset to default!", Toast.LENGTH_SHORT).show()
+                                    viewModel.clearAllLocalData()
+                                    Toast.makeText(context, "Local trips, chats, and cache cleared!", Toast.LENGTH_SHORT).show()
                                 },
                                 shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Icon(Icons.Default.RestartAlt, null, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("Reset Sample Data", fontSize = 12.sp)
+                                Text("Clear Local Data", fontSize = 12.sp)
                             }
 
                             Button(

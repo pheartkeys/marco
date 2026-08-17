@@ -23,8 +23,55 @@ data class TripEntity(
     val timeshareExchangeDetails: String = "",
     val isOfflineSynced: Boolean = true,
     val lastSyncedTimestamp: Long = System.currentTimeMillis(),
-    val heroThemeIndex: Int = 0
+    val heroThemeIndex: Int = 0,
+    val status: String = "PLANNING" // "PLANNING", "IN_PROGRESS", "COMPLETED"
 )
+
+enum class TripStatus(val value: String, val label: String, val badgeEmoji: String) {
+    PLANNING("PLANNING", "Planning Stage", "📋"),
+    IN_PROGRESS("IN_PROGRESS", "On Trip / Live", "🧭"),
+    COMPLETED("COMPLETED", "Completed", "🏁");
+
+    companion object {
+        fun fromString(value: String): TripStatus {
+            return entries.firstOrNull { it.value.equals(value, ignoreCase = true) } ?: PLANNING
+        }
+    }
+}
+
+fun TripEntity.isTripInProgress(): Boolean {
+    if (status.equals("IN_PROGRESS", ignoreCase = true) ||
+        status.equals("ACTIVE", ignoreCase = true) ||
+        status.equals("ON_TRIP", ignoreCase = true)) {
+        return true
+    }
+    if (status.equals("COMPLETED", ignoreCase = true) ||
+        status.equals("PAST", ignoreCase = true)) {
+        return false
+    }
+    if (status.equals("PLANNING", ignoreCase = true)) {
+        return false
+    }
+    return try {
+        val now = java.time.LocalDate.now()
+        val formats = listOf(
+            java.time.format.DateTimeFormatter.ofPattern("MMM dd, yyyy", java.util.Locale.US),
+            java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd", java.util.Locale.US),
+            java.time.format.DateTimeFormatter.ofPattern("MM/dd/yyyy", java.util.Locale.US)
+        )
+        var start: java.time.LocalDate? = null
+        var end: java.time.LocalDate? = null
+        for (fmt in formats) {
+            if (start == null) try { start = java.time.LocalDate.parse(startDate.trim(), fmt) } catch (_: Exception) {}
+            if (end == null) try { end = java.time.LocalDate.parse(endDate.trim(), fmt) } catch (_: Exception) {}
+        }
+        if (start != null && end != null) {
+            !now.isBefore(start) && !now.isAfter(end)
+        } else false
+    } catch (_: Exception) {
+        false
+    }
+}
 
 @Entity(tableName = "trip_activities")
 data class TripActivityEntity(

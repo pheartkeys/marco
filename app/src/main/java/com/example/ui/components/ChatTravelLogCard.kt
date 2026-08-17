@@ -36,11 +36,11 @@ fun ChatTravelLogCard(
 ) {
     var isSaved by remember { mutableStateOf(false) }
 
-    val journalTitle = "Day 2 Expedition Chronicle: The Azure Shores of Wailea"
+    val journalLocation = trip?.destination ?: "Expedition Destination"
+    val journalTitle = "Expedition Chronicle: ${trip?.title ?: "Journey Notes"}"
     val journalBody = """
-        "As dawn rose over the volcanic ridge of Haleakalā, the trade winds whispered gentle fortune. Our company ventured along the stone promenade where turtles basked amidst crystal tide pools. With step-free passage secured for every step of our carriage, we partook in fresh papaya and macadamia honey, untroubled by allergens. Truly, the splendor of this archipelago rivals the grandest ports of the East."
+        "As dawn rose over the horizon of $journalLocation, the expedition prepared for another chapter of discovery. With curated routes and seamless accessibility secured for the journey, our travelers immersed in local culture and landscapes, untroubled by delays. Truly, this journey stands as an unforgettable exploration."
     """.trimIndent()
-    val journalLocation = trip?.destination ?: "Wailea Coast, Maui"
 
     Card(
         shape = RoundedCornerShape(20.dp),

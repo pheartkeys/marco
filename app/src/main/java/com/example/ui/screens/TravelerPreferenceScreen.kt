@@ -325,7 +325,7 @@ fun LearnedDnaSection(
         Spacer(modifier = Modifier.height(8.dp))
 
         val affinities = listOf(
-            AffinityItem("Morning Outdoor Scenery & Ramps", 96, EmeraldGreen, "Highly favored in Maui & Alps"),
+            AffinityItem("Morning Outdoor Scenery & Ramps", 96, EmeraldGreen, "Highly favored in past itineraries"),
             AffinityItem("Spacious Multi-Bedroom Timeshares", 94, OceanBlue, "Consistently higher rating than standard rooms"),
             AffinityItem("Delta SkyMiles & Partner Upgrades", 92, AmberGold, "Primary airline points redemption synergy"),
             AffinityItem("Scenic High-Speed Rail & Glacier Trains", 90, TealAccent, "Preferred over driving rental cars"),
