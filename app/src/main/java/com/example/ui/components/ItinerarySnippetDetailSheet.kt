@@ -1,6 +1,7 @@
 package com.example.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -16,17 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.TripActivityEntity
-import com.example.ui.theme.EmeraldGreen
-import com.example.ui.theme.OceanBlue
-import com.example.ui.theme.SunsetCoral
-import com.example.ui.theme.VenetianGold
+import com.example.ui.theme.*
 
 /**
  * Expanded detail and edit view for itinerary items opened directly from in-chat cards.
@@ -83,11 +80,9 @@ fun ItinerarySnippetDetailSheet(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(44.dp)
+                            .size(40.dp)
                             .clip(CircleShape)
-                            .background(
-                                Brush.linearGradient(listOf(OceanBlue, Color(0xFF0F172A)))
-                            ),
+                            .background(LuxuryCardElevated),
                         contentAlignment = Alignment.Center
                     ) {
                         val icon = when (activity.category.uppercase()) {
@@ -114,20 +109,17 @@ fun ItinerarySnippetDetailSheet(
                             Text(
                                 text = "DAY ${activity.dayNumber} • ${activity.category}",
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    fontSize = 10.sp,
                                     fontWeight = FontWeight.Black,
-                                    letterSpacing = 0.8.sp,
                                     color = OceanBlue
                                 ),
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                             )
                         }
-                        Spacer(modifier = Modifier.height(2.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "Itinerary Segment Details",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 11.sp
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }
@@ -165,10 +157,7 @@ fun ItinerarySnippetDetailSheet(
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
                             text = editedTitle,
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 17.sp
-                            )
+                            style = MaterialTheme.typography.titleLarge
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -187,11 +176,10 @@ fun ItinerarySnippetDetailSheet(
                             Text(
                                 text = editedTimeSlot,
                                 style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.SemiBold,
-                                    fontSize = 13.sp
+                                    fontWeight = FontWeight.SemiBold
                                 )
                             )
-                            Text("•", color = Color.Gray)
+                            Text("•", color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Icon(
                                 imageVector = Icons.Default.LocationOn,
                                 contentDescription = null,
@@ -201,7 +189,6 @@ fun ItinerarySnippetDetailSheet(
                             Text(
                                 text = editedLocation,
                                 style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontSize = 13.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             )
@@ -212,7 +199,8 @@ fun ItinerarySnippetDetailSheet(
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
                                 color = MaterialTheme.colorScheme.surface,
-                                tonalElevation = 1.dp
+                                tonalElevation = 0.dp,
+                                border = BorderStroke(1.dp, ContourBorder)
                             ) {
                                 Row(
                                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
@@ -229,7 +217,6 @@ fun ItinerarySnippetDetailSheet(
                                         text = "Confirmation: $editedConfirmation",
                                         style = MaterialTheme.typography.labelMedium.copy(
                                             fontWeight = FontWeight.Bold,
-                                            fontSize = 12.sp,
                                             letterSpacing = 0.5.sp
                                         )
                                     )
@@ -242,7 +229,6 @@ fun ItinerarySnippetDetailSheet(
                             Text(
                                 text = editedNotes,
                                 style = MaterialTheme.typography.bodySmall.copy(
-                                    fontSize = 12.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             )
@@ -269,8 +255,7 @@ fun ItinerarySnippetDetailSheet(
                                         text = editedAccessibility,
                                         style = MaterialTheme.typography.labelSmall.copy(
                                             color = EmeraldGreen,
-                                            fontWeight = FontWeight.SemiBold,
-                                            fontSize = 11.sp
+                                            fontWeight = FontWeight.SemiBold
                                         )
                                     )
                                 }
@@ -306,7 +291,7 @@ fun ItinerarySnippetDetailSheet(
                                     label = {
                                         Text(
                                             text = if (isCompleted) "Completed" else "Mark Done",
-                                            fontSize = 11.sp
+                                            style = MaterialTheme.typography.labelMedium
                                         )
                                     },
                                     leadingIcon = {
@@ -314,7 +299,7 @@ fun ItinerarySnippetDetailSheet(
                                             imageVector = if (isCompleted) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
                                             contentDescription = null,
                                             modifier = Modifier.size(14.dp),
-                                            tint = if (isCompleted) EmeraldGreen else Color.Gray
+                                            tint = if (isCompleted) EmeraldGreen else MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     },
                                     shape = RoundedCornerShape(12.dp)
@@ -341,7 +326,7 @@ fun ItinerarySnippetDetailSheet(
                         OutlinedTextField(
                             value = editedTitle,
                             onValueChange = { editedTitle = it },
-                            label = { Text("Activity Title", fontSize = 12.sp) },
+                            label = { Text("Activity Title", style = MaterialTheme.typography.labelMedium) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -353,14 +338,14 @@ fun ItinerarySnippetDetailSheet(
                             OutlinedTextField(
                                 value = editedTimeSlot,
                                 onValueChange = { editedTimeSlot = it },
-                                label = { Text("Time Slot", fontSize = 12.sp) },
+                                label = { Text("Time Slot", style = MaterialTheme.typography.labelMedium) },
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp)
                             )
                             OutlinedTextField(
                                 value = editedCost,
                                 onValueChange = { editedCost = it },
-                                label = { Text("Cost ($)", fontSize = 12.sp) },
+                                label = { Text("Cost ($)", style = MaterialTheme.typography.labelMedium) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp)
@@ -370,7 +355,7 @@ fun ItinerarySnippetDetailSheet(
                         OutlinedTextField(
                             value = editedLocation,
                             onValueChange = { editedLocation = it },
-                            label = { Text("Location", fontSize = 12.sp) },
+                            label = { Text("Location", style = MaterialTheme.typography.labelMedium) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -378,7 +363,7 @@ fun ItinerarySnippetDetailSheet(
                         OutlinedTextField(
                             value = editedConfirmation,
                             onValueChange = { editedConfirmation = it },
-                            label = { Text("Confirmation Code / Voucher #", fontSize = 12.sp) },
+                            label = { Text("Confirmation Code / Voucher #", style = MaterialTheme.typography.labelMedium) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -386,7 +371,7 @@ fun ItinerarySnippetDetailSheet(
                         OutlinedTextField(
                             value = editedAccessibility,
                             onValueChange = { editedAccessibility = it },
-                            label = { Text("Accessibility / Dietary Badges", fontSize = 12.sp) },
+                            label = { Text("Accessibility / Dietary Badges", style = MaterialTheme.typography.labelMedium) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -394,7 +379,7 @@ fun ItinerarySnippetDetailSheet(
                         OutlinedTextField(
                             value = editedNotes,
                             onValueChange = { editedNotes = it },
-                            label = { Text("Expedition Notes & Hints", fontSize = 12.sp) },
+                            label = { Text("Expedition Notes & Hints", style = MaterialTheme.typography.labelMedium) },
                             modifier = Modifier.fillMaxWidth(),
                             maxLines = 3,
                             shape = RoundedCornerShape(12.dp)
@@ -413,7 +398,7 @@ fun ItinerarySnippetDetailSheet(
                 if (!isEditing) {
                     OutlinedButton(
                         onClick = { isEditing = true },
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier
                             .weight(1f)
                             .testTag("edit_snippet_button")
@@ -424,7 +409,7 @@ fun ItinerarySnippetDetailSheet(
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Edit Details", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text("Edit Details", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold))
                     }
 
                     if (activity.vendorPhone.isNotBlank()) {
@@ -436,7 +421,7 @@ fun ItinerarySnippetDetailSheet(
                                 )
                                 onDismiss()
                             },
-                            shape = RoundedCornerShape(14.dp),
+                            shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = OceanBlue),
                             modifier = Modifier
                                 .weight(1f)
@@ -448,7 +433,7 @@ fun ItinerarySnippetDetailSheet(
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Call Desk", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("Call Desk", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold))
                         }
                     }
                 } else {
@@ -464,10 +449,10 @@ fun ItinerarySnippetDetailSheet(
                             editedConfirmation = activity.confirmationCode
                             editedAccessibility = activity.accessibilityBadge
                         },
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Cancel", fontSize = 12.sp)
+                        Text("Cancel", style = MaterialTheme.typography.labelMedium)
                     }
 
                     Button(
@@ -487,7 +472,7 @@ fun ItinerarySnippetDetailSheet(
                             isEditing = false
                             showSavedSnackbar = true
                         },
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = OceanBlue),
                         modifier = Modifier
                             .weight(1f)
@@ -499,7 +484,7 @@ fun ItinerarySnippetDetailSheet(
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Save & Update", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text("Save & Update", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold))
                     }
                 }
             }
@@ -523,11 +508,10 @@ fun ItinerarySnippetDetailSheet(
                             modifier = Modifier.size(16.dp)
                         )
                         Text(
-                            text = "Itinerary changes saved and synced to expedition database!",
+                            text = "Saved to your itinerary.",
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = EmeraldGreen,
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 12.sp
+                                fontWeight = FontWeight.SemiBold
                             )
                         )
                     }
@@ -544,10 +528,9 @@ fun ItinerarySnippetDetailSheet(
                     .testTag("return_to_chat_button")
             ) {
                 Text(
-                    "← Return to Expedition Chat",
+                    "Return to Expedition Chat",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium
+                    style = MaterialTheme.typography.labelMedium
                 )
             }
         }

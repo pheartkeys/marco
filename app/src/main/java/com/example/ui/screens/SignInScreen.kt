@@ -6,10 +6,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,7 +39,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -71,15 +71,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ui.theme.CelestialLapis
-import com.example.ui.theme.ElegantDarkBackground
-import com.example.ui.theme.ElegantDarkSurface
-import com.example.ui.theme.ElegantError
-import com.example.ui.theme.EmeraldGreen
-import com.example.ui.theme.OceanBlue
-import com.example.ui.theme.SunsetCoral
-import com.example.ui.theme.VenetianGold
-import com.example.ui.theme.VenetianGoldLight
+import com.example.ui.theme.*
 import com.example.viewmodel.TravelViewModel
 
 @Composable
@@ -105,15 +97,7 @@ fun SignInScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        CelestialLapis.copy(alpha = 0.85f),
-                        ElegantDarkBackground,
-                        ElegantDarkBackground
-                    )
-                )
-            )
+            .background(LuxuryDarkBase)
             .statusBarsPadding()
             .navigationBarsPadding()
             .imePadding()
@@ -136,12 +120,12 @@ fun SignInScreen(
                     modifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.6f))
+                        .background(LuxuryCard)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onSurface,
+                        tint = TextPrimary,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -151,10 +135,10 @@ fun SignInScreen(
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
-                        text = "Skip for Now",
-                        color = VenetianGold,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold
+                        text = "Skip",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = ChampagneGold,
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
@@ -164,24 +148,17 @@ fun SignInScreen(
             // Branding Emblem
             Box(
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(72.dp)
                     .clip(CircleShape)
-                    .background(
-                        Brush.linearGradient(
-                            listOf(
-                                CelestialLapis,
-                                Color(0xFF0F172A)
-                            )
-                        )
-                    )
-                    .border(2.dp, VenetianGold.copy(alpha = 0.6f), CircleShape),
+                    .background(LuxuryCardElevated)
+                    .border(1.dp, LuxuryBorder, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Explore,
                     contentDescription = "Marco Emblem",
-                    tint = VenetianGold,
-                    modifier = Modifier.size(44.dp)
+                    tint = ChampagneGold,
+                    modifier = Modifier.size(36.dp)
                 )
             }
 
@@ -204,14 +181,12 @@ fun SignInScreen(
                     border = androidx.compose.foundation.BorderStroke(1.dp, VenetianGold.copy(alpha = 0.4f))
                 ) {
                     Text(
-                        text = "EXPEDITIONS",
+                        text = "Expeditions",
                         style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize = 10.sp,
                             fontWeight = FontWeight.Black,
-                            letterSpacing = 1.sp,
                             color = VenetianGold
                         ),
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
             }
@@ -219,11 +194,10 @@ fun SignInScreen(
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "Sign in to synchronize your itineraries, travel DNA, multi-currency wallet, and AI concierge across all devices.",
-                fontSize = 13.sp,
+                text = "Sign in to sync your itineraries and travel preferences across all devices.",
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = 18.sp,
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
 
@@ -248,21 +222,19 @@ fun SignInScreen(
                 ) {
                     Text(
                         text = "Welcome Back",
-                        style = MaterialTheme.typography.titleMedium.copy(
+                        style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = 17.sp,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     )
                     Text(
                         text = "Enter your credentials to continue",
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 12.sp
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
 
-                    Spacer(modifier = Modifier.height(18.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     // Error Message Banner
                     AnimatedVisibility(
@@ -281,8 +253,8 @@ fun SignInScreen(
                             ) {
                                 Text(
                                     text = msg,
-                                    color = SunsetCoral,
-                                    fontSize = 12.sp,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onErrorContainer,
                                     modifier = Modifier.padding(12.dp)
                                 )
                             }
@@ -292,8 +264,7 @@ fun SignInScreen(
                     // Email Field
                     Text(
                         text = "Email Address",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(6.dp))
@@ -303,7 +274,7 @@ fun SignInScreen(
                             email = it
                             errorMessage = null
                         },
-                        placeholder = { Text("traveler@example.com", fontSize = 13.sp) },
+                        placeholder = { Text("traveler@example.com", style = MaterialTheme.typography.bodyMedium) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Email,
@@ -332,7 +303,7 @@ fun SignInScreen(
                         )
                     )
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     // Password Field
                     Row(
@@ -342,19 +313,21 @@ fun SignInScreen(
                     ) {
                         Text(
                             text = "Password",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurface
                         )
-                        Text(
-                            text = "Forgot Password?",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = OceanBlue,
-                            modifier = Modifier
-                                .clickable { onNavigateToForgotPassword() }
-                                .testTag("signin_forgot_password_button")
-                        )
+                        TextButton(
+                            onClick = onNavigateToForgotPassword,
+                            modifier = Modifier.testTag("signin_forgot_password_button"),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                        ) {
+                            Text(
+                                text = "Forgot Password?",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = WaypointCyan
+                            )
+                        }
                     }
                     Spacer(modifier = Modifier.height(6.dp))
                     OutlinedTextField(
@@ -363,7 +336,7 @@ fun SignInScreen(
                             password = it
                             errorMessage = null
                         },
-                        placeholder = { Text("••••••••", fontSize = 13.sp) },
+                        placeholder = { Text("••••••••", style = MaterialTheme.typography.bodyMedium) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Lock,
@@ -435,7 +408,7 @@ fun SignInScreen(
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(50.dp)
+                            .height(48.dp)
                             .testTag("signin_submit_button")
                     ) {
                         if (isLoading) {
@@ -445,41 +418,41 @@ fun SignInScreen(
                                 strokeWidth = 2.dp
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Authenticating...", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                            Text("Authenticating...", style = MaterialTheme.typography.labelLarge)
                         } else {
                             Text(
                                 text = "Sign In",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.labelLarge,
                                 color = VenetianGoldLight
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(18.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     // OR Divider
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Divider(
+                        HorizontalDivider(
                             modifier = Modifier.weight(1f),
                             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
                         )
                         Text(
-                            text = "  OR  ",
-                            fontSize = 11.sp,
+                            text = "OR",
+                            style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 8.dp)
                         )
-                        Divider(
+                        HorizontalDivider(
                             modifier = Modifier.weight(1f),
                             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(18.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     // Google Sign-In Quick Auth Button
                     OutlinedButton(
@@ -522,14 +495,14 @@ fun SignInScreen(
                     ) {
                         Text(
                             text = "G",
-                            fontSize = 16.sp,
+                            style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Black,
                             color = EmeraldGreen
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Continue with Google",
-                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold
                         )
                     }
@@ -546,18 +519,21 @@ fun SignInScreen(
             ) {
                 Text(
                     text = "Don't have an account? ",
-                    fontSize = 13.sp,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Text(
-                    text = "Sign Up",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = VenetianGold,
-                    modifier = Modifier
-                        .clickable { onNavigateToSignUp() }
-                        .testTag("signin_to_signup_button")
-                )
+                TextButton(
+                    onClick = onNavigateToSignUp,
+                    modifier = Modifier.testTag("signin_to_signup_button"),
+                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp)
+                ) {
+                    Text(
+                        text = "Sign Up",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = VenetianGold
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))

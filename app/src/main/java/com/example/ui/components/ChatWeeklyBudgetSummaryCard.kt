@@ -2,6 +2,7 @@ package com.example.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -28,6 +29,7 @@ import com.example.data.model.ChatMessageEntity
 import com.example.data.model.TripEntity
 import com.example.data.model.WalletBalanceEntity
 import com.example.data.model.WalletTransactionEntity
+import com.example.ui.theme.*
 
 /**
  * Automated Weekly Budget Summary Card delivered by AI in chat.
@@ -72,7 +74,8 @@ fun ChatWeeklyBudgetSummaryCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 6.dp)
@@ -95,20 +98,16 @@ fun ChatWeeklyBudgetSummaryCard(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(42.dp)
+                            .size(38.dp)
                             .clip(CircleShape)
-                            .background(
-                                Brush.linearGradient(
-                                    colors = listOf(Color(0xFF673AB7), Color(0xFF3F51B5))
-                                )
-                            ),
+                            .background(LuxuryCardElevated),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Analytics,
                             contentDescription = "Weekly Budget Summary",
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
+                            tint = ChampagneGold,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
 
@@ -118,23 +117,21 @@ fun ChatWeeklyBudgetSummaryCard(
                             horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             Text(
-                                text = "Weekly Budget Arbitrage",
+                                text = "Weekly budget summary",
                                 style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp
+                                    fontWeight = FontWeight.Bold
                                 )
                             )
                             Surface(
                                 shape = RoundedCornerShape(6.dp),
-                                color = Color(0xFFEDE7F6)
+                                color = CompassLilac.copy(alpha = 0.15f)
                             ) {
                                 Text(
                                     text = "AI Report",
                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        color = Color(0xFF512DA8),
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 9.sp
+                                        color = CompassLilac,
+                                        fontWeight = FontWeight.Bold
                                     )
                                 )
                             }
@@ -142,8 +139,7 @@ fun ChatWeeklyBudgetSummaryCard(
                         Text(
                             text = "Spend vs. Loyalty Program Savings",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 12.sp
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }
@@ -161,7 +157,7 @@ fun ChatWeeklyBudgetSummaryCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Visual Chart Box: Actual Spend vs Loyalty Savings Donut / Bar Breakdown
             Surface(
@@ -184,17 +180,17 @@ fun ChatWeeklyBudgetSummaryCard(
                             modifier = Modifier.size(90.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            val savedRatio = if (totalGrossTripValue > 0) (totalLoyaltySavings / totalGrossTripValue).toFloat() else 0.72f
+                            val savedRatio = if (totalGrossTripValue > 0) (totalLoyaltySavings / totalGrossTripValue).toFloat() else 0f
                             Canvas(modifier = Modifier.fillMaxSize()) {
                                 val strokeWidth = 10.dp.toPx()
                                 // Background circle (Spend)
                                 drawCircle(
-                                    color = Color(0xFF1976D2),
+                                    color = MaritimeBlue,
                                     style = Stroke(strokeWidth)
                                 )
                                 // Arc for Savings
                                 drawArc(
-                                    color = Color(0xFF00C853),
+                                    color = WayfinderEmerald,
                                     startAngle = -90f,
                                     sweepAngle = 360f * savedRatio,
                                     useCenter = false,
@@ -206,13 +202,12 @@ fun ChatWeeklyBudgetSummaryCard(
                                     text = "${animatedSavingsPercent.toInt()}%",
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontWeight = FontWeight.ExtraBold,
-                                        color = Color(0xFF00C853)
+                                        color = WayfinderEmerald
                                     )
                                 )
                                 Text(
-                                    text = "SAVED",
+                                    text = "Saved",
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        fontSize = 8.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -241,7 +236,7 @@ fun ChatWeeklyBudgetSummaryCard(
                                         modifier = Modifier
                                             .size(10.dp)
                                             .clip(CircleShape)
-                                            .background(Color(0xFF1976D2))
+                                            .background(MaritimeBlue)
                                     )
                                     Text(
                                         text = "Out of Pocket:",
@@ -268,12 +263,12 @@ fun ChatWeeklyBudgetSummaryCard(
                                         modifier = Modifier
                                             .size(10.dp)
                                             .clip(CircleShape)
-                                            .background(Color(0xFF00C853))
+                                            .background(WayfinderEmerald)
                                     )
                                     Text(
                                         text = "Loyalty Savings:",
                                         style = MaterialTheme.typography.bodySmall.copy(
-                                            color = Color(0xFF00C853),
+                                            color = WayfinderEmerald,
                                             fontWeight = FontWeight.Medium
                                         )
                                     )
@@ -282,12 +277,12 @@ fun ChatWeeklyBudgetSummaryCard(
                                     text = "+$${String.format("%,.2f", totalLoyaltySavings)}",
                                     style = MaterialTheme.typography.bodyMedium.copy(
                                         fontWeight = FontWeight.ExtraBold,
-                                        color = Color(0xFF00C853)
+                                        color = WayfinderEmerald
                                     )
                                 )
                             }
 
-                            Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
                             // Gross Trip Value
                             Row(
@@ -320,7 +315,7 @@ fun ChatWeeklyBudgetSummaryCard(
             // Highlights & Arbitrage Insights
             Surface(
                 shape = RoundedCornerShape(12.dp),
-                color = Color(0xFFE8F5E9).copy(alpha = 0.7f),
+                color = WayfinderEmerald.copy(alpha = 0.15f),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
@@ -331,15 +326,15 @@ fun ChatWeeklyBudgetSummaryCard(
                     Icon(
                         imageVector = Icons.Default.TrendingUp,
                         contentDescription = null,
-                        tint = Color(0xFF2E7D32),
+                        tint = WayfinderEmerald,
                         modifier = Modifier.size(18.dp)
                     )
                     Column {
                         Text(
-                            text = "AI Arbitrage Takeaway",
+                            text = "AI takeaway",
                             style = MaterialTheme.typography.labelMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF2E7D32)
+                                color = WayfinderEmerald
                             )
                         )
                         val takeawayText = if (totalLoyaltySavings > 0) {
@@ -350,8 +345,7 @@ fun ChatWeeklyBudgetSummaryCard(
                         Text(
                             text = takeawayText,
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = Color(0xFF1B5E20),
-                                fontSize = 11.sp,
+                                color = WayfinderEmerald,
                                 lineHeight = 15.sp
                             )
                         )
@@ -416,7 +410,7 @@ fun ChatWeeklyBudgetSummaryCard(
                                             Text(
                                                 text = "Saved: +$${String.format("%.0f", item.saved)}",
                                                 style = MaterialTheme.typography.labelSmall.copy(
-                                                    color = Color(0xFF00C853),
+                                                    color = WayfinderEmerald,
                                                     fontWeight = FontWeight.Bold
                                                 )
                                             )
@@ -439,14 +433,14 @@ fun ChatWeeklyBudgetSummaryCard(
                                         modifier = Modifier
                                             .weight(if (catSavedRatio > 0) (1f - catSavedRatio).coerceAtLeast(0.05f) else 1f)
                                             .fillMaxHeight()
-                                            .background(Color(0xFF1976D2))
+                                            .background(MaritimeBlue)
                                     )
                                     if (catSavedRatio > 0) {
                                         Box(
                                             modifier = Modifier
                                                 .weight(catSavedRatio.coerceAtLeast(0.05f))
                                                 .fillMaxHeight()
-                                                .background(Color(0xFF00C853))
+                                                .background(WayfinderEmerald)
                                         )
                                     }
                                 }
@@ -462,7 +456,10 @@ fun ChatWeeklyBudgetSummaryCard(
             Button(
                 onClick = onOpenFullWallet,
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F9D58)),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = WayfinderEmerald,
+                    contentColor = CartographyDarkBase
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("weekly_summary_open_wallet_btn")
@@ -470,15 +467,13 @@ fun ChatWeeklyBudgetSummaryCard(
                 Icon(
                     imageVector = Icons.Default.AccountBalanceWallet,
                     contentDescription = null,
-                    tint = Color.White,
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "View Points, Cards & Timeshare Swaps →",
                     style = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        fontWeight = FontWeight.Bold
                     )
                 )
             }

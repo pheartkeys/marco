@@ -6,10 +6,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,6 +45,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,15 +64,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.ui.theme.CelestialLapis
-import com.example.ui.theme.ElegantDarkBackground
-import com.example.ui.theme.ElegantDarkSurface
-import com.example.ui.theme.ElegantError
-import com.example.ui.theme.EmeraldGreen
-import com.example.ui.theme.SunsetCoral
-import com.example.ui.theme.VenetianGold
-import com.example.ui.theme.VenetianGoldLight
+import com.example.ui.theme.*
 import com.example.viewmodel.TravelViewModel
 
 @Composable
@@ -94,15 +87,7 @@ fun ForgotPasswordScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        CelestialLapis.copy(alpha = 0.85f),
-                        ElegantDarkBackground,
-                        ElegantDarkBackground
-                    )
-                )
-            )
+            .background(LuxuryDarkBase)
             .statusBarsPadding()
             .navigationBarsPadding()
             .imePadding()
@@ -125,12 +110,12 @@ fun ForgotPasswordScreen(
                     modifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.6f))
+                        .background(LuxuryCard)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onSurface,
+                        tint = TextPrimary,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -141,24 +126,17 @@ fun ForgotPasswordScreen(
             // Lock Reset Emblem
             Box(
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(72.dp)
                     .clip(CircleShape)
-                    .background(
-                        Brush.linearGradient(
-                            listOf(
-                                CelestialLapis,
-                                Color(0xFF0F172A)
-                            )
-                        )
-                    )
-                    .border(2.dp, VenetianGold.copy(alpha = 0.6f), CircleShape),
+                    .background(LuxuryCardElevated)
+                    .border(1.dp, LuxuryBorder, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.LockReset,
                     contentDescription = "Reset Password",
-                    tint = VenetianGold,
-                    modifier = Modifier.size(44.dp)
+                    tint = ChampagneGold,
+                    modifier = Modifier.size(36.dp)
                 )
             }
 
@@ -167,7 +145,6 @@ fun ForgotPasswordScreen(
             Text(
                 text = "Reset Password",
                 style = MaterialTheme.typography.headlineSmall.copy(
-                    fontWeight = FontWeight.ExtraBold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             )
@@ -176,10 +153,9 @@ fun ForgotPasswordScreen(
 
             Text(
                 text = "Enter the email associated with your Marco Expeditions account and we will send you a password reset link.",
-                fontSize = 13.sp,
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = 18.sp,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
@@ -220,7 +196,7 @@ fun ForgotPasswordScreen(
                                     tint = EmeraldGreen,
                                     modifier = Modifier.size(36.dp)
                                 )
-                                Spacer(modifier = Modifier.height(10.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = "Reset Instructions Sent!",
                                     style = MaterialTheme.typography.titleMedium.copy(
@@ -231,10 +207,9 @@ fun ForgotPasswordScreen(
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(
                                     text = "We sent an email to $email with instructions to reset your password. Please check your inbox and spam folder.",
-                                    fontSize = 12.sp,
+                                    style = MaterialTheme.typography.labelMedium,
                                     textAlign = TextAlign.Center,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    lineHeight = 16.sp
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -250,18 +225,17 @@ fun ForgotPasswordScreen(
                             ),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(50.dp)
+                                .height(48.dp)
                                 .testTag("forgot_password_back_to_signin_button")
                         ) {
                             Text(
                                 text = "Return to Sign In",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.labelLarge,
                                 color = VenetianGoldLight
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         OutlinedButton(
                             onClick = {
@@ -269,11 +243,15 @@ fun ForgotPasswordScreen(
                                 errorMessage = null
                             },
                             shape = RoundedCornerShape(14.dp),
+                            border = androidx.compose.foundation.BorderStroke(
+                                1.dp,
+                                MaterialTheme.colorScheme.outlineVariant
+                            ),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
                                 text = "Try Another Email",
-                                fontSize = 13.sp,
+                                style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                         }
@@ -283,7 +261,6 @@ fun ForgotPasswordScreen(
                             text = "Account Recovery",
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                         )
@@ -307,8 +284,8 @@ fun ForgotPasswordScreen(
                                 ) {
                                     Text(
                                         text = msg,
-                                        color = SunsetCoral,
-                                        fontSize = 12.sp,
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.onErrorContainer,
                                         modifier = Modifier.padding(12.dp)
                                     )
                                 }
@@ -317,8 +294,7 @@ fun ForgotPasswordScreen(
 
                         Text(
                             text = "Email Address",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(6.dp))
@@ -328,7 +304,7 @@ fun ForgotPasswordScreen(
                                 email = it
                                 errorMessage = null
                             },
-                            placeholder = { Text("traveler@example.com", fontSize = 13.sp) },
+                            placeholder = { Text("traveler@example.com", style = MaterialTheme.typography.bodyMedium) },
                             leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Default.Email,
@@ -386,7 +362,7 @@ fun ForgotPasswordScreen(
                             ),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(50.dp)
+                                .height(48.dp)
                                 .testTag("forgot_password_submit_button")
                         ) {
                             if (isLoading) {
@@ -396,12 +372,11 @@ fun ForgotPasswordScreen(
                                     strokeWidth = 2.dp
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Sending Link...", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                                Text("Sending Link...", style = MaterialTheme.typography.labelLarge)
                             } else {
                                 Text(
                                     text = "Send Reset Link",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.labelLarge,
                                     color = VenetianGoldLight
                                 )
                             }
@@ -420,18 +395,21 @@ fun ForgotPasswordScreen(
             ) {
                 Text(
                     text = "Remembered your password? ",
-                    fontSize = 13.sp,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Text(
-                    text = "Sign In",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = VenetianGold,
-                    modifier = Modifier
-                        .clickable { onNavigateToSignIn() }
-                        .testTag("forgot_password_to_signin_link")
-                )
+                TextButton(
+                    onClick = onNavigateToSignIn,
+                    modifier = Modifier.testTag("forgot_password_to_signin_link"),
+                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp)
+                ) {
+                    Text(
+                        text = "Sign In",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = VenetianGold
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))

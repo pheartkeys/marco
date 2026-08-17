@@ -600,32 +600,6 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
                     triggerEmergencySos()
                 }
 
-                // Vintage Parchment Map Intent
-                lower.contains("parchment") || lower.contains("vintage map") || lower.contains("cartography") || lower.contains("wind rose") || lower.contains("rhumb") -> {
-                    _isConciergeTyping.value = false
-                    repository.insertChatMessage(
-                        ChatMessageEntity(
-                            tripId = tripId,
-                            sender = "CARD_PARCHMENT_MAP",
-                            text = "🧭 **Antique Journey Cartography & Parchment Map**\nHistorical wind rose vectors, nautical rhumb lines, and GPS coordinate tracing across your route.",
-                            timestamp = System.currentTimeMillis()
-                        )
-                    )
-                }
-
-                // Travel Log Journal Intent
-                lower.contains("travel log") || lower.contains("journal") || lower.contains("chronicle") || lower.contains("daily reflection") -> {
-                    _isConciergeTyping.value = false
-                    repository.insertChatMessage(
-                        ChatMessageEntity(
-                            tripId = tripId,
-                            sender = "CARD_TRAVEL_LOG",
-                            text = "📜 **Marco's Daily Travel Log & Expedition Chronicle**\nAn AI-penned literary journal entry summarizing today's highlights. Tap below to archive directly to your permanent memories.",
-                            timestamp = System.currentTimeMillis()
-                        )
-                    )
-                }
-
                 // Group Media Carousel Intent
                 lower.contains("carousel") || lower.contains("photo reel") || lower.contains("group photo") || lower.contains("shared photos") -> {
                     _isConciergeTyping.value = false

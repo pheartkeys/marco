@@ -7,8 +7,10 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -46,15 +48,17 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.ui.theme.AmberGold
-import com.example.ui.theme.EmeraldGreen
-import com.example.ui.theme.Navy900
-import com.example.ui.theme.OceanBlue
-import com.example.ui.theme.PurpleAccent
-import com.example.ui.theme.SkyBlueLight
-import com.example.ui.theme.SunsetCoral
-import com.example.ui.theme.TealAccent
+import com.example.ui.theme.ChampagneGold
+import com.example.ui.theme.ChampagneGoldMuted
+import com.example.ui.theme.LuxuryBorder
+import com.example.ui.theme.LuxuryCard
+import com.example.ui.theme.LuxuryCardElevated
+import com.example.ui.theme.LuxurySurface
+import com.example.ui.theme.StatusAzure
+import com.example.ui.theme.StatusEmerald
+import com.example.ui.theme.TextMuted
+import com.example.ui.theme.TextPrimary
+import com.example.ui.theme.TextSecondary
 
 @Composable
 fun CategoryIconBadge(
@@ -68,30 +72,31 @@ fun CategoryIconBadge(
         modifier = modifier
             .size(size.dp)
             .clip(RoundedCornerShape(10.dp))
-            .background(bgColor),
+            .background(bgColor)
+            .border(1.dp, LuxuryBorder, RoundedCornerShape(10.dp)),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             imageVector = icon,
             contentDescription = category,
             tint = tintColor,
-            modifier = Modifier.size((size * 0.58).dp)
+            modifier = Modifier.size((size * 0.52).dp)
         )
     }
 }
 
 fun getCategoryStyling(category: String): Triple<ImageVector, Color, Color> {
     return when (category.uppercase()) {
-        "FLIGHT", "AIRLINE" -> Triple(Icons.Default.Flight, Color(0xFF0284C7).copy(alpha = 0.15f), OceanBlue)
-        "HOTEL" -> Triple(Icons.Default.Hotel, Color(0xFF8B5CF6).copy(alpha = 0.15f), PurpleAccent)
-        "TIMESHARE", "EXCHANGE" -> Triple(Icons.Default.Apartment, Color(0xFFF59E0B).copy(alpha = 0.15f), AmberGold)
-        "CAMPGROUND", "CAMPING" -> Triple(Icons.Default.Cabin, Color(0xFF10B981).copy(alpha = 0.15f), EmeraldGreen)
-        "TRANSIT", "TRANSPORT" -> Triple(Icons.Default.DirectionsBus, Color(0xFF0D9488).copy(alpha = 0.15f), TealAccent)
-        "DINING", "FOOD" -> Triple(Icons.Default.Restaurant, Color(0xFFF43F5E).copy(alpha = 0.15f), SunsetCoral)
-        "FAMILY_KIDS", "FAMILY" -> Triple(Icons.Default.ChildCare, Color(0xFFEC4899).copy(alpha = 0.15f), Color(0xFFEC4899))
-        "CREDIT_CARD", "REWARDS" -> Triple(Icons.Default.CardMembership, Color(0xFFF59E0B).copy(alpha = 0.15f), AmberGold)
-        "WALLET" -> Triple(Icons.Default.AccountBalanceWallet, Color(0xFF0284C7).copy(alpha = 0.15f), OceanBlue)
-        else -> Triple(Icons.Default.LocalActivity, Color(0xFF0284C7).copy(alpha = 0.15f), OceanBlue)
+        "FLIGHT", "AIRLINE" -> Triple(Icons.Default.Flight, LuxuryCardElevated, TextSecondary)
+        "HOTEL" -> Triple(Icons.Default.Hotel, LuxuryCardElevated, ChampagneGold)
+        "TIMESHARE", "EXCHANGE" -> Triple(Icons.Default.Apartment, LuxuryCardElevated, ChampagneGold)
+        "CAMPGROUND", "CAMPING" -> Triple(Icons.Default.Cabin, LuxuryCardElevated, TextSecondary)
+        "TRANSIT", "TRANSPORT" -> Triple(Icons.Default.DirectionsBus, LuxuryCardElevated, TextSecondary)
+        "DINING", "FOOD" -> Triple(Icons.Default.Restaurant, LuxuryCardElevated, ChampagneGold)
+        "FAMILY_KIDS", "FAMILY" -> Triple(Icons.Default.ChildCare, LuxuryCardElevated, TextSecondary)
+        "CREDIT_CARD", "REWARDS" -> Triple(Icons.Default.CardMembership, LuxuryCardElevated, ChampagneGold)
+        "WALLET" -> Triple(Icons.Default.AccountBalanceWallet, LuxuryCardElevated, TextSecondary)
+        else -> Triple(Icons.Default.LocalActivity, LuxuryCardElevated, ChampagneGold)
     }
 }
 
@@ -101,8 +106,9 @@ fun AccessibilityTagChip(
     modifier: Modifier = Modifier
 ) {
     Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = TealAccent.copy(alpha = 0.12f),
+        shape = RoundedCornerShape(8.dp),
+        color = LuxurySurface,
+        border = androidx.compose.foundation.BorderStroke(1.dp, LuxuryBorder),
         modifier = modifier
     ) {
         Row(
@@ -112,16 +118,15 @@ fun AccessibilityTagChip(
             Icon(
                 imageVector = Icons.Default.Accessible,
                 contentDescription = null,
-                tint = TealAccent,
+                tint = TextSecondary,
                 modifier = Modifier.size(12.dp)
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelSmall.copy(
-                    fontSize = 10.sp,
                     fontWeight = FontWeight.Medium,
-                    color = TealAccent
+                    color = TextSecondary
                 )
             )
         }
@@ -154,14 +159,10 @@ fun LiveAudioWaveform(
             val scale = (heights[i % heights.size] * animProgress).coerceIn(0.2f, 1.0f)
             Box(
                 modifier = Modifier
-                    .width(4.dp)
-                    .height((24 * scale).dp)
+                    .width(3.dp)
+                    .height((22 * scale).dp)
                     .clip(CircleShape)
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(SkyBlueLight, TealAccent)
-                        )
-                    )
+                    .background(ChampagneGold)
             )
         }
     }
@@ -175,51 +176,45 @@ fun HeroGradientBanner(
     heroThemeIndex: Int = 0,
     modifier: Modifier = Modifier
 ) {
-    val gradientColors = when (heroThemeIndex % 4) {
-        0 -> listOf(Navy900, OceanBlue, TealAccent)
-        1 -> listOf(Navy900, Color(0xFF1E3A8A), PurpleAccent)
-        2 -> listOf(Color(0xFF064E3B), EmeraldGreen, TealAccent)
-        else -> listOf(Navy900, Color(0xFFB45309), AmberGold)
-    }
-
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(Brush.horizontalGradient(gradientColors))
-            .padding(20.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(LuxuryCard)
+            .border(1.dp, LuxuryBorder, RoundedCornerShape(16.dp))
+            .padding(18.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.Top
         ) {
-            androidx.compose.foundation.layout.Column(
+            Column(
                 modifier = Modifier.weight(1f)
             ) {
                 if (badgeText.isNotBlank()) {
                     Surface(
-                        shape = RoundedCornerShape(20.dp),
-                        color = Color.White.copy(alpha = 0.2f),
+                        shape = RoundedCornerShape(6.dp),
+                        color = ChampagneGoldMuted,
+                        border = androidx.compose.foundation.BorderStroke(1.dp, ChampagneGold.copy(alpha = 0.3f)),
                         modifier = Modifier.padding(bottom = 8.dp)
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(6.dp)
+                                    .size(5.dp)
                                     .clip(CircleShape)
-                                    .background(EmeraldGreen)
+                                    .background(ChampagneGold)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = badgeText,
+                                text = badgeText.uppercase(),
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 11.sp
+                                    color = ChampagneGold,
+                                    fontWeight = FontWeight.SemiBold
                                 )
                             )
                         }
@@ -228,18 +223,16 @@ fun HeroGradientBanner(
 
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = TextPrimary,
+                        fontWeight = FontWeight.Bold
                     )
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        color = Color.White.copy(alpha = 0.85f),
-                        fontSize = 13.sp
+                        color = TextSecondary
                     )
                 )
             }

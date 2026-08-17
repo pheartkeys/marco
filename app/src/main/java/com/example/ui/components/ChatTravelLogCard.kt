@@ -1,6 +1,7 @@
 package com.example.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,14 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.data.model.ChatMessageEntity
 import com.example.data.model.TripEntity
+import com.example.ui.theme.*
 
 /**
  * Digital Travel Log: AI summarizes daily highlights in an eloquent journal-style tone
@@ -38,16 +38,15 @@ fun ChatTravelLogCard(
 
     val journalLocation = trip?.destination ?: "Expedition Destination"
     val journalTitle = "Expedition Chronicle: ${trip?.title ?: "Journey Notes"}"
-    val journalBody = """
-        "As dawn rose over the horizon of $journalLocation, the expedition prepared for another chapter of discovery. With curated routes and seamless accessibility secured for the journey, our travelers immersed in local culture and landscapes, untroubled by delays. Truly, this journey stands as an unforgettable exploration."
-    """.trimIndent()
+    val journalBody = "Your travel log for the day will appear here."
 
     Card(
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 6.dp)
@@ -72,17 +71,13 @@ fun ChatTravelLogCard(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(CircleShape)
-                            .background(
-                                Brush.linearGradient(
-                                    listOf(Color(0xFFD97706), Color(0xFF92400E))
-                                )
-                            ),
+                            .background(LuxuryCardElevated),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.MenuBook,
                             contentDescription = null,
-                            tint = Color(0xFFFEF3C7),
+                            tint = ChampagneGold,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -95,21 +90,19 @@ fun ChatTravelLogCard(
                             Text(
                                 text = "Marco's Travel Log",
                                 style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp
+                                    fontWeight = FontWeight.Bold
                                 )
                             )
                             Surface(
                                 shape = RoundedCornerShape(6.dp),
-                                color = Color(0xFFFEF3C7)
+                                color = AntiqueBrass.copy(alpha = 0.15f)
                             ) {
                                 Text(
                                     text = "Chronicle",
                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        color = Color(0xFF92400E),
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 9.sp
+                                        color = VenetianGoldLight,
+                                        fontWeight = FontWeight.Bold
                                     )
                                 )
                             }
@@ -117,8 +110,7 @@ fun ChatTravelLogCard(
                         Text(
                             text = "Daily Journal & AI Reflection",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 12.sp
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }
@@ -139,11 +131,7 @@ fun ChatTravelLogCard(
             Surface(
                 shape = RoundedCornerShape(16.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
-                border = ButtonDefaults.outlinedButtonBorder.copy(
-                    brush = Brush.horizontalGradient(
-                        listOf(Color(0xFFD97706).copy(alpha = 0.4f), Color.Transparent)
-                    )
-                ),
+                border = BorderStroke(1.dp, AntiqueBrass.copy(alpha = 0.4f)),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(14.dp)) {
@@ -161,7 +149,6 @@ fun ChatTravelLogCard(
                         text = journalBody,
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontStyle = FontStyle.Italic,
-                            lineHeight = 22.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
@@ -174,17 +161,16 @@ fun ChatTravelLogCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "📍 $journalLocation",
+                            text = journalLocation,
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.SemiBold,
-                                color = Color(0xFFD97706)
+                                color = AntiqueBrass
                             )
                         )
                         Text(
                             text = "Marco Polo Persona",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 10.sp
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }
@@ -203,7 +189,8 @@ fun ChatTravelLogCard(
                 },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isSaved) Color(0xFF10B981) else Color(0xFFD97706)
+                    containerColor = if (isSaved) WayfinderEmerald else AntiqueBrass,
+                    contentColor = CartographyDarkBase
                 ),
                 modifier = Modifier
                     .fillMaxWidth()

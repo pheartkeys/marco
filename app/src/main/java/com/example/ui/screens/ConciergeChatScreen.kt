@@ -113,32 +113,15 @@ fun ConciergeChatScreen(
     val isTripActive = currentTrip?.isTripInProgress() == true
     val suggestionChips = remember(isTripActive) {
         buildList {
-            add("🧭 Antique Parchment Map")
-            add("📜 Daily Travel Log")
-            add("📸 Group Photo Reel")
-            add("📋 Itinerary Snippets")
+            add("Show Current Itinerary")
+            add("Real-Time Budget & FX Tracker")
+            add("AI Activity & Excursion Radar")
+            add("Pre-Trip Safety & Offline Pack")
             if (isTripActive) {
-                add("🚨 Emergency SOS Beacon")
+                add("Emergency SOS Beacon")
             }
-            add("💰 Real-Time Budget & FX Tracker")
-            add("📊 Weekly Budget Arbitrage Report")
-            add("⚙️ Settings & Voices")
-            add("♿ Family & Accessibility Planner")
-            add("🎯 AI Activity & Excursion Radar")
-            add("⚡ Dynamic Weather Rebooking")
-            add("🥗 Dietary & Allergen Safety")
-            add("✈️ Plan New Trip")
-            if (currentTrip != null) {
-                add("📋 Show Current Itinerary")
-                add("📞 Vendor & Accommodation Concierge")
-            }
-            add("💳 My Points & Timeshares Wallet")
-            add("🧬 My Traveler DNA & Profile")
-            if (isTripActive) {
-                add("🛡️ Live Safety Radar & SOS")
-            } else {
-                add("🛡️ Pre-Trip Safety & Offline Pack")
-            }
+            add("Plan New Trip")
+            add("My Traveler DNA & Profile")
         }
     }
 
@@ -168,7 +151,8 @@ fun ConciergeChatScreen(
         // TOP APP BAR: AI Status + Active Trip Selector + Clear Chat
         Surface(
             color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 3.dp,
+            tonalElevation = 0.dp,
+            border = BorderStroke(1.dp, ContourBorder),
             modifier = Modifier.fillMaxWidth()
         ) {
             Row(
@@ -184,13 +168,13 @@ fun ConciergeChatScreen(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(CircleShape)
-                            .background(Brush.linearGradient(listOf(CelestialLapis, Color(0xFF0F172A)))),
+                            .background(LuxuryCardElevated),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Explore,
                             contentDescription = "Marco Expedition Concierge",
-                            tint = VenetianGold,
+                            tint = ChampagneGold,
                             modifier = Modifier.size(22.dp)
                         )
                     }
@@ -198,11 +182,9 @@ fun ConciergeChatScreen(
                     Column {
                         Text(
                             text = "Marco",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = 18.sp,
-                                letterSpacing = 0.5.sp,
-                                color = TextAtlasPrimary
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
                             )
                         )
                     }
@@ -220,23 +202,22 @@ fun ConciergeChatScreen(
                                 .testTag("trip_context_selector")
                         ) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 val destLabel = currentTrip?.destination?.split(",")?.firstOrNull()?.trim() ?: "Plan Trip"
                                 Text(
                                     text = destLabel,
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        color = OceanBlue,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 11.sp
+                                        color = WaypointCyan,
+                                        fontWeight = FontWeight.Bold
                                     )
                                 )
-                                Spacer(modifier = Modifier.width(2.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
                                 Icon(
                                     imageVector = Icons.Default.ExpandMore,
                                     contentDescription = "Switch Trip",
-                                    tint = OceanBlue,
+                                    tint = WaypointCyan,
                                     modifier = Modifier.size(14.dp)
                                 )
                             }
@@ -249,7 +230,7 @@ fun ConciergeChatScreen(
                             if (tripsList.isEmpty()) {
                                 DropdownMenuItem(
                                     text = {
-                                        Text("✨ Plan New AI Trip...", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = OceanBlue)
+                                        Text("Plan New AI Trip...", fontWeight = FontWeight.Bold, color = WaypointCyan)
                                     },
                                     onClick = {
                                         isTripMenuExpanded = false
@@ -263,24 +244,26 @@ fun ConciergeChatScreen(
                                         text = {
                                             Column {
                                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                                    Text(trip.title, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                                                    Spacer(modifier = Modifier.width(6.dp))
+                                                    Text(trip.title, fontWeight = FontWeight.Bold)
+                                                    Spacer(modifier = Modifier.width(4.dp))
                                                     Surface(
                                                         shape = RoundedCornerShape(4.dp),
                                                         color = if (active) EmeraldGreen.copy(alpha = 0.15f) else OceanBlue.copy(alpha = 0.15f)
                                                     ) {
                                                         Text(
-                                                            text = if (active) "ON-TRIP" else "PLANNING",
+                                                            text = if (active) "On-trip" else "Planning",
                                                             style = MaterialTheme.typography.labelSmall.copy(
-                                                                color = if (active) EmeraldGreen else OceanBlue,
-                                                                fontWeight = FontWeight.Bold,
-                                                                fontSize = 9.sp
+                                                                color = if (active) EmeraldGreen else WaypointCyan,
+                                                                fontWeight = FontWeight.Bold
                                                             ),
-                                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
                                                         )
                                                     }
                                                 }
-                                                Text("${trip.destination} • ${trip.startDate}", fontSize = 11.sp, color = Color.Gray)
+                                                Text(
+                                                    "${trip.destination} • ${trip.startDate}",
+                                                    style = MaterialTheme.typography.bodySmall.copy(color = TextAtlasSecondary)
+                                                )
                                             }
                                         },
                                         onClick = {
@@ -290,14 +273,13 @@ fun ConciergeChatScreen(
                                     )
                                 }
                                 currentTrip?.let { trip ->
-                                    Divider()
+                                    HorizontalDivider(color = ContourBorderSubtle)
                                     DropdownMenuItem(
                                         text = {
                                             Text(
-                                                text = if (trip.isTripInProgress()) "📋 Switch to Planning Mode (Hide SOS)" else "🧭 Start Vacation / On-Trip Mode (Activate SOS)",
-                                                fontSize = 12.sp,
+                                                text = if (trip.isTripInProgress()) "Switch to Planning Mode (Hide SOS)" else "Start Vacation / On-Trip Mode (Activate SOS)",
                                                 fontWeight = FontWeight.Bold,
-                                                color = if (trip.isTripInProgress()) OceanBlue else EmeraldGreen
+                                                color = if (trip.isTripInProgress()) WaypointCyan else EmeraldGreen
                                             )
                                         },
                                         onClick = {
@@ -306,10 +288,10 @@ fun ConciergeChatScreen(
                                         }
                                     )
                                 }
-                                Divider()
+                                HorizontalDivider(color = ContourBorderSubtle)
                                 DropdownMenuItem(
                                     text = {
-                                        Text("✨ Plan Another Trip...", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = OceanBlue)
+                                        Text("Plan Another Trip...", fontWeight = FontWeight.Medium, color = WaypointCyan)
                                     },
                                     onClick = {
                                         isTripMenuExpanded = false
@@ -327,15 +309,16 @@ fun ConciergeChatScreen(
                         IconButton(
                             onClick = { viewModel.triggerEmergencySos() },
                             modifier = Modifier
+                                .minimumInteractiveComponentSize()
                                 .size(34.dp)
                                 .clip(CircleShape)
-                                .background(Color(0xFFDC2626).copy(alpha = 0.15f))
+                                .background(WaxSealCrimson.copy(alpha = 0.15f))
                                 .testTag("sos_beacon_top_button")
                         ) {
                             Icon(
                                 imageVector = Icons.Default.HealthAndSafety,
                                 contentDescription = "Emergency SOS",
-                                tint = Color(0xFFEF4444),
+                                tint = WaxSealCrimson,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -352,6 +335,7 @@ fun ConciergeChatScreen(
                             }
                         },
                         modifier = Modifier
+                            .minimumInteractiveComponentSize()
                             .size(34.dp)
                             .testTag("top_bar_account_button")
                     ) {
@@ -369,6 +353,7 @@ fun ConciergeChatScreen(
                     IconButton(
                         onClick = onOpenSettings,
                         modifier = Modifier
+                            .minimumInteractiveComponentSize()
                             .size(34.dp)
                             .testTag("open_settings_top_button")
                     ) {
@@ -386,6 +371,7 @@ fun ConciergeChatScreen(
                     IconButton(
                         onClick = { viewModel.clearChat() },
                         modifier = Modifier
+                            .minimumInteractiveComponentSize()
                             .size(34.dp)
                             .testTag("clear_chat_button")
                     ) {
@@ -409,7 +395,7 @@ fun ConciergeChatScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 6.dp)
+                        .padding(vertical = 8.dp)
                 ) {
                     HorizontalPager(
                         state = tripPagerState,
@@ -417,17 +403,17 @@ fun ConciergeChatScreen(
                             .fillMaxWidth()
                             .height(64.dp),
                         contentPadding = PaddingValues(horizontal = 16.dp),
-                        pageSpacing = 10.dp
+                        pageSpacing = 8.dp
                     ) { page ->
                         val trip = tripsList.getOrNull(page)
                         if (trip != null) {
                             val isSelected = trip.id == selectedTripId
                             Card(
-                                shape = RoundedCornerShape(14.dp),
+                                shape = RoundedCornerShape(16.dp),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = if (isSelected) OceanBlue.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surface
+                                    containerColor = LuxuryCard
                                 ),
-                                border = if (isSelected) androidx.compose.foundation.BorderStroke(1.5.dp, OceanBlue.copy(alpha = 0.6f)) else null,
+                                border = BorderStroke(1.dp, LuxuryBorder),
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .clickable {
@@ -443,20 +429,20 @@ fun ConciergeChatScreen(
                                 ) {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                                         modifier = Modifier.weight(1f)
                                     ) {
                                         Box(
                                             modifier = Modifier
                                                 .size(34.dp)
                                                 .clip(CircleShape)
-                                                .background(if (isSelected) OceanBlue else MaterialTheme.colorScheme.surfaceVariant),
+                                                .background(LuxuryCardElevated),
                                             contentAlignment = Alignment.Center
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.FlightTakeoff,
                                                 contentDescription = null,
-                                                tint = if (isSelected) VenetianGold else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                tint = ChampagneGold,
                                                 modifier = Modifier.size(16.dp)
                                             )
                                         }
@@ -465,10 +451,9 @@ fun ConciergeChatScreen(
                                             Row(verticalAlignment = Alignment.CenterVertically) {
                                                 Text(
                                                     text = trip.title,
-                                                    style = MaterialTheme.typography.labelMedium.copy(
-                                                        fontWeight = FontWeight.Bold,
-                                                        fontSize = 13.sp,
-                                                        color = if (isSelected) OceanBlue else MaterialTheme.colorScheme.onSurface
+                                                    style = MaterialTheme.typography.titleSmall.copy(
+                                                        fontWeight = FontWeight.SemiBold,
+                                                        color = TextPrimary
                                                     ),
                                                     maxLines = 1
                                                 )
@@ -476,25 +461,23 @@ fun ConciergeChatScreen(
                                                 val inProgress = trip.isTripInProgress()
                                                 Surface(
                                                     shape = RoundedCornerShape(4.dp),
-                                                    color = if (inProgress) EmeraldGreen.copy(alpha = 0.15f) else OceanBlue.copy(alpha = 0.15f)
+                                                    color = LuxuryCardElevated,
+                                                    border = BorderStroke(1.dp, LuxuryBorder)
                                                 ) {
                                                     Text(
-                                                        text = if (inProgress) "ON-TRIP LIVE" else "PLANNING",
+                                                        text = if (inProgress) "Active" else "Planning",
                                                         style = MaterialTheme.typography.labelSmall.copy(
-                                                            color = if (inProgress) EmeraldGreen else OceanBlue,
-                                                            fontWeight = FontWeight.Black,
-                                                            fontSize = 8.sp,
-                                                            letterSpacing = 0.5.sp
+                                                            color = TextSecondary,
+                                                            fontWeight = FontWeight.Medium
                                                         ),
-                                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
                                                     )
                                                 }
                                             }
                                             Text(
-                                                text = "${trip.destination} • ${trip.startDate} – ${trip.endDate}",
+                                                text = "${trip.destination} • ${trip.startDate} to ${trip.endDate}",
                                                 style = MaterialTheme.typography.bodySmall.copy(
-                                                    fontSize = 11.sp,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                    color = TextSecondary
                                                 ),
                                                 maxLines = 1
                                             )
@@ -503,12 +486,14 @@ fun ConciergeChatScreen(
 
                                     IconButton(
                                         onClick = onOpenItinerary,
-                                        modifier = Modifier.size(28.dp)
+                                        modifier = Modifier
+                                            .minimumInteractiveComponentSize()
+                                            .size(28.dp)
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.Tune,
                                             contentDescription = "Open Full Itinerary",
-                                            tint = OceanBlue,
+                                            tint = TextSecondary,
                                             modifier = Modifier.size(16.dp)
                                         )
                                     }
@@ -529,10 +514,10 @@ fun ConciergeChatScreen(
                                 val isCurrent = tripPagerState.currentPage == index
                                 Box(
                                     modifier = Modifier
-                                        .padding(horizontal = 3.dp)
+                                        .padding(horizontal = 4.dp)
                                         .size(if (isCurrent) 14.dp else 5.dp, 5.dp)
                                         .clip(RoundedCornerShape(3.dp))
-                                        .background(if (isCurrent) OceanBlue else Color.Gray.copy(alpha = 0.35f))
+                                        .background(if (isCurrent) WaypointCyan else TextAtlasSubtle.copy(alpha = 0.35f))
                                 )
                             }
                         }
@@ -556,82 +541,37 @@ fun ConciergeChatScreen(
         }
 
         // DUAL CHAT STREAM TABS (Marco vs Travel Crew)
-        Surface(
-            color = CartographySurface,
-            border = BorderStroke(1.dp, ContourBorderSubtle),
+        SingleChoiceSegmentedButtonRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp),
-            shape = RoundedCornerShape(10.dp)
+                .padding(horizontal = 16.dp, vertical = 4.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp),
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                // Tab 0: Marco
-                Surface(
-                    color = if (activeChatStreamTab == 0) NavigationalGold else Color.Transparent,
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable { viewModel.setActiveChatStreamTab(0) }
-                ) {
-                    Row(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Explore,
-                            contentDescription = "Marco",
-                            tint = if (activeChatStreamTab == 0) CartographyDarkBase else NavigationalGold,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "Marco",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = if (activeChatStreamTab == 0) CartographyDarkBase else TextAtlasPrimary
-                            )
-                        )
-                    }
-                }
-
-                // Tab 1: Travel Crew
-                Surface(
-                    color = if (activeChatStreamTab == 1) MaritimeBlue else Color.Transparent,
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable { viewModel.setActiveChatStreamTab(1) }
-                ) {
-                    Row(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.NaturePeople,
-                            contentDescription = "Travel Crew",
-                            tint = if (activeChatStreamTab == 1) Color.White else WaypointCyan,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "Travel Crew",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = if (activeChatStreamTab == 1) Color.White else TextAtlasPrimary
-                            )
-                        )
-                    }
-                }
-            }
+            SegmentedButton(
+                selected = activeChatStreamTab == 0,
+                onClick = { viewModel.setActiveChatStreamTab(0) },
+                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Explore,
+                        contentDescription = "Marco",
+                        modifier = Modifier.size(16.dp)
+                    )
+                },
+                label = { Text("Marco") }
+            )
+            SegmentedButton(
+                selected = activeChatStreamTab == 1,
+                onClick = { viewModel.setActiveChatStreamTab(1) },
+                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.NaturePeople,
+                        contentDescription = "Travel Crew",
+                        modifier = Modifier.size(16.dp)
+                    )
+                },
+                label = { Text("Travel Crew") }
+            )
         }
 
         val displayedMessages = remember(messages, activeChatStreamTab) {
@@ -656,8 +596,8 @@ fun ConciergeChatScreen(
                 item {
                     Card(
                         shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(containerColor = CartographyCard),
-                        border = BorderStroke(1.dp, ContourBorder),
+                        colors = CardDefaults.cardColors(containerColor = LuxuryCard),
+                        border = BorderStroke(1.dp, LuxuryBorder),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 12.dp)
@@ -668,35 +608,34 @@ fun ConciergeChatScreen(
                                     modifier = Modifier
                                         .size(36.dp)
                                         .clip(CircleShape)
-                                        .background(if (activeChatStreamTab == 1) MaritimeBlue else NavigationalGold),
+                                        .background(LuxuryCardElevated),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
                                         imageVector = if (activeChatStreamTab == 1) Icons.Default.NaturePeople else Icons.Default.Explore,
                                         contentDescription = null,
-                                        tint = if (activeChatStreamTab == 1) Color.White else CartographyDarkBase,
+                                        tint = ChampagneGold,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
-                                Spacer(modifier = Modifier.width(10.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
                                 Column {
                                     Text(
-                                        text = if (activeChatStreamTab == 1) "Travel Crew" else "Marco",
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 15.sp,
-                                        color = TextAtlasPrimary
+                                        text = if (activeChatStreamTab == 1) "Travel Crew" else "Marco Concierge",
+                                        style = MaterialTheme.typography.titleMedium.copy(
+                                            fontWeight = FontWeight.Bold,
+                                            color = TextAtlasPrimary
+                                        )
                                     )
                                 }
                             }
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = if (activeChatStreamTab == 1)
                                     "Coordinate activities, share trip memories, and plan with your travel party.\n\nTap '+' below to share a group photo."
                                 else
                                     "Research destinations, check loyalty rewards, arrange accessible itineraries, and coordinate travel safety.\n\nType a message or tap '+' below to begin.",
-                                fontSize = 13.sp,
-                                lineHeight = 18.sp,
-                                color = TextAtlasPrimary
+                                style = MaterialTheme.typography.bodyMedium.copy(color = TextAtlasPrimary)
                             )
                         }
                     }
@@ -905,25 +844,6 @@ fun ConciergeChatScreen(
                             onOpenFullMemories = onOpenMemories
                         )
                     }
-                    "CARD_TRAVEL_LOG" -> {
-                        ChatTravelLogCard(
-                            message = msg,
-                            trip = currentTrip,
-                            onSaveMemory = { caption, location ->
-                                viewModel.saveTravelLogAsMemory(caption, location)
-                            },
-                            onPlayTts = { viewModel.playAudioTranscript(msg.text) }
-                        )
-                    }
-                    "CARD_PARCHMENT_MAP" -> {
-                        ChatVintageParchmentMapCard(
-                            message = msg,
-                            trip = currentTrip,
-                            activities = activities,
-                            onPlayTts = { viewModel.playAudioTranscript(msg.text) },
-                            onOpenFullSafetyMap = onOpenSafetyMap
-                        )
-                    }
                     "CARD_EMERGENCY_SOS" -> {
                         ChatEmergencySosCard(
                             message = msg,
@@ -994,8 +914,7 @@ fun ConciergeChatScreen(
                             if (chip.contains("Settings", ignoreCase = true)) {
                                 onOpenSettings()
                             } else {
-                                val cleanPrompt = chip.replace(Regex("^[^\u0000-\u007F]+"), "").trim()
-                                viewModel.sendChatMessage(cleanPrompt)
+                                viewModel.sendChatMessage(chip)
                             }
                         }
                         .testTag("suggestion_chip_${chip.take(8)}")
@@ -1004,7 +923,6 @@ fun ConciergeChatScreen(
                         text = chip,
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.SemiBold,
-                            fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         ),
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
@@ -1032,7 +950,7 @@ fun ConciergeChatScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 14.dp, vertical = 10.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
                         // Multi-line Text Input Area (spans full width)
                         Box(
@@ -1047,19 +965,16 @@ fun ConciergeChatScreen(
                                     else
                                         "Message Marco or plan a trip...",
                                     style = MaterialTheme.typography.bodyMedium.copy(
-                                        color = TextAtlasSubtle,
-                                        fontSize = 14.sp
+                                        color = TextAtlasSubtle
                                     ),
-                                    modifier = Modifier.padding(top = 2.dp)
+                                    modifier = Modifier.padding(top = 4.dp)
                                 )
                             }
                             androidx.compose.foundation.text.BasicTextField(
                                 value = inputText,
                                 onValueChange = { inputText = it },
                                 textStyle = MaterialTheme.typography.bodyMedium.copy(
-                                    color = TextAtlasPrimary,
-                                    fontSize = 14.sp,
-                                    lineHeight = 20.sp
+                                    color = TextAtlasPrimary
                                 ),
                                 cursorBrush = androidx.compose.ui.graphics.SolidColor(NavigationalGold),
                                 modifier = Modifier
@@ -1118,7 +1033,7 @@ fun ConciergeChatScreen(
                                         .clickable {
                                             isListeningVoice = !isListeningVoice
                                             if (isListeningVoice) {
-                                                inputText = "Show me the antique parchment map and emergency hospital coordinates"
+                                                inputText = "Show pre-trip safety pack and emergency hospital coordinates"
                                             }
                                         }
                                         .testTag("voice_input_button"),
@@ -1127,7 +1042,7 @@ fun ConciergeChatScreen(
                                     Icon(
                                         imageVector = if (isListeningVoice) Icons.Default.Mic else Icons.Default.MicOff,
                                         contentDescription = "Voice Input",
-                                        tint = if (isListeningVoice) NavigationalGold else TextAtlasSecondary,
+                                        tint = if (isListeningVoice) ChampagneGold else TextSecondary,
                                         modifier = Modifier.size(16.dp)
                                     )
                                 }
@@ -1140,11 +1055,11 @@ fun ConciergeChatScreen(
                                     .size(36.dp)
                                     .clip(CircleShape)
                                     .background(
-                                        if (canSend) NavigationalGold else CartographyCardElevated
+                                        if (canSend) LuxuryCardElevated else LuxuryCard
                                     )
                                     .border(
                                         1.dp,
-                                        if (canSend) NavigationalGold else ContourBorderSubtle,
+                                        if (canSend) ChampagneGold else LuxuryBorder,
                                         CircleShape
                                     )
                                     .clickable(enabled = canSend) {
@@ -1160,7 +1075,7 @@ fun ConciergeChatScreen(
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.Send,
                                     contentDescription = "Send Message",
-                                    tint = if (canSend) CartographyDarkBase else TextAtlasSubtle,
+                                    tint = if (canSend) TextPrimary else TextMuted,
                                     modifier = Modifier.size(16.dp)
                                 )
                             }
@@ -1190,28 +1105,26 @@ fun ConciergeChatScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 val actions = buildList {
-                    add(Triple("🧭 Antique Parchment Map", "Historical wind rose vectors, rhumb lines, and GPS route", "Show antique parchment map"))
-                    add(Triple("📜 Marco's Daily Travel Log", "AI-penned literary expedition chronicle and highlights", "Show daily travel log and expedition chronicle"))
-                    add(Triple("📸 Group Photo Reel", "Collaborative photo reel with AI scene tags & 1-tap likes", "Show group photo carousel"))
-                    add(Triple("📋 Structured Itinerary Snippets", "Quick-scan cards for flights, hotels, and vouchers", "Show itinerary snippets and cards"))
+                    add(Triple("Group Photo Reel", "Collaborative photo reel with AI scene tags & 1-tap likes", "Show group photo carousel"))
+                    add(Triple("Structured Itinerary Snippets", "Quick-scan cards for flights, hotels, and vouchers", "Show itinerary snippets and cards"))
                     if (isTripActive) {
-                        add(Triple("🚨 Emergency SOS Beacon", "Transmit live GPS telemetry to contacts and 911 dispatch", "Broadcast emergency SOS beacon"))
+                        add(Triple("Emergency SOS Beacon", "Transmit live GPS telemetry to contacts and 911 dispatch", "Broadcast emergency SOS beacon"))
                     }
-                    add(Triple("💰 Budget & Currency Tracker", "Live balances, encrypted tokens, and zero-fee FX converter", "Check my budget, expenses, and currency conversion"))
-                    add(Triple("📊 Weekly Budget & Arbitrage Summary", "Spend vs loyalty savings comparison & category breakdown", "Show weekly budget summary and savings vs spend"))
-                    add(Triple("♿ Family & Accessibility Planner", "Dietary restrictions, wheelchair needs, and family age pacing", "Open family and accessibility planner studio"))
-                    add(Triple("✈️ Plan New Itinerary", "Generate tailored 5-day trip with points & pacing", "Plan trip to Tokyo & Kyoto, Japan"))
-                    add(Triple("📞 Call Hotel Front Desk", "Simulate live phone inquiry for pool hours & check-in", "Call hotel front desk for heated pool hours & ADA access"))
-                    add(Triple("💳 Rewards & Timeshare Wallet", "View SkyMiles, Bonvoy, and RCI Trading Power", "Check my points and timeshare wallet"))
-                    add(Triple("🧬 My Traveler DNA", "View learned preferences and rate past trips", "Show my traveler DNA and learned profile"))
+                    add(Triple("Budget & Currency Tracker", "Live balances, encrypted tokens, and zero-fee FX converter", "Check my budget, expenses, and currency conversion"))
+                    add(Triple("Weekly Budget & Arbitrage Summary", "Spend vs loyalty savings comparison & category breakdown", "Show weekly budget summary and savings vs spend"))
+                    add(Triple("Family & Accessibility Planner", "Dietary restrictions, wheelchair needs, and family age pacing", "Open family and accessibility planner studio"))
+                    add(Triple("Plan New Itinerary", "Generate tailored 5-day trip with points & pacing", "Plan trip to Tokyo & Kyoto, Japan"))
+                    add(Triple("Call Hotel Front Desk", "Simulate live phone inquiry for pool hours & check-in", "Call hotel front desk for heated pool hours & ADA access"))
+                    add(Triple("Rewards & Timeshare Wallet", "View SkyMiles, Bonvoy, and RCI Trading Power", "Check my points and timeshare wallet"))
+                    add(Triple("My Traveler DNA", "View learned preferences and rate past trips", "Show my traveler DNA and learned profile"))
                     if (isTripActive) {
-                        add(Triple("🛡️ Offline Safety & Live SOS", "Live GPS telemetry, hospital ER & emergency dispatch", "Show offline safety, hospital and emergency info"))
+                        add(Triple("Offline Safety & Live SOS", "Live GPS telemetry, hospital ER & emergency dispatch", "Show offline safety, hospital and emergency info"))
                     } else {
-                        add(Triple("🛡️ Pre-Trip Safety & Preparation", "Emergency directory, hospital & consular guide", "Show offline safety, hospital and emergency info"))
+                        add(Triple("Pre-Trip Safety & Preparation", "Emergency directory, hospital & consular guide", "Show offline safety, hospital and emergency info"))
                     }
-                    add(Triple("🔐 Cloud Account & Sign In", "Sign in to sync itineraries, wallet, and traveler DNA", "__OPEN_AUTH__"))
-                    add(Triple("📸 Vacation Memories", "View shared photos and vacation notes", "Show vacation memories and moments"))
-                    add(Triple("⚙️ Settings & Voice Concierge", "Switch narrator voice, BYOK API keys, and model parameters", "__OPEN_SETTINGS__"))
+                    add(Triple("Cloud Account & Sign In", "Sign in to sync itineraries, wallet, and traveler DNA", "__OPEN_AUTH__"))
+                    add(Triple("Vacation Memories", "View shared photos and vacation notes", "Show vacation memories and moments"))
+                    add(Triple("Settings & Voice Concierge", "Switch narrator voice, BYOK API keys, and model parameters", "__OPEN_SETTINGS__"))
                 }
 
                 actions.forEach { (title, subtitle, prompt) ->
@@ -1233,14 +1146,14 @@ fun ConciergeChatScreen(
                             }
                     ) {
                         Row(
-                            modifier = Modifier.padding(14.dp),
+                            modifier = Modifier.padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(title, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                                Text(subtitle, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(title, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
+                                Text(subtitle, style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant))
                             }
-                            Icon(Icons.Default.Send, null, tint = OceanBlue, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.Send, null, tint = WaypointCyan, modifier = Modifier.size(16.dp))
                         }
                     }
                 }
@@ -1285,9 +1198,10 @@ fun ChatItineraryCard(
     var selectedDay by remember { mutableIntStateOf(1) }
 
     Card(
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -1307,31 +1221,36 @@ fun ChatItineraryCard(
                     ) {
                         Icon(Icons.Default.FlightTakeoff, null, tint = OceanBlue, modifier = Modifier.size(18.dp))
                     }
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Column {
                         Text(
                             text = trip?.title ?: "Tailored Journey",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
                         )
                         Text(
                             text = "${trip?.destination ?: "Active Trip"} • ${trip?.travelStyle ?: "Points & Luxury"}",
-                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                     }
                 }
 
-                IconButton(onClick = { isExpanded = !isExpanded }, modifier = Modifier.size(28.dp)) {
+                IconButton(
+                    onClick = { isExpanded = !isExpanded },
+                    modifier = Modifier
+                        .minimumInteractiveComponentSize()
+                        .size(28.dp)
+                ) {
                     Icon(
                         imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                         contentDescription = "Toggle",
-                        tint = OceanBlue
+                        tint = WaypointCyan
                     )
                 }
             }
 
             Text(
                 text = message.text,
-                style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, lineHeight = 17.sp),
+                style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
@@ -1342,8 +1261,8 @@ fun ChatItineraryCard(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 6.dp),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         for (d in 1..daysCount) {
                             val isDaySelected = selectedDay == d
@@ -1355,10 +1274,10 @@ fun ChatItineraryCard(
                                 Text(
                                     text = "Day $d",
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        color = if (isDaySelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        color = if (isDaySelected) CartographyDarkBase else MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontWeight = FontWeight.Bold
                                     ),
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                                 )
                             }
                         }
@@ -1368,7 +1287,7 @@ fun ChatItineraryCard(
                     val dayActs = activities.filter { it.dayNumber == selectedDay }
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(top = 6.dp)
+                        modifier = Modifier.padding(top = 8.dp)
                     ) {
                         dayActs.forEach { act ->
                             Surface(
@@ -1377,7 +1296,7 @@ fun ChatItineraryCard(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(10.dp),
+                                    modifier = Modifier.padding(8.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Icon(
@@ -1396,11 +1315,11 @@ fun ChatItineraryCard(
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(
                                             text = "${act.timeSlot} • ${act.title}",
-                                            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                                         )
                                         Text(
                                             text = "${act.location} • ${act.accessibilityBadge}",
-                                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         )
                                     }
                                 }
@@ -1408,7 +1327,7 @@ fun ChatItineraryCard(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     // Action Buttons Row
                     Row(
@@ -1416,10 +1335,11 @@ fun ChatItineraryCard(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Surface(
-                            shape = RoundedCornerShape(10.dp),
+                            shape = RoundedCornerShape(12.dp),
                             color = AmberGold.copy(alpha = 0.15f),
                             modifier = Modifier
                                 .weight(1f)
+                                .heightIn(min = 48.dp)
                                 .clickable { onTriggerCall() }
                         ) {
                             Row(
@@ -1429,15 +1349,16 @@ fun ChatItineraryCard(
                             ) {
                                 Icon(Icons.Default.PhoneInTalk, null, tint = AmberGold, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("Call Hotel", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = AmberGold)
+                                Text("Call Hotel", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = AmberGold))
                             }
                         }
 
                         Surface(
-                            shape = RoundedCornerShape(10.dp),
+                            shape = RoundedCornerShape(12.dp),
                             color = EmeraldGreen.copy(alpha = 0.15f),
                             modifier = Modifier
                                 .weight(1f)
+                                .heightIn(min = 48.dp)
                                 .clickable { onToggleOffline() }
                         ) {
                             Row(
@@ -1447,7 +1368,7 @@ fun ChatItineraryCard(
                             ) {
                                 Icon(Icons.Default.CloudDownload, null, tint = EmeraldGreen, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("Sync Offline", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = EmeraldGreen)
+                                Text("Sync Offline", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = EmeraldGreen))
                             }
                         }
                     }
@@ -1469,9 +1390,10 @@ fun ChatVoiceCallCard(
     var isTranscriptOpen by remember { mutableStateOf(false) }
 
     Card(
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = AmberGold.copy(alpha = 0.08f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -1491,36 +1413,36 @@ fun ChatVoiceCallCard(
                     ) {
                         Icon(Icons.Default.PhoneInTalk, null, tint = AmberGold, modifier = Modifier.size(18.dp))
                     }
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Column {
                         Text(
                             text = "AI Voice Telephony Dispatch",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = AmberGold, fontSize = 13.sp)
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = AmberGold)
                         )
                         Text(
                             text = callLog?.vendorName ?: "Lodging Front Desk",
-                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp)
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
 
                 Surface(
-                    shape = RoundedCornerShape(6.dp),
+                    shape = RoundedCornerShape(12.dp),
                     color = EmeraldGreen.copy(alpha = 0.2f)
                 ) {
                     Text(
-                        text = "COMPLETED",
-                        style = MaterialTheme.typography.labelSmall.copy(color = EmeraldGreen, fontWeight = FontWeight.Bold, fontSize = 9.sp),
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                        text = "Completed",
+                        style = MaterialTheme.typography.labelSmall.copy(color = EmeraldGreen, fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Confirmed Details Highlight Box
             Surface(
-                shape = RoundedCornerShape(10.dp),
+                shape = RoundedCornerShape(12.dp),
                 color = MaterialTheme.colorScheme.surface,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -1530,20 +1452,20 @@ fun ChatVoiceCallCard(
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = callLog?.callSummaryOutcome ?: "Pool open daily 7am-10pm with ADA chair lift verified.",
-                            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
                         )
                     }
                     if (!callLog?.confirmedDetails.isNullOrBlank()) {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "Note: ${callLog?.confirmedDetails}",
-                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Action Row: Listen TTS + View Transcript
             Row(
@@ -1553,8 +1475,9 @@ fun ChatVoiceCallCard(
             ) {
                 Text(
                     text = if (isTranscriptOpen) "Hide Transcript" else "View Call Transcript",
-                    style = MaterialTheme.typography.labelSmall.copy(color = OceanBlue, fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.labelSmall.copy(color = WaypointCyan, fontWeight = FontWeight.Bold),
                     modifier = Modifier
+                        .minimumInteractiveComponentSize()
                         .clickable { isTranscriptOpen = !isTranscriptOpen }
                         .padding(vertical = 4.dp)
                 )
@@ -1562,15 +1485,17 @@ fun ChatVoiceCallCard(
                 Surface(
                     shape = RoundedCornerShape(12.dp),
                     color = AmberGold,
-                    modifier = Modifier.clickable { onPlayAudio() }
+                    modifier = Modifier
+                        .heightIn(min = 48.dp)
+                        .clickable { onPlayAudio() }
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.VolumeUp, null, tint = Color.White, modifier = Modifier.size(14.dp))
+                        Icon(Icons.Default.VolumeUp, null, tint = CartographyDarkBase, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Play Audio", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text("Play Audio", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = CartographyDarkBase))
                     }
                 }
             }
@@ -1578,14 +1503,14 @@ fun ChatVoiceCallCard(
             AnimatedVisibility(visible = isTranscriptOpen) {
                 Column(modifier = Modifier.padding(top = 8.dp)) {
                     Surface(
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(12.dp),
                         color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
                             text = callLog?.audioTranscript ?: "AI Agent: 'Inquiring regarding pool operating hours.'\nVendor: 'Pool open 7am to 10pm daily.'",
-                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, lineHeight = 16.sp),
-                            modifier = Modifier.padding(10.dp)
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(8.dp)
                         )
                     }
                 }
@@ -1605,9 +1530,10 @@ fun ChatRewardsCard(
     onPlayTts: () -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -1627,16 +1553,16 @@ fun ChatRewardsCard(
                     ) {
                         Icon(Icons.Default.AccountBalanceWallet, null, tint = TealAccent, modifier = Modifier.size(18.dp))
                     }
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Column {
                         val totalValuation = accounts.sumOf { it.rewardsEstimatedValuationUsd }
                         Text(
                             text = "Rewards & Timeshare Portfolio",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
                         )
                         Text(
                             text = if (accounts.isNotEmpty()) "${accounts.size} Connected Accounts • $${totalValuation.toInt()} Est. Value" else "0 Connected Accounts • Link points & timeshares",
-                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                     }
                 }
@@ -1646,14 +1572,14 @@ fun ChatRewardsCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Account Badges Grid
             if (accounts.isNotEmpty()) {
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     accounts.take(4).forEach { acc ->
                         Surface(
-                            shape = RoundedCornerShape(10.dp),
+                            shape = RoundedCornerShape(12.dp),
                             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -1663,21 +1589,23 @@ fun ChatRewardsCard(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column {
-                                    Text(acc.providerName, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                                    Text(acc.accountNumberMasked, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(acc.providerName, style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold))
+                                    Text(acc.accountNumberMasked, style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant))
                                 }
                                 Column(horizontalAlignment = Alignment.End) {
                                     Text(
                                         text = "${acc.balanceValue} ${acc.unitLabel}",
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 12.sp,
-                                        color = OceanBlue
+                                        style = MaterialTheme.typography.labelMedium.copy(
+                                            fontWeight = FontWeight.Bold,
+                                            color = WaypointCyan
+                                        )
                                     )
                                     Text(
                                         text = "≈ $${acc.rewardsEstimatedValuationUsd.toInt()}",
-                                        fontSize = 10.sp,
-                                        color = EmeraldGreen,
-                                        fontWeight = FontWeight.Bold
+                                        style = MaterialTheme.typography.labelSmall.copy(
+                                            color = EmeraldGreen,
+                                            fontWeight = FontWeight.Bold
+                                        )
                                     )
                                 }
                             }
@@ -1686,36 +1614,37 @@ fun ChatRewardsCard(
                 }
             } else {
                 Surface(
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(12.dp),
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = "No loyalty or timeshare accounts linked yet. Link your Delta, Marriott, Hilton, or RCI accounts to optimize points.",
-                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant),
+                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                         modifier = Modifier.padding(12.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Point Optimization Button
             Surface(
-                shape = RoundedCornerShape(10.dp),
+                shape = RoundedCornerShape(12.dp),
                 color = OceanBlue,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .heightIn(min = 48.dp)
                     .clickable { onRunOptimizer() }
             ) {
                 Row(
-                    modifier = Modifier.padding(vertical = 10.dp),
+                    modifier = Modifier.padding(vertical = 8.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.AutoAwesome, null, tint = AmberGold, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.AutoAwesome, null, tint = CartographyDarkBase, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Optimize Points & Timeshare Swaps", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("Optimize Points & Timeshare Swaps", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = CartographyDarkBase))
                 }
             }
         }
@@ -1736,9 +1665,10 @@ fun ChatTravelerDnaCard(
     var isFeedbackSubmitted by remember { mutableStateOf(false) }
 
     Card(
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -1753,20 +1683,20 @@ fun ChatTravelerDnaCard(
                         modifier = Modifier
                             .size(36.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFF8B5CF6).copy(alpha = 0.2f)),
+                            .background(CompassLilac.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.Psychology, null, tint = Color(0xFF8B5CF6), modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.Psychology, null, tint = CompassLilac, modifier = Modifier.size(18.dp))
                     }
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Column {
                         Text(
                             text = "AI Traveler DNA & Learning",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color(0xFF8B5CF6))
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = CompassLilac)
                         )
                         Text(
                             text = "${preference?.totalTripsAnalyzed ?: 0} Journeys Analyzed",
-                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                     }
                 }
@@ -1776,17 +1706,17 @@ fun ChatTravelerDnaCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // AI Insights Highlight
             Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = Color(0xFF8B5CF6).copy(alpha = 0.08f),
+                shape = RoundedCornerShape(12.dp),
+                color = CompassLilac.copy(alpha = 0.08f),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = preference?.learnedInsightsSummary ?: "Set up your preferences or plan your first journey to build your Traveler DNA profile.",
-                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, lineHeight = 17.sp),
+                    style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(12.dp)
                 )
             }
@@ -1795,15 +1725,15 @@ fun ChatTravelerDnaCard(
 
             // Interactive 1-Tap Past Trip Training Rating
             Text(
-                text = if (isFeedbackSubmitted) "✅ AI Model Retrained from your Feedback!" else "Train AI: Rate Past Trip Experience",
-                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                text = if (isFeedbackSubmitted) "AI Model Retrained from your Feedback!" else "Train AI: Rate Past Trip Experience",
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
             )
 
             if (!isFeedbackSubmitted) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 6.dp),
+                        .padding(vertical = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -1812,7 +1742,7 @@ fun ChatTravelerDnaCard(
                             Icon(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = "$i Stars",
-                                tint = if (i <= selectedRating) AmberGold else Color.LightGray,
+                                tint = if (i <= selectedRating) AmberGold else ContourBorder,
                                 modifier = Modifier
                                     .size(24.dp)
                                     .clickable { selectedRating = i }
@@ -1822,17 +1752,19 @@ fun ChatTravelerDnaCard(
                     }
 
                     Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = Color(0xFF8B5CF6),
-                        modifier = Modifier.clickable {
-                            onRatePastTrip(selectedRating, "5-star rating recorded for quiet suite & morning activities.")
-                            isFeedbackSubmitted = true
-                        }
+                        shape = RoundedCornerShape(12.dp),
+                        color = CompassLilac,
+                        modifier = Modifier
+                            .heightIn(min = 48.dp)
+                            .clickable {
+                                onRatePastTrip(selectedRating, "5-star rating recorded for quiet suite & morning activities.")
+                                isFeedbackSubmitted = true
+                            }
                     ) {
                         Text(
                             text = "Submit Rating",
                             style = MaterialTheme.typography.labelSmall.copy(color = Color.White, fontWeight = FontWeight.Bold),
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                         )
                     }
                 }
@@ -1852,9 +1784,10 @@ fun ChatOfflineSafetyCard(
     onPlayTts: () -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -1869,20 +1802,20 @@ fun ChatOfflineSafetyCard(
                         modifier = Modifier
                             .size(36.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFFEF4444).copy(alpha = 0.15f)),
+                            .background(WaxSealCrimson.copy(alpha = 0.15f)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.Shield, null, tint = Color(0xFFEF4444), modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.Shield, null, tint = WaxSealCrimson, modifier = Modifier.size(18.dp))
                     }
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Column {
                         Text(
                             text = "Emergency Safety & Medical Radar",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFFEF4444), fontSize = 13.sp)
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = WaxSealCrimson)
                         )
                         Text(
-                            text = "${trip?.destination ?: "Active Destination"} • 24/7 Monitored",
-                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            text = "${trip?.destination ?: "Active Destination"} • Monitored",
+                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                     }
                 }
@@ -1892,37 +1825,36 @@ fun ChatOfflineSafetyCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Safety details
             Surface(
-                shape = RoundedCornerShape(10.dp),
+                shape = RoundedCornerShape(12.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(12.dp)) {
                     Text(
-                        text = "🚨 Local Emergency SOS: Dial 911 (US) / 112 (EU) / 110 (JP)",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp
+                        text = "Local Emergency SOS: Dial 911 (US) / 112 (EU) / 110 (JP)",
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "🏥 Emergency Medical Care: 24/7 Local Trauma ER & Regional Citizen Consular Services",
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = "Emergency Medical Care: 24/7 Local Trauma ER & Regional Citizen Consular Services",
+                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Offline Sync Button
             Surface(
-                shape = RoundedCornerShape(10.dp),
+                shape = RoundedCornerShape(12.dp),
                 color = EmeraldGreen,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .heightIn(min = 48.dp)
                     .clickable { onToggleOffline() }
             ) {
                 Row(
@@ -1930,9 +1862,9 @@ fun ChatOfflineSafetyCard(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.CloudDownload, null, tint = Color.White, modifier = Modifier.size(14.dp))
+                    Icon(Icons.Default.CloudDownload, null, tint = CartographyDarkBase, modifier = Modifier.size(14.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Toggle Offline Emergency Vector Pack", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("Toggle Offline Emergency Vector Pack", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = CartographyDarkBase))
                 }
             }
         }
@@ -1952,9 +1884,10 @@ fun ChatGroupMemoryCard(
     var isAdding by remember { mutableStateOf(false) }
 
     Card(
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -1973,66 +1906,67 @@ fun ChatGroupMemoryCard(
                     ) {
                         Icon(Icons.Default.Favorite, null, tint = OceanBlue, modifier = Modifier.size(18.dp))
                     }
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Column {
                         Text(
                             text = "Vacation Moments & Shared Log",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
                         )
                         Text(
                             text = "${memories.size} Moments Recorded",
-                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Moments list
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 memories.take(3).forEach { mem ->
                     Surface(
-                        shape = RoundedCornerShape(10.dp),
+                        shape = RoundedCornerShape(12.dp),
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
-                            modifier = Modifier.padding(10.dp),
+                            modifier = Modifier.padding(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
                                 modifier = Modifier
                                     .size(36.dp)
-                                    .clip(RoundedCornerShape(8.dp))
+                                    .clip(RoundedCornerShape(12.dp))
                                     .background(Color(mem.photoGradientColor)),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text("📸", fontSize = 16.sp)
+                                Icon(Icons.Default.PhotoCamera, null, tint = Color.White, modifier = Modifier.size(18.dp))
                             }
-                            Spacer(modifier = Modifier.width(10.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(mem.caption, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
-                                Text("${mem.authorName} • ${mem.locationTag}", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(mem.caption, style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold))
+                                Text("${mem.authorName} • ${mem.locationTag}", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant))
                             }
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             if (!isAdding) {
                 Surface(
-                    shape = RoundedCornerShape(8.dp),
+                    shape = RoundedCornerShape(12.dp),
                     color = OceanBlue.copy(alpha = 0.12f),
                     modifier = Modifier
                         .fillMaxWidth()
+                        .heightIn(min = 48.dp)
                         .clickable { isAdding = true }
                 ) {
                     Text(
                         text = "+ Add New Travel Memory",
-                        style = MaterialTheme.typography.labelSmall.copy(color = OceanBlue, fontWeight = FontWeight.Bold),
+                        style = MaterialTheme.typography.labelSmall.copy(color = WaypointCyan, fontWeight = FontWeight.Bold),
                         modifier = Modifier.padding(vertical = 8.dp),
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
@@ -2045,11 +1979,11 @@ fun ChatGroupMemoryCard(
                     OutlinedTextField(
                         value = captionText,
                         onValueChange = { captionText = it },
-                        placeholder = { Text("Write a moment caption...", fontSize = 11.sp) },
+                        placeholder = { Text("Write a moment caption...") },
                         modifier = Modifier.weight(1f),
                         singleLine = true
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     IconButton(
                         onClick = {
                             if (captionText.isNotBlank()) {
@@ -2077,16 +2011,15 @@ fun UserMessageBubble(text: String) {
         horizontalAlignment = Alignment.End
     ) {
         Surface(
-            shape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp, bottomStart = 18.dp, bottomEnd = 4.dp),
-            color = OceanBlue,
+            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 16.dp, bottomEnd = 4.dp),
+            color = LuxuryCardElevated,
+            border = BorderStroke(1.dp, LuxuryBorder),
             modifier = Modifier.padding(start = 48.dp)
         ) {
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp
+                    color = TextPrimary
                 ),
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
             )
@@ -2110,30 +2043,30 @@ fun AiAssistantMessageBubble(
             Icon(
                 imageVector = Icons.Default.Explore,
                 contentDescription = null,
-                tint = VenetianGold,
+                tint = ChampagneGold,
                 modifier = Modifier.size(13.dp)
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = "Marco Concierge",
-                style = MaterialTheme.typography.labelSmall.copy(
-                    fontSize = 11.sp,
+                style = MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    color = VenetianGold
+                    color = ChampagneGold
                 )
             )
         }
 
         Surface(
-            shape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp, bottomStart = 4.dp, bottomEnd = 18.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant,
+            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 4.dp, bottomEnd = 16.dp),
+            color = LuxuryCard,
+            border = BorderStroke(1.dp, LuxuryBorder),
             modifier = Modifier.padding(end = 36.dp)
         ) {
             Column(modifier = Modifier.padding(14.dp)) {
                 Text(
                     text = message.text,
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = TextPrimary,
                         fontSize = 14.sp,
                         lineHeight = 21.sp
                     )
@@ -2151,7 +2084,7 @@ fun AiAssistantMessageBubble(
                         Icon(
                             imageVector = Icons.Default.VolumeUp,
                             contentDescription = "Listen",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = TextSecondary,
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -2290,7 +2223,7 @@ fun ChatFamilyAccessibilityCard(
 
             Text(
                 text = message.text,
-                style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, lineHeight = 17.sp),
+                style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
@@ -2589,24 +2522,24 @@ fun ChatActivitySuggestionsCard(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(CircleShape)
-                            .background(Brush.linearGradient(listOf(OceanBlue, TealAccent))),
+                            .background(LuxuryCardElevated),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.AutoAwesome,
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = ChampagneGold,
                             modifier = Modifier.size(20.dp)
                         )
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
-                            text = "AI Activity & Excursion Radar",
+                            text = "Activity Suggestions",
                             style = MaterialTheme.typography.titleSmall.copy(
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.SemiBold,
                                 fontSize = 14.sp,
-                                color = OceanBlue
+                                color = TextPrimary
                             )
                         )
                         Text(
@@ -2867,24 +2800,24 @@ fun ChatDynamicAdjustmentCard(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(CircleShape)
-                            .background(Brush.linearGradient(listOf(SunsetCoral, AmberGold))),
+                            .background(LuxuryCardElevated),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = ChampagneGold,
                             modifier = Modifier.size(20.dp)
                         )
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
-                            text = "Dynamic Itinerary Adjustment Radar",
+                            text = "Itinerary Adjustment Notice",
                             style = MaterialTheme.typography.titleSmall.copy(
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.SemiBold,
                                 fontSize = 14.sp,
-                                color = SunsetCoral
+                                color = TextPrimary
                             )
                         )
                         Text(

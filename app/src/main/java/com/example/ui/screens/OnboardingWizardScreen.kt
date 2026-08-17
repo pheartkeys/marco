@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.ui.theme.*
 import com.example.viewmodel.TravelViewModel
 
@@ -81,13 +80,12 @@ fun OnboardingWizardScreen(
                                 modifier = Modifier.size(18.dp)
                             )
                         }
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                         Column {
                             Text(
-                                text = "MARCO EXPEDITIONS",
+                                text = "Marco Expeditions",
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontWeight = FontWeight.Black,
-                                    letterSpacing = 1.5.sp,
                                     color = NavigationalGold
                                 )
                             )
@@ -176,7 +174,7 @@ fun OnboardingWizardScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -227,7 +225,7 @@ fun OnboardingWizardScreen(
                         shape = RoundedCornerShape(10.dp)
                     ) {
                         Text(
-                            text = if (currentStep == 3) "Initialize Traveler DNA ➔" else "Continue",
+                            text = if (currentStep == 3) "Initialize Traveler DNA" else "Continue",
                             fontWeight = FontWeight.Bold
                         )
                         if (currentStep < 3) {
@@ -257,7 +255,7 @@ private fun CartographicStepperHeader(
             .fillMaxWidth()
             .background(CartographySurface)
             .border(BorderStroke(1.dp, ContourBorder))
-            .padding(14.dp)
+            .padding(16.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -312,7 +310,7 @@ private fun CartographicStepperHeader(
                         text = "Step $i",
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
-                            color = if (isActive) NavigationalGold else TextAtlasSubtle
+                            color = if (isActive) NavigationalGold else TextAtlasSecondary
                         )
                     )
                     if (i < totalSteps) {
@@ -372,7 +370,7 @@ private fun StepOnePacingScreen(
             title = "1. Expedition Travel Style",
             subtitle = "How do you prefer to experience destinations?"
         )
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         styles.forEach { (style, desc) ->
             val selected = selectedStyle == style
@@ -391,7 +389,7 @@ private fun StepOnePacingScreen(
             title = "2. Daily Pacing & Rhythm",
             subtitle = "Marco tailors morning departure times and rest buffers."
         )
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         pacings.forEach { pace ->
             val selected = selectedPacing == pace
@@ -417,11 +415,11 @@ private fun StepTwoAccessibilityScreen(
     onFamilyDynamicsChange: (String) -> Unit
 ) {
     val accessibilityChecklist = listOf(
-        "♿ Step-Free Wheelchair & Ramp Access",
-        "👶 Stroller-Friendly Paths & Elevators",
-        "🌿 Low-Sensory & Quiet Recovery Zones",
-        "🦻 Visual & Audio Guide Support",
-        "🚗 Accessible Ground Transit Pre-Booking"
+        "Step-Free Wheelchair & Ramp Access",
+        "Stroller-Friendly Paths & Elevators",
+        "Low-Sensory & Quiet Recovery Zones",
+        "Visual & Audio Guide Support",
+        "Accessible Ground Transit Pre-Booking"
     )
 
     val dietaryOptions = listOf(
@@ -442,7 +440,7 @@ private fun StepTwoAccessibilityScreen(
             title = "Accessibility & Mobility Standards",
             subtitle = "Marco strictly verifies venues for step-free access and assistance."
         )
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         accessibilityChecklist.forEach { option ->
             val isChecked = accessibilityOptions.contains(option)
@@ -459,7 +457,7 @@ private fun StepTwoAccessibilityScreen(
             title = "Dietary & Allergen Verification",
             subtitle = "Marco prompts kitchens directly for cross-contamination safety."
         )
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         dietaryOptions.forEach { diet ->
             val isSelected = dietary == diet
@@ -481,16 +479,16 @@ private fun StepThreeLoyaltyScreen(
     onToggleProgram: (String) -> Unit
 ) {
     val loyaltyOptions = listOf(
-        "Delta SkyMiles (Platinum Elite)" to "AIRLINE",
-        "United MileagePlus (Premier 1K)" to "AIRLINE",
-        "American AAdvantage (Executive Platinum)" to "AIRLINE",
-        "World of Hyatt (Globalist / Free Suite Upgrades)" to "HOTEL",
-        "Marriott Bonvoy (Titanium Elite)" to "HOTEL",
-        "Hilton Honors (Diamond)" to "HOTEL",
-        "RCI Timeshare Exchange Points (32 TPU)" to "TIMESHARE",
-        "Interval International (Club Interval Gold)" to "TIMESHARE",
-        "Chase Sapphire Ultimate Rewards" to "CREDIT_CARD",
-        "Amex Membership Rewards (1:1 Airline Transfers)" to "CREDIT_CARD"
+        "Delta SkyMiles (Platinum Elite)" to "Airline",
+        "United MileagePlus (Premier 1K)" to "Airline",
+        "American AAdvantage (Executive Platinum)" to "Airline",
+        "World of Hyatt (Globalist / Free Suite Upgrades)" to "Hotel",
+        "Marriott Bonvoy (Titanium Elite)" to "Hotel",
+        "Hilton Honors (Diamond)" to "Hotel",
+        "RCI Timeshare Exchange Points (32 TPU)" to "Timeshare",
+        "Interval International (Club Interval Gold)" to "Timeshare",
+        "Chase Sapphire Ultimate Rewards" to "Credit Card",
+        "Amex Membership Rewards (1:1 Airline Transfers)" to "Credit Card"
     )
 
     Column(
@@ -595,11 +593,11 @@ private fun PapercraftSelectCard(
                     )
                 )
                 if (description.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = description,
                         style = MaterialTheme.typography.bodySmall.copy(
-                            color = TextAtlasSubtle
+                            color = TextAtlasSecondary
                         )
                     )
                 }
@@ -640,7 +638,7 @@ private fun PapercraftCheckboxCard(
         ) {
             Checkbox(
                 checked = isChecked,
-                onCheckedChange = { onClick() },
+                onCheckedChange = null,
                 colors = CheckboxDefaults.colors(
                     checkedColor = SilkRoadTeal,
                     uncheckedColor = ContourBorder,
@@ -667,9 +665,9 @@ private fun PapercraftLoyaltyBadgeCard(
     onClick: () -> Unit
 ) {
     val categoryColor = when (category) {
-        "AIRLINE" -> WaypointCyan
-        "HOTEL" -> NavigationalGold
-        "TIMESHARE" -> SilkRoadTeal
+        "Airline" -> WaypointCyan
+        "Hotel" -> NavigationalGold
+        "Timeshare" -> SilkRoadTeal
         else -> CompassLilac
     }
 
@@ -704,7 +702,7 @@ private fun PapercraftLoyaltyBadgeCard(
                     )
                 )
             }
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = name,
                 style = MaterialTheme.typography.bodyMedium.copy(

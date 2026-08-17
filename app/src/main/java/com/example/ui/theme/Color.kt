@@ -3,108 +3,134 @@ package com.example.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // =================================================================
-// MARCO PAPERCRAFT-FLAT-CARTOGRAPHY DESIGN SYSTEM
+// MARCO BLACK-ON-BLACK MINIMALIST DESIGN SYSTEM
+// Pure deep black architecture with a single subtle warm gold accent.
 // =================================================================
 
-// Deep Atlas Canvas (Midnight Ink & Contour Slate)
-val CartographyDarkBase = Color(0xFF11141D)        // Deepest atlas background
-val CartographySurface = Color(0xFF181E2B)         // Main component surface
-val CartographyCard = Color(0xFF22293A)            // Flat papercraft card
-val CartographyCardElevated = Color(0xFF2B3448)    // Floating modal & topbar layer
-val ContourBorder = Color(0xFF38445E)              // Crisp 1dp cartographic contour border
-val ContourBorderSubtle = Color(0xFF263044)        // Subtle secondary border
+// Pure Pitch Black & Deep Graphite Surfaces
+val LuxuryDarkBase = Color(0xFF000000)          // Pure pitch black canvas
+val LuxurySurface = Color(0xFF0A0A0A)           // Subtle structural black
+val LuxuryCard = Color(0xFF121212)              // Dark graphite card surface
+val LuxuryCardElevated = Color(0xFF1A1A1A)      // Floating sheets & modals
+val LuxuryBorder = Color(0xFF242424)            // Hairline 1dp structural border
+val LuxuryBorderSubtle = Color(0xFF181818)      // Faint hairline divider
 
-// Tactile Paper & Vellum Tones
-val ParchmentVellum = Color(0xFFFBF8F2)            // Warm ivory parchment
-val ParchmentSand = Color(0xFFF4EDE2)              // Tactile papercraft fill
-val ParchmentMuted = Color(0xFFE8E0D2)             // Muted vellum tone
-val ParchmentDark = Color(0xFF24201E)              // Weathered antique paper
+// The Single Subtle Accent (Muted Warm Gold)
+val ChampagneGold = Color(0xFFD4AF37)           // Subtle warm champagne gold
+val ChampagneGoldLight = Color(0xFFE8D390)      // Subtle gold highlight
+val ChampagneGoldDark = Color(0xFFA68525)       // Deep gold
+val ChampagneGoldMuted = Color(0x1AD4AF37)      // 10% faint gold tint
 
-// Navigational Brass & Compass Gold
-val NavigationalGold = Color(0xFFF59E0B)           // Primary compass gold accent
-val VenetianGold = Color(0xFFF59E0B)               // Alias for historical explorer
-val VenetianGoldLight = Color(0xFFFDE68A)          // Gilded glow
-val VenetianGoldDeep = Color(0xFFB45309)           // Deep burnished gold
-val AntiqueBrass = Color(0xFFD97706)               // Warm navigational brass
-val GoldenSparkle = Color(0xFFFFE082)              // AI sparkle gold
+// Functional Status Tokens (Subtle & Restrained)
+val StatusEmerald = Color(0xFF10B981)           // Subtle green (active status)
+val StatusEmeraldMuted = Color(0x1A10B981)
+val StatusCrimson = Color(0xFFDC2626)           // Muted red (emergency only)
+val StatusCrimsonMuted = Color(0x1ADC2626)
+val StatusAzure = ChampagneGold                 // Unified with main accent
+val StatusAzureMuted = ChampagneGoldMuted
 
-// Maritime Wayfinder Blues & Route Teals
-val MaritimeBlue = Color(0xFF0284C7)               // Primary route indigo / blue
-val MediterraneanAzure = Color(0xFF0284C7)         // Azure sea
-val WaypointCyan = Color(0xFF38BDF8)               // Active waypoint indicator
-val SilkRoadTeal = Color(0xFF0D9488)               // Silk road jade & water
-val SilkRoadJade = SilkRoadTeal
-val CelestialLapis = Color(0xFF1E293B)             // Night sky lapis
-
-// Wax Seals & Status Stamps
-val WaxSealCrimson = Color(0xFFE11D48)             // Emergency SOS & critical seal
-val TerracottaStamp = Color(0xFFEA580C)            // Expedition coral / transit stamp
-val TerracottaMap = Color(0xFFEA580C)              // Map terrain highlight
-val WayfinderEmerald = Color(0xFF10B981)           // Safe route & sync green
-val CompassLilac = Color(0xFF8B5CF6)               // AI Traveler DNA synthesis
-
-// High-Contrast Typography Tones
-val TextAtlasPrimary = Color(0xFFF8FAFC)           // Crisp ivory-white header text
-val TextAtlasSecondary = Color(0xFF94A3B8)         // Slate subtitle & metadata text
-val TextAtlasSubtle = Color(0xFF64748B)            // Muted coordinate/timestamp text
+// Monochrome Typography Tones
+val TextPrimary = Color(0xFFF2F2F2)             // Crisp clean off-white
+val TextSecondary = Color(0xFF8E8E93)           // Neutral muted slate-gray
+val TextMuted = Color(0xFF555555)               // Subtle dark gray metadata
 
 // =================================================================
-// COMPATIBILITY ALIASES (Harmonized with Cartography Palette)
+// UNIFIED TOKEN MAPPINGS (ALL RAINBOW COLORS REMOVED)
 // =================================================================
-val Navy900 = CartographyDarkBase
-val Navy800 = CartographySurface
-val Navy700 = CartographyCard
-val OceanBlue = MaritimeBlue                       // Action blue
-val SkyBlueLight = WaypointCyan                    // Highlight cyan
-val TealAccent = SilkRoadTeal                      // Accessibility & transit
-val EmeraldGreen = WayfinderEmerald                // Live sync & budget savings
-val AmberGold = NavigationalGold                   // Voice calls & rewards sweet spots
-val SunsetCoral = TerracottaStamp                  // Alerts & highlights
-val PurpleAccent = CompassLilac                    // AI learning & group reels
 
-val DarkSurface = CartographyDarkBase
-val DarkSurfaceElevated = CartographySurface
-val DarkSurfaceCard = CartographyCard
-val DarkBorder = ContourBorder
+// Cartography Design Tokens (Strict Monochrome Black Architecture)
+val CartographyDarkBase = LuxuryDarkBase
+val CartographySurface = LuxurySurface
+val CartographyCard = LuxuryCard
+val CartographyCardElevated = LuxuryCardElevated
+val ContourBorder = LuxuryBorder
+val ContourBorderSubtle = LuxuryBorderSubtle
 
-val LightBackground = CartographyDarkBase
-val LightSurface = CartographySurface
-val LightSurfaceElevated = CartographyCardElevated
-val LightSurfaceCard = CartographyCard
-val LightBorder = ContourBorder
+// Legacy Palette Aliases Harmonized to Strict Monochrome + Single Accent
+val ParchmentVellum = LuxuryCard
+val ParchmentSand = LuxuryCard
+val ParchmentMuted = LuxurySurface
+val ParchmentDark = LuxuryDarkBase
 
-val TextPrimaryDark = TextAtlasPrimary
-val TextSecondaryDark = TextAtlasSecondary
-val TextPrimaryLight = TextAtlasPrimary
-val TextSecondaryLight = TextAtlasSecondary
+val NavigationalGold = ChampagneGold
+val VenetianGold = ChampagneGold
+val VenetianGoldLight = ChampagneGoldLight
+val VenetianGoldDeep = ChampagneGoldDark
+val AntiqueBrass = ChampagneGold
+val GoldenSparkle = ChampagneGoldLight
 
-// Elegant Dark Palette mappings
-val ElegantDarkBackground = CartographyDarkBase
-val ElegantDarkSurface = CartographySurface
-val ElegantDarkSurfaceVariant = CartographyCard
-val ElegantDarkBorder = ContourBorder
-val ElegantDarkOutlineVariant = ContourBorderSubtle
+// All legacy theme tokens mapped to monochrome black/graphite structure
+val MaritimeBlue = LuxuryCardElevated
+val MediterraneanAzure = LuxuryCardElevated
+val WaypointCyan = TextSecondary
+val SilkRoadTeal = TextSecondary
+val SilkRoadJade = TextSecondary
+val CelestialLapis = LuxuryCardElevated
 
-val ElegantLilacPrimary = MaritimeBlue
-val ElegantOnPrimary = Color.White
-val ElegantPrimaryContainer = CartographyCardElevated
-val ElegantOnPrimaryContainer = TextAtlasPrimary
+val WaxSealCrimson = StatusCrimson
+val TerracottaStamp = TextSecondary
+val TerracottaMap = TextSecondary
+val WayfinderEmerald = TextSecondary
+val CompassLilac = TextSecondary
 
-val ElegantSecondary = NavigationalGold
-val ElegantOnSecondary = CartographyDarkBase
-val ElegantSecondaryContainer = CartographyCard
-val ElegantOnSecondaryContainer = TextAtlasPrimary
+val TextAtlasPrimary = TextPrimary
+val TextAtlasSecondary = TextSecondary
+val TextAtlasSubtle = TextMuted
 
-val ElegantTextPrimary = TextAtlasPrimary
-val ElegantTextSecondary = TextAtlasSecondary
-val ElegantTextSubtle = TextAtlasSubtle
+// Theme Compatibility Aliases (Strict Black & Monochrome)
+val Navy900 = LuxuryDarkBase
+val Navy800 = LuxurySurface
+val Navy700 = LuxuryCard
+val OceanBlue = LuxuryCardElevated
+val SkyBlueLight = TextSecondary
+val TealAccent = TextSecondary
+val EmeraldGreen = TextSecondary
+val AmberGold = LuxuryCardElevated
+val SunsetCoral = TextSecondary
+val PurpleAccent = TextSecondary
 
-val ElegantError = WaxSealCrimson
+val DarkSurface = LuxuryDarkBase
+val DarkSurfaceElevated = LuxurySurface
+val DarkSurfaceCard = LuxuryCard
+val DarkBorder = LuxuryBorder
+
+val LightBackground = LuxuryDarkBase
+val LightSurface = LuxurySurface
+val LightSurfaceElevated = LuxuryCardElevated
+val LightSurfaceCard = LuxuryCard
+val LightBorder = LuxuryBorder
+
+val TextPrimaryDark = TextPrimary
+val TextSecondaryDark = TextSecondary
+val TextPrimaryLight = TextPrimary
+val TextSecondaryLight = TextSecondary
+
+val ElegantDarkBackground = LuxuryDarkBase
+val ElegantDarkSurface = LuxurySurface
+val ElegantDarkSurfaceVariant = LuxuryCard
+val ElegantDarkBorder = LuxuryBorder
+val ElegantDarkOutlineVariant = LuxuryBorderSubtle
+
+val ElegantLilacPrimary = ChampagneGold
+val ElegantOnPrimary = LuxuryDarkBase
+val ElegantPrimaryContainer = LuxuryCardElevated
+val ElegantOnPrimaryContainer = TextPrimary
+
+val ElegantSecondary = TextSecondary
+val ElegantOnSecondary = LuxuryDarkBase
+val ElegantSecondaryContainer = LuxuryCard
+val ElegantOnSecondaryContainer = TextPrimary
+
+val ElegantTextPrimary = TextPrimary
+val ElegantTextSecondary = TextSecondary
+val ElegantTextSubtle = TextMuted
+
+val ElegantError = StatusCrimson
 val ElegantOnError = Color.White
-val ElegantErrorContainer = Color(0xFF4C0519)
-val ElegantOnErrorContainer = Color(0xFFFFE4E6)
+val ElegantErrorContainer = Color(0xFF2B0A0A)
+val ElegantOnErrorContainer = Color(0xFFFCA5A5)
 
-val ElegantSuccess = WayfinderEmerald
-val ElegantAmber = NavigationalGold
-val ElegantTeal = SilkRoadTeal
-val ExplorerParchmentCard = CartographyCard
+val ElegantSuccess = StatusEmerald
+val ElegantAmber = ChampagneGold
+val ElegantTeal = TextSecondary
+val ExplorerParchmentCard = LuxuryCard

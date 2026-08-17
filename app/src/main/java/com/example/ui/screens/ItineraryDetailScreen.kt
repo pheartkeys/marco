@@ -1,8 +1,9 @@
 package com.example.ui.screens
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,12 +40,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -52,6 +53,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -61,27 +63,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.data.model.TripActivityEntity
 import com.example.data.model.TripEntity
 import com.example.data.model.isTripInProgress
 import com.example.ui.components.AccessibilityTagChip
 import com.example.ui.components.CategoryIconBadge
 import com.example.ui.components.HeroGradientBanner
-import com.example.ui.theme.AmberGold
-import com.example.ui.theme.EmeraldGreen
-import com.example.ui.theme.Navy900
-import com.example.ui.theme.OceanBlue
-import com.example.ui.theme.PurpleAccent
-import com.example.ui.theme.SkyBlueLight
-import com.example.ui.theme.SunsetCoral
-import com.example.ui.theme.TealAccent
+import com.example.ui.theme.*
 import com.example.viewmodel.TravelViewModel
 
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -141,6 +133,7 @@ fun ItineraryDetailScreen(
                         IconButton(
                             onClick = onNavigateBack,
                             modifier = Modifier
+                                .minimumInteractiveComponentSize()
                                 .size(40.dp)
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colorScheme.surfaceVariant)
@@ -156,16 +149,12 @@ fun ItineraryDetailScreen(
                         Column {
                             Text(
                                 text = "Expedition Itinerary & Bookings",
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 17.sp
-                                )
+                                style = MaterialTheme.typography.titleLarge
                             )
                             Text(
                                 text = currentTrip?.title ?: "Trip Details & Pacing",
                                 style = MaterialTheme.typography.bodySmall.copy(
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    fontSize = 11.sp
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 ),
                                 maxLines = 1
                             )
@@ -175,11 +164,12 @@ fun ItineraryDetailScreen(
                     IconButton(
                         onClick = onOpenPlanDialog,
                         modifier = Modifier
+                            .minimumInteractiveComponentSize()
                             .size(38.dp)
                             .clip(CircleShape)
-                            .background(OceanBlue.copy(alpha = 0.15f))
+                            .background(MaritimeBlue.copy(alpha = 0.15f))
                     ) {
-                        Icon(Icons.Default.Add, contentDescription = "Plan New Trip", tint = OceanBlue)
+                        Icon(Icons.Default.Add, contentDescription = "Plan New Trip", tint = MaritimeBlue)
                     }
                 }
             }
@@ -189,16 +179,16 @@ fun ItineraryDetailScreen(
                 item {
                     Surface(
                         shape = RoundedCornerShape(12.dp),
-                        color = EmeraldGreen.copy(alpha = 0.15f),
+                        color = WayfinderEmerald.copy(alpha = 0.15f),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
                             modifier = Modifier.padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.CloudDone, null, tint = EmeraldGreen, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.CloudDone, null, tint = WayfinderEmerald, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(msg, color = EmeraldGreen, style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium))
+                            Text(msg, color = WayfinderEmerald, style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium))
                         }
                     }
                 }
@@ -229,14 +219,15 @@ fun ItineraryDetailScreen(
             item {
                 Surface(
                     shape = RoundedCornerShape(16.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    border = BorderStroke(1.dp, ContourBorder),
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { isPreferenceDialogOpen = true }
                         .testTag("open_preference_dna_card")
                 ) {
                     Row(
-                        modifier = Modifier.padding(14.dp),
+                        modifier = Modifier.padding(16.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -246,51 +237,47 @@ fun ItineraryDetailScreen(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(34.dp)
+                                    .size(36.dp)
                                     .clip(CircleShape)
-                                    .background(Color(0xFF8B5CF6).copy(alpha = 0.2f)),
+                                    .background(CartographyCardElevated),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     Icons.Default.Psychology,
                                     contentDescription = null,
-                                    tint = Color(0xFF8B5CF6),
+                                    tint = NavigationalGold,
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
-                            Spacer(modifier = Modifier.width(10.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
                             Column {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
-                                        text = "AI Traveler DNA",
-                                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = Color(0xFF8B5CF6))
+                                        text = "Traveler Profile & AI Preferences",
+                                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                                     )
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Surface(
-                                        shape = RoundedCornerShape(6.dp),
-                                        color = EmeraldGreen.copy(alpha = 0.15f)
-                                    ) {
+                                    userPref?.let { pref ->
+                                        Spacer(modifier = Modifier.width(8.dp))
                                         Text(
-                                            text = "${userPref?.totalTripsAnalyzed ?: 2} Insights Learned",
-                                            style = MaterialTheme.typography.labelSmall.copy(color = EmeraldGreen, fontSize = 9.sp, fontWeight = FontWeight.Bold),
-                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                                            text = "• ${pref.totalTripsAnalyzed} Insights",
+                                            style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         )
                                     }
                                 }
                                 Text(
                                     text = userPref?.learnedInsightsSummary?.take(65)?.let { "$it..." } ?: "Learns from your ratings and preferred airline & hotel types.",
-                                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant),
+                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                                     maxLines = 1
                                 )
                             }
                         }
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Star, null, tint = AmberGold, modifier = Modifier.size(14.dp))
+                            Icon(Icons.Default.Star, null, tint = NavigationalGold, modifier = Modifier.size(14.dp))
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "Train AI",
-                                style = MaterialTheme.typography.labelSmall.copy(color = OceanBlue, fontWeight = FontWeight.Bold)
+                                text = "Preferences",
+                                style = MaterialTheme.typography.labelSmall.copy(color = NavigationalGold, fontWeight = FontWeight.Bold)
                             )
                         }
                     }
@@ -315,15 +302,12 @@ fun ItineraryDetailScreen(
                 ) {
                     Text(
                         text = if (selectedDayFilter == 0) "All Scheduled Activities (${activities.size})" else "Day $selectedDayFilter Schedule",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 17.sp
-                        )
+                        style = MaterialTheme.typography.titleLarge
                     )
                     Text(
-                        text = "Real-time sync active",
+                        text = "Live Sync",
                         style = MaterialTheme.typography.labelSmall.copy(
-                            color = TealAccent,
+                            color = WayfinderEmerald,
                             fontWeight = FontWeight.SemiBold
                         )
                     )
@@ -347,10 +331,10 @@ fun ItineraryDetailScreen(
                             Icon(
                                 imageVector = Icons.Default.AutoAwesome,
                                 contentDescription = null,
-                                tint = OceanBlue,
+                                tint = NavigationalGold,
                                 modifier = Modifier.size(36.dp)
                             )
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = "No activities for this day",
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
@@ -384,25 +368,19 @@ fun ItineraryDetailScreen(
         }
 
         // Floating Action Button
-        FloatingActionButton(
+        ExtendedFloatingActionButton(
             onClick = onOpenPlanDialog,
-            containerColor = OceanBlue,
-            contentColor = Color.White,
-            shape = RoundedCornerShape(18.dp),
+            containerColor = LuxuryCardElevated,
+            contentColor = TextPrimary,
+            shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(20.dp)
-                .testTag("plan_new_trip_fab")
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(Icons.Default.AutoAwesome, contentDescription = "Plan Trip", tint = AmberGold)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("AI Trip Planner", fontWeight = FontWeight.Bold)
-            }
-        }
+                .border(1.dp, LuxuryBorder, RoundedCornerShape(12.dp))
+                .testTag("plan_new_trip_fab"),
+            icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "Plan Trip", tint = ChampagneGold) },
+            text = { Text("AI Trip Planner", fontWeight = FontWeight.Medium) }
+        )
     }
 
     if (isPreferenceDialogOpen) {
@@ -437,19 +415,20 @@ fun TripHeroCard(
     val isTripActive = trip.isTripInProgress()
 
     Card(
-        shape = RoundedCornerShape(22.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            // Gradient Top
+            // Flat Top Band
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp))
-                    .background(Brush.horizontalGradient(listOf(Navy900, OceanBlue, TealAccent)))
-                    .padding(18.dp)
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                    .background(CartographyCardElevated)
+                    .padding(16.dp)
             ) {
                 Column {
                     Row(
@@ -460,21 +439,23 @@ fun TripHeroCard(
                         // Switcher button
                         Box {
                             Surface(
-                                shape = RoundedCornerShape(20.dp),
-                                color = Color.White.copy(alpha = 0.2f),
-                                modifier = Modifier.clickable { onMenuToggle() }
+                                shape = RoundedCornerShape(12.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                modifier = Modifier
+                                    .clickable { onMenuToggle() }
+                                    .minimumInteractiveComponentSize()
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Icon(Icons.Default.SwapHoriz, null, tint = Color.White, modifier = Modifier.size(14.dp))
+                                    Icon(Icons.Default.SwapHoriz, null, tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(14.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
                                         text = "Switch Trip",
-                                        style = MaterialTheme.typography.labelSmall.copy(color = Color.White, fontWeight = FontWeight.Bold)
+                                        style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                                     )
-                                    Icon(Icons.Default.ExpandMore, null, tint = Color.White, modifier = Modifier.size(14.dp))
+                                    Icon(Icons.Default.ExpandMore, null, tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(14.dp))
                                 }
                             }
 
@@ -486,27 +467,29 @@ fun TripHeroCard(
                                     DropdownMenuItem(
                                         text = {
                                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Text(t.title, fontSize = 13.sp)
-                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Text(t.title, style = MaterialTheme.typography.bodyMedium)
+                                                Spacer(modifier = Modifier.width(8.dp))
                                                 Text(
-                                                    text = if (t.isTripInProgress()) "🧭 Live" else "📋 Plan",
-                                                    fontSize = 10.sp,
-                                                    color = if (t.isTripInProgress()) EmeraldGreen else OceanBlue,
-                                                    fontWeight = FontWeight.Bold
+                                                    text = if (t.isTripInProgress()) "Live" else "Plan",
+                                                    style = MaterialTheme.typography.labelSmall.copy(
+                                                        color = if (t.isTripInProgress()) WayfinderEmerald else WaypointCyan,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
                                                 )
                                             }
                                         },
                                         onClick = { onSelectTrip(t.id) }
                                     )
                                 }
-                                Divider()
+                                HorizontalDivider()
                                 DropdownMenuItem(
                                     text = {
                                         Text(
-                                            text = if (isTripActive) "📋 Set to Planning Mode (Hide SOS)" else "🧭 Start Trip / On-Trip Mode (Activate SOS)",
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (isTripActive) OceanBlue else EmeraldGreen,
-                                            fontSize = 12.sp
+                                            text = if (isTripActive) "Set to Planning Mode (Hide SOS)" else "Start Trip / On-Trip Mode (Activate SOS)",
+                                            style = MaterialTheme.typography.labelMedium.copy(
+                                                fontWeight = FontWeight.Bold,
+                                                color = if (isTripActive) WaypointCyan else WayfinderEmerald
+                                            )
                                         )
                                     },
                                     onClick = {
@@ -515,7 +498,7 @@ fun TripHeroCard(
                                     }
                                 )
                                 DropdownMenuItem(
-                                    text = { Text("✨ Plan New AI Trip...", fontWeight = FontWeight.Bold, color = OceanBlue, fontSize = 12.sp) },
+                                    text = { Text("Plan New AI Trip...", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = WaypointCyan)) },
                                     onClick = {
                                         onMenuToggle()
                                         onNewTripClick()
@@ -524,23 +507,24 @@ fun TripHeroCard(
                             }
                         }
 
-                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             // Trip Status Badge Pill
                             Surface(
-                                shape = RoundedCornerShape(20.dp),
-                                color = if (isTripActive) EmeraldGreen.copy(alpha = 0.3f) else Color.White.copy(alpha = 0.2f),
-                                modifier = Modifier.clickable { onToggleTripStatus() }
+                                shape = RoundedCornerShape(12.dp),
+                                color = if (isTripActive) WayfinderEmerald.copy(alpha = 0.3f) else MaterialTheme.colorScheme.surfaceVariant,
+                                modifier = Modifier
+                                    .clickable { onToggleTripStatus() }
+                                    .minimumInteractiveComponentSize()
                             ) {
                                 Row(
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = if (isTripActive) "🧭 ON-TRIP" else "📋 PLANNING",
+                                        text = if (isTripActive) "On-trip" else "Planning",
                                         style = MaterialTheme.typography.labelSmall.copy(
-                                            color = Color.White,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 10.sp
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            fontWeight = FontWeight.Bold
                                         )
                                     )
                                 }
@@ -548,9 +532,11 @@ fun TripHeroCard(
 
                             // Offline sync status icon
                             Surface(
-                                shape = RoundedCornerShape(20.dp),
-                                color = if (trip.isOfflineSynced) EmeraldGreen.copy(alpha = 0.25f) else Color.White.copy(alpha = 0.2f),
-                                modifier = Modifier.clickable { onToggleOfflineSync() }
+                                shape = RoundedCornerShape(12.dp),
+                                color = if (trip.isOfflineSynced) WayfinderEmerald.copy(alpha = 0.25f) else MaterialTheme.colorScheme.surfaceVariant,
+                                modifier = Modifier
+                                    .clickable { onToggleOfflineSync() }
+                                    .minimumInteractiveComponentSize()
                             ) {
                                 Row(
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -559,16 +545,15 @@ fun TripHeroCard(
                                     Icon(
                                         imageVector = if (trip.isOfflineSynced) Icons.Default.CloudDone else Icons.Default.CloudOff,
                                         contentDescription = null,
-                                        tint = if (trip.isOfflineSynced) EmeraldGreen else Color.White,
+                                        tint = if (trip.isOfflineSynced) WayfinderEmerald else MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(14.dp)
                                     )
-                                    Spacer(modifier = Modifier.width(3.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
                                     Text(
                                         text = if (trip.isOfflineSynced) "Synced" else "Syncing...",
                                         style = MaterialTheme.typography.labelSmall.copy(
-                                            color = Color.White,
-                                            fontWeight = FontWeight.SemiBold,
-                                            fontSize = 10.sp
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            fontWeight = FontWeight.SemiBold
                                         )
                                     )
                                 }
@@ -580,18 +565,15 @@ fun TripHeroCard(
 
                     Text(
                         text = trip.title,
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "${trip.startDate} - ${trip.endDate} • ${trip.destination}",
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = Color.White.copy(alpha = 0.85f),
-                            fontSize = 13.sp
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                 }
@@ -609,14 +591,13 @@ fun TripHeroCard(
                     if (trip.childrenCount > 0) {
                         Surface(
                             shape = RoundedCornerShape(12.dp),
-                            color = Color(0xFFEC4899).copy(alpha = 0.12f)
+                            color = TerracottaStamp.copy(alpha = 0.12f)
                         ) {
                             Text(
                                 text = "${trip.childrenCount} Child Travelers",
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    fontSize = 10.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = Color(0xFFEC4899)
+                                    color = TerracottaStamp
                                 ),
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                             )
@@ -638,19 +619,19 @@ fun TripHeroCard(
                     Text(
                         text = "${(progress * 100).toInt()}% Used",
                         style = MaterialTheme.typography.labelMedium.copy(
-                            color = if (progress > 0.85f) SunsetCoral else OceanBlue,
+                            color = if (progress > 0.85f) SunsetCoral else WaypointCyan,
                             fontWeight = FontWeight.Bold
                         )
                     )
                 }
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 LinearProgressIndicator(
                     progress = { progress },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(6.dp)
+                        .height(8.dp)
                         .clip(CircleShape),
-                    color = if (progress > 0.85f) SunsetCoral else OceanBlue,
+                    color = if (progress > 0.85f) SunsetCoral else MaritimeBlue,
                     trackColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             }
@@ -673,10 +654,18 @@ fun DayFilterSection(
             FilterChip(
                 selected = selectedDay == 0,
                 onClick = { onSelectDay(0) },
-                label = { Text("All Days (${activities.size})", fontWeight = FontWeight.SemiBold) },
+                label = { Text("All Days (${activities.size})", fontWeight = FontWeight.Medium) },
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = OceanBlue.copy(alpha = 0.2f),
-                    selectedLabelColor = OceanBlue
+                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    selectedLabelColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = selectedDay == 0,
+                    borderColor = MaterialTheme.colorScheme.outline,
+                    selectedBorderColor = MaterialTheme.colorScheme.primary
                 )
             )
         }
@@ -686,10 +675,18 @@ fun DayFilterSection(
             FilterChip(
                 selected = selectedDay == d,
                 onClick = { onSelectDay(d) },
-                label = { Text("Day $d ($dayCount)", fontWeight = FontWeight.SemiBold) },
+                label = { Text("Day $d ($dayCount)", fontWeight = FontWeight.Medium) },
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = OceanBlue.copy(alpha = 0.2f),
-                    selectedLabelColor = OceanBlue
+                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    selectedLabelColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = selectedDay == d,
+                    borderColor = MaterialTheme.colorScheme.outline,
+                    selectedBorderColor = MaterialTheme.colorScheme.primary
                 )
             )
         }
@@ -704,12 +701,13 @@ fun ActivityItemCard(
     onVoiceCall: () -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(14.dp)) {
             // Header Row: Category Badge, Time, Day, Checkbox
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -717,21 +715,20 @@ fun ActivityItemCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    CategoryIconBadge(category = activity.category, size = 36)
-                    Spacer(modifier = Modifier.width(10.dp))
+                    CategoryIconBadge(category = activity.category, size = 32)
+                    Spacer(modifier = Modifier.width(8.dp))
                     Column {
                         Text(
                             text = "Day ${activity.dayNumber} • ${activity.timeSlot}",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                color = OceanBlue,
-                                fontWeight = FontWeight.Bold
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontWeight = FontWeight.Medium
                             )
                         )
                         Text(
                             text = activity.category,
                             style = MaterialTheme.typography.labelSmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 10.sp
+                                color = MaterialTheme.colorScheme.outline
                             )
                         )
                     }
@@ -740,24 +737,24 @@ fun ActivityItemCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(
                         onClick = onToggleCompleted,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.minimumInteractiveComponentSize().size(32.dp)
                     ) {
                         Icon(
                             imageVector = if (activity.isCompleted) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
                             contentDescription = "Toggle Complete",
-                            tint = if (activity.isCompleted) EmeraldGreen else MaterialTheme.colorScheme.outline
+                            tint = if (activity.isCompleted) WayfinderEmerald else MaterialTheme.colorScheme.outline
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Title
             Text(
                 text = activity.title,
                 style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                     textDecoration = if (activity.isCompleted) TextDecoration.LineThrough else TextDecoration.None
                 )
             )
@@ -770,14 +767,13 @@ fun ActivityItemCard(
                         imageVector = Icons.Default.LocationOn,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(14.dp)
+                        modifier = Modifier.size(13.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = activity.location,
                         style = MaterialTheme.typography.bodySmall.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 12.sp
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                 }
@@ -785,16 +781,18 @@ fun ActivityItemCard(
 
             // Notes
             if (activity.notes.isNotBlank()) {
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = activity.notes,
-                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp),
-                        modifier = Modifier.padding(10.dp)
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        modifier = Modifier.padding(8.dp)
                     )
                 }
             }
@@ -809,25 +807,27 @@ fun ActivityItemCard(
             ) {
                 AccessibilityTagChip(text = activity.accessibilityBadge)
 
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     // AI Voice Call trigger
                     Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = AmberGold.copy(alpha = 0.15f),
-                        modifier = Modifier.clickable { onVoiceCall() }
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                        modifier = Modifier
+                            .clickable { onVoiceCall() }
+                            .minimumInteractiveComponentSize()
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.Call, null, tint = AmberGold, modifier = Modifier.size(12.dp))
+                            Icon(Icons.Default.Call, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(12.dp))
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "AI Call Vendor",
+                                text = "Call Vendor",
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    color = AmberGold,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 11.sp
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Medium
                                 )
                             )
                         }
@@ -836,13 +836,13 @@ fun ActivityItemCard(
                     // Delete
                     IconButton(
                         onClick = onDelete,
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.minimumInteractiveComponentSize().size(28.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Delete",
                             tint = MaterialTheme.colorScheme.outline,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(15.dp)
                         )
                     }
                 }
@@ -854,7 +854,7 @@ fun ActivityItemCard(
 @Composable
 fun EmptyTripCard(onOpenPlanDialog: () -> Unit) {
     Card(
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -864,26 +864,29 @@ fun EmptyTripCard(onOpenPlanDialog: () -> Unit) {
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(Icons.Default.AutoAwesome, null, tint = OceanBlue, modifier = Modifier.size(44.dp))
+            Icon(Icons.Default.AutoAwesome, null, tint = MaritimeBlue, modifier = Modifier.size(44.dp))
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "Welcome to VoyageAI Travel Agent",
+                text = "Welcome to Marco",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Replace traditional agency hassles with smart AI multi-modal itinerary planning, rewards optimization, and live vendor voice calls.",
+                text = "Plan itineraries, track budgets, and call vendors in one place.",
                 style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = onOpenPlanDialog,
-                colors = ButtonDefaults.buttonColors(containerColor = OceanBlue),
-                shape = RoundedCornerShape(14.dp)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaritimeBlue,
+                    contentColor = CartographyDarkBase
+                ),
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Icon(Icons.Default.Add, null)
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(8.dp))
                 Text("Plan First Trip", fontWeight = FontWeight.Bold)
             }
         }

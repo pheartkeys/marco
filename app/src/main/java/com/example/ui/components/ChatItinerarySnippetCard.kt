@@ -1,6 +1,7 @@
 package com.example.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -14,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -22,6 +22,14 @@ import androidx.compose.ui.unit.sp
 import com.example.data.model.ChatMessageEntity
 import com.example.data.model.TripActivityEntity
 import com.example.data.model.TripEntity
+import com.example.ui.theme.CartographyDarkBase
+import com.example.ui.theme.CompassLilac
+import com.example.ui.theme.ContourBorder
+import com.example.ui.theme.MaritimeBlue
+import com.example.ui.theme.SilkRoadTeal
+import com.example.ui.theme.WayfinderEmerald
+import com.example.ui.theme.WaypointCyan
+import com.example.ui.theme.WaxSealCrimson
 
 /**
  * Compact, horizontally scrollable cards for structured itinerary snippets
@@ -44,7 +52,8 @@ fun ChatItinerarySnippetCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 6.dp)
@@ -69,13 +78,13 @@ fun ChatItinerarySnippetCard(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFF0284C7).copy(alpha = 0.15f)),
+                            .background(MaritimeBlue.copy(alpha = 0.15f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.EventNote,
                             contentDescription = null,
-                            tint = Color(0xFF0284C7),
+                            tint = MaritimeBlue,
                             modifier = Modifier.size(22.dp)
                         )
                     }
@@ -88,21 +97,19 @@ fun ChatItinerarySnippetCard(
                             Text(
                                 text = "Itinerary Highlights",
                                 style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp
+                                    fontWeight = FontWeight.Bold
                                 )
                             )
                             Surface(
                                 shape = RoundedCornerShape(6.dp),
-                                color = Color(0xFFE0F2FE)
+                                color = MaritimeBlue.copy(alpha = 0.15f)
                             ) {
                                 Text(
                                     text = "${displayActivities.size} Segments",
                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        color = Color(0xFF0369A1),
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 9.sp
+                                        color = WaypointCyan,
+                                        fontWeight = FontWeight.Bold
                                     )
                                 )
                             }
@@ -110,8 +117,7 @@ fun ChatItinerarySnippetCard(
                         Text(
                             text = trip?.title ?: "Active Expedition",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 12.sp
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }
@@ -126,7 +132,7 @@ fun ChatItinerarySnippetCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Horizontal Scrollable Cards
             if (displayActivities.isNotEmpty()) {
@@ -155,7 +161,6 @@ fun ChatItinerarySnippetCard(
                     Text(
                         text = "No activities added yet. Tap below to build or customize this itinerary.",
                         style = MaterialTheme.typography.bodySmall.copy(
-                            fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         ),
                         modifier = Modifier.padding(12.dp)
@@ -169,7 +174,10 @@ fun ChatItinerarySnippetCard(
             Button(
                 onClick = onOpenFullItinerary,
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0284C7)),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaritimeBlue,
+                    contentColor = CartographyDarkBase
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("open_full_itinerary_view_btn")
@@ -177,15 +185,13 @@ fun ChatItinerarySnippetCard(
                 Icon(
                     imageVector = Icons.Default.CalendarMonth,
                     contentDescription = null,
-                    tint = Color.White,
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Open Full Itinerary & Booking Details →",
+                    text = "Open Full Itinerary & Booking Details",
                     style = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        fontWeight = FontWeight.Bold
                     )
                 )
             }
@@ -199,10 +205,10 @@ private fun ItinerarySnippetItem(
     onClick: () -> Unit
 ) {
     val (icon, bgCol, tintCol) = when (activity.category.uppercase()) {
-        "FLIGHT" -> Triple(Icons.Default.Flight, Color(0xFF0284C7).copy(alpha = 0.15f), Color(0xFF0284C7))
-        "HOTEL", "TIMESHARE" -> Triple(Icons.Default.Hotel, Color(0xFF8B5CF6).copy(alpha = 0.15f), Color(0xFF8B5CF6))
-        "DINING" -> Triple(Icons.Default.Restaurant, Color(0xFFF43F5E).copy(alpha = 0.15f), Color(0xFFF43F5E))
-        else -> Triple(Icons.Default.LocalActivity, Color(0xFF10B981).copy(alpha = 0.15f), Color(0xFF10B981))
+        "FLIGHT" -> Triple(Icons.Default.Flight, MaritimeBlue.copy(alpha = 0.15f), MaritimeBlue)
+        "HOTEL", "TIMESHARE" -> Triple(Icons.Default.Hotel, CompassLilac.copy(alpha = 0.15f), CompassLilac)
+        "DINING" -> Triple(Icons.Default.Restaurant, WaxSealCrimson.copy(alpha = 0.15f), WaxSealCrimson)
+        else -> Triple(Icons.Default.LocalActivity, WayfinderEmerald.copy(alpha = 0.15f), WayfinderEmerald)
     }
 
     Card(
@@ -257,8 +263,7 @@ private fun ItinerarySnippetItem(
                         text = activity.timeSlot,
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                         style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 10.sp
+                            fontWeight = FontWeight.SemiBold
                         )
                     )
                 }
@@ -271,7 +276,6 @@ private fun ItinerarySnippetItem(
                 text = activity.title,
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 13.sp,
                     lineHeight = 17.sp
                 ),
                 maxLines = 2
@@ -293,8 +297,7 @@ private fun ItinerarySnippetItem(
                 Text(
                     text = activity.location,
                     style = MaterialTheme.typography.labelSmall.copy(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 11.sp
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
                     maxLines = 1
                 )
@@ -305,15 +308,14 @@ private fun ItinerarySnippetItem(
             // Accessibility or Confirmation Badge
             Surface(
                 shape = RoundedCornerShape(6.dp),
-                color = Color(0xFF0D9488).copy(alpha = 0.12f),
+                color = SilkRoadTeal.copy(alpha = 0.12f),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = activity.accessibilityBadge,
-                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp),
                     style = MaterialTheme.typography.labelSmall.copy(
-                        color = Color(0xFF0D9488),
-                        fontSize = 9.sp,
+                        color = SilkRoadTeal,
                         fontWeight = FontWeight.Medium
                     ),
                     maxLines = 1

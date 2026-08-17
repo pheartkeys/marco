@@ -1,6 +1,7 @@
 package com.example.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.ChatMessageEntity
 import com.example.data.model.GroupMemoryEntity
+import com.example.ui.theme.*
 
 /**
  * In-stream collaborative media carousel displaying photos and moments shared
@@ -44,7 +46,8 @@ fun ChatGroupMediaCarouselCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 6.dp)
@@ -69,13 +72,13 @@ fun ChatGroupMediaCarouselCard(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFFEC4899).copy(alpha = 0.2f)),
+                            .background(CompassLilac.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Collections,
                             contentDescription = null,
-                            tint = Color(0xFFEC4899),
+                            tint = CompassLilac,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -88,21 +91,19 @@ fun ChatGroupMediaCarouselCard(
                             Text(
                                 text = "Group Memories Reel",
                                 style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp
+                                    fontWeight = FontWeight.Bold
                                 )
                             )
                             Surface(
                                 shape = RoundedCornerShape(6.dp),
-                                color = Color(0xFFFCE7F3)
+                                color = CompassLilac.copy(alpha = 0.15f)
                             ) {
                                 Text(
                                     text = "${displayMemories.size} Photos",
                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        color = Color(0xFFBE185D),
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 9.sp
+                                        color = CompassLilac,
+                                        fontWeight = FontWeight.Bold
                                     )
                                 )
                             }
@@ -110,8 +111,7 @@ fun ChatGroupMediaCarouselCard(
                         Text(
                             text = "Collaborative stream from your travel crew",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 12.sp
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }
@@ -129,7 +129,7 @@ fun ChatGroupMediaCarouselCard(
                         Icon(
                             imageVector = Icons.Default.AddPhotoAlternate,
                             contentDescription = "Upload trip photo",
-                            tint = Color(0xFFEC4899)
+                            tint = CompassLilac
                         )
                     }
                 }
@@ -160,7 +160,7 @@ fun ChatGroupMediaCarouselCard(
                 ) {
                     Text(
                         text = "No group photos added yet. Tap '+' above to capture and share moments with your travel crew.",
-                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant),
+                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                         modifier = Modifier.padding(12.dp)
                     )
                 }
@@ -172,7 +172,7 @@ fun ChatGroupMediaCarouselCard(
             Button(
                 onClick = onOpenFullMemories,
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6)),
+                colors = ButtonDefaults.buttonColors(containerColor = CompassLilac),
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("open_full_memories_view_btn")
@@ -185,7 +185,7 @@ fun ChatGroupMediaCarouselCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Open Vacation Moments & AI Story Reels →",
+                    text = "Open Vacation Moments & AI Story Reels",
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -209,19 +209,12 @@ private fun MediaCardItem(
         modifier = Modifier.width(200.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            // Photo Simulation with gradient banner
+            // Photo Simulation with dark banner
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp)
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(
-                                Color(memory.photoGradientColor),
-                                Color(memory.photoGradientColor).copy(alpha = 0.6f)
-                            )
-                        )
-                    )
+                    .background(LuxuryCardElevated)
                     .padding(8.dp),
                 contentAlignment = Alignment.BottomStart
             ) {
@@ -233,7 +226,6 @@ private fun MediaCardItem(
                         text = memory.aiTag,
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = Color.White,
-                            fontSize = 10.sp,
                             fontWeight = FontWeight.Bold
                         ),
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -247,7 +239,6 @@ private fun MediaCardItem(
                     text = memory.caption,
                     style = MaterialTheme.typography.bodySmall.copy(
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 12.sp,
                         lineHeight = 16.sp
                     ),
                     maxLines = 2
@@ -265,15 +256,13 @@ private fun MediaCardItem(
                             text = memory.authorName,
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontSize = 10.sp
+                                color = MaterialTheme.colorScheme.primary
                             )
                         )
                         Text(
                             text = memory.locationTag,
                             style = MaterialTheme.typography.labelSmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 9.sp
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }
@@ -283,12 +272,12 @@ private fun MediaCardItem(
                             isLiked = !isLiked
                             onLike()
                         },
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.minimumInteractiveComponentSize()
                     ) {
                         Icon(
                             imageVector = if (isLiked) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
                             contentDescription = "Like memory",
-                            tint = if (isLiked) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = if (isLiked) WaxSealCrimson else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(16.dp)
                         )
                     }

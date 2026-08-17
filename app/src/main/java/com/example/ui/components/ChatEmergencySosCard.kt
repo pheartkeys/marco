@@ -3,7 +3,9 @@ package com.example.ui.components
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,9 +21,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.data.model.ChatMessageEntity
 import com.example.data.model.TripEntity
+import com.example.ui.theme.CartographyDarkBase
+import com.example.ui.theme.CelestialLapis
+import com.example.ui.theme.ContourBorder
+import com.example.ui.theme.MaritimeBlue
+import com.example.ui.theme.TextAtlasSecondary
+import com.example.ui.theme.WaxSealCrimson
 
 /**
  * Emergency SOS & Safety Radar Card:
@@ -44,9 +51,10 @@ fun ChatEmergencySosCard(
     Card(
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF450A0A)
+            containerColor = MaterialTheme.colorScheme.errorContainer
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 6.dp)
@@ -68,7 +76,7 @@ fun ChatEmergencySosCard(
                         modifier = Modifier
                             .size(36.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFFDC2626)),
+                            .background(WaxSealCrimson),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -82,22 +90,22 @@ fun ChatEmergencySosCard(
                     Column {
                         Text(
                             text = "EMERGENCY SOS BEACON",
-                            color = Color(0xFFFCA5A5),
-                            fontWeight = FontWeight.Black,
-                            fontSize = 13.sp,
-                            letterSpacing = 0.5.sp
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                color = Color(0xFFFCA5A5)
+                            )
                         )
                         Text(
                             text = "Live Active Trip Safety Network",
-                            color = Color(0xFFD1D5DB),
-                            fontSize = 11.sp
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = Color(0xFFD1D5DB)
+                            )
                         )
                     }
                 }
 
                 IconButton(
                     onClick = onPlayTts,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.minimumInteractiveComponentSize()
                 ) {
                     Icon(
                         imageVector = Icons.Default.VolumeUp,
@@ -113,7 +121,7 @@ fun ChatEmergencySosCard(
             // Telemetry summary
             Surface(
                 shape = RoundedCornerShape(12.dp),
-                color = Color(0xFF1F2937).copy(alpha = 0.7f),
+                color = CelestialLapis.copy(alpha = 0.7f),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(12.dp)) {
@@ -122,15 +130,17 @@ fun ChatEmergencySosCard(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "📍 Expedition:",
-                            color = Color(0xFF9CA3AF),
-                            fontSize = 11.sp
+                            text = "Expedition:",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = TextAtlasSecondary
+                            )
                         )
                         Text(
                             text = destination,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 11.sp
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
                         )
                     }
                     Spacer(modifier = Modifier.height(4.dp))
@@ -139,15 +149,17 @@ fun ChatEmergencySosCard(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "🏥 Emergency Support:",
-                            color = Color(0xFF9CA3AF),
-                            fontSize = 11.sp
+                            text = "Emergency Support:",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = TextAtlasSecondary
+                            )
                         )
                         Text(
                             text = "Local 911/112 Dispatch & Trauma ER",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 11.sp
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
                         )
                     }
                     Spacer(modifier = Modifier.height(4.dp))
@@ -156,15 +168,17 @@ fun ChatEmergencySosCard(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "🏛️ Consular Assistance:",
-                            color = Color(0xFF9CA3AF),
-                            fontSize = 11.sp
+                            text = "Consular Assistance:",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = TextAtlasSecondary
+                            )
                         )
                         Text(
                             text = "24/7 Citizen Traveler Safety Desk",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 11.sp
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
                         )
                     }
                 }
@@ -182,13 +196,16 @@ fun ChatEmergencySosCard(
                         val dialIntent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:911"))
                         context.startActivity(dialIntent)
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626)),
+                    colors = ButtonDefaults.buttonColors(containerColor = WaxSealCrimson),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(Icons.Default.Call, null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Call 911 / ER", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    Text(
+                        "Call 911 / ER",
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                    )
                 }
 
                 Button(
@@ -202,12 +219,19 @@ fun ChatEmergencySosCard(
                         }
                         try {
                             context.startActivity(smsIntent)
+                            isDispatched = true
                         } catch (e: Exception) {
-                            // Fallback
+                            Toast.makeText(
+                                context,
+                                "Unable to open messaging app for SOS broadcast.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
-                        isDispatched = true
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0284C7)),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaritimeBlue,
+                        contentColor = CartographyDarkBase
+                    ),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
                 ) {
@@ -219,8 +243,7 @@ fun ChatEmergencySosCard(
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = if (isDispatched) "Sent SOS GPS" else "Broadcast SOS",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                     )
                 }
             }

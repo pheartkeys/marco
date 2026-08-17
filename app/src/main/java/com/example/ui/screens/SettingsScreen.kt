@@ -1,9 +1,8 @@
 package com.example.ui.screens
 
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,8 +28,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.CloudQueue
 import androidx.compose.material.icons.filled.CloudSync
@@ -57,7 +56,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -67,8 +65,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.activity.compose.BackHandler
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
@@ -76,6 +72,9 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.minimumInteractiveComponentSize
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -85,7 +84,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -98,19 +96,11 @@ import com.example.data.local.AppSettingsState
 import com.example.data.local.AvailableVoiceProfiles
 import com.example.data.local.VoiceProfile
 import com.example.data.sync.CloudSyncManager
+import com.example.BuildConfig
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import com.example.ui.theme.AmberGold
-import com.example.ui.theme.CelestialLapis
-import com.example.ui.theme.EmeraldGreen
-import com.example.ui.theme.OceanBlue
-import com.example.ui.theme.ParchmentSand
-import com.example.ui.theme.SunsetCoral
-import com.example.ui.theme.TealAccent
-import com.example.ui.theme.VenetianGold
-import com.example.ui.theme.VenetianGoldDeep
-import com.example.ui.theme.VenetianGoldLight
+import com.example.ui.theme.*
 import com.example.viewmodel.TravelViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -177,14 +167,14 @@ fun SettingsScreen(
         topBar = {
             Surface(
                 color = MaterialTheme.colorScheme.surface,
-                tonalElevation = 3.dp,
+                tonalElevation = 0.dp,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .statusBarsPadding()
-                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
@@ -202,13 +192,13 @@ fun SettingsScreen(
                         modifier = Modifier
                             .size(34.dp)
                             .clip(CircleShape)
-                            .background(Brush.linearGradient(listOf(CelestialLapis, VenetianGoldDeep))),
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Tune,
                             contentDescription = null,
-                            tint = VenetianGoldLight,
+                            tint = VenetianGold,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -218,17 +208,15 @@ fun SettingsScreen(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "Settings & Voice Concierge",
-                            style = MaterialTheme.typography.titleMedium.copy(
+                            style = MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.ExtraBold,
-                                fontSize = 17.sp,
                                 letterSpacing = 0.3.sp
                             )
                         )
                         Text(
                             text = "API Keys • Explorer Voices • System Preferences",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 11.sp
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }
@@ -257,13 +245,17 @@ fun SettingsScreen(
                             Toast.makeText(context, "Settings saved successfully!", Toast.LENGTH_SHORT).show()
                             isSavedNotificationVisible = true
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = VenetianGold),
-                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = LuxuryCardElevated,
+                            contentColor = TextPrimary
+                        ),
+                        border = BorderStroke(1.dp, LuxuryBorder),
+                        shape = RoundedCornerShape(10.dp),
                         modifier = Modifier.testTag("save_settings_top_button")
                     ) {
-                        Icon(Icons.Default.Save, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Save, contentDescription = null, tint = ChampagneGold, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Save", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        Text("Save", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Medium)
                     }
                 }
             }
@@ -278,18 +270,18 @@ fun SettingsScreen(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item { Spacer(modifier = Modifier.height(6.dp)) }
+            item { Spacer(modifier = Modifier.height(8.dp)) }
 
             // ==========================================
             // SECTION 0: FIREBASE CLOUD SYNC & ACCOUNT
             // ==========================================
             item {
                 Card(
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(14.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = CelestialLapis.copy(alpha = 0.08f)
+                        containerColor = LuxuryCard
                     ),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, CelestialLapis.copy(alpha = 0.3f)),
+                    border = BorderStroke(1.dp, LuxuryBorder),
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("firebase_sync_card")
@@ -305,13 +297,13 @@ fun SettingsScreen(
                                     modifier = Modifier
                                         .size(36.dp)
                                         .clip(CircleShape)
-                                        .background(CelestialLapis.copy(alpha = 0.2f)),
+                                        .background(LuxuryCardElevated),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.CloudSync,
                                         contentDescription = null,
-                                        tint = CelestialLapis,
+                                        tint = ChampagneGold,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
@@ -319,14 +311,13 @@ fun SettingsScreen(
                                 Column {
                                     Text(
                                         text = "Cloud Sync & Account",
-                                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
                                     )
                                     Text(
-                                        text = "App ID: go-marco • com.go.marco",
+                                        text = "App ID: go-marco",
                                         style = MaterialTheme.typography.labelSmall.copy(
-                                            color = CelestialLapis,
-                                            fontWeight = FontWeight.SemiBold,
-                                            fontSize = 10.sp
+                                            color = TextSecondary,
+                                            fontWeight = FontWeight.Normal
                                         )
                                     )
                                 }
@@ -334,12 +325,9 @@ fun SettingsScreen(
 
                             // Connection Badge
                             Surface(
-                                shape = RoundedCornerShape(20.dp),
-                                color = if (firebaseUser != null) EmeraldGreen.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant,
-                                border = androidx.compose.foundation.BorderStroke(
-                                    1.dp,
-                                    if (firebaseUser != null) EmeraldGreen.copy(alpha = 0.4f) else MaterialTheme.colorScheme.outlineVariant
-                                )
+                                shape = RoundedCornerShape(12.dp),
+                                color = LuxurySurface,
+                                border = BorderStroke(1.dp, LuxuryBorder)
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
@@ -349,14 +337,14 @@ fun SettingsScreen(
                                         modifier = Modifier
                                             .size(6.dp)
                                             .clip(CircleShape)
-                                            .background(if (firebaseUser != null) EmeraldGreen else Color.Gray)
+                                            .background(if (firebaseUser != null) StatusEmerald else TextSecondary)
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
-                                        text = if (firebaseUser != null) "Connected" else "Offline Local",
-                                        fontSize = 10.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = if (firebaseUser != null) EmeraldGreen else MaterialTheme.colorScheme.onSurfaceVariant
+                                        text = if (firebaseUser != null) "Connected" else "Offline",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Medium,
+                                        color = TextSecondary
                                     )
                                 }
                             }
@@ -392,19 +380,18 @@ fun SettingsScreen(
                                             Column {
                                                 Text(
                                                     text = firebaseUser?.displayName ?: firebaseUser?.email ?: "Authenticated Traveler",
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    fontSize = 13.sp
+                                                    style = MaterialTheme.typography.titleSmall
                                                 )
                                                 if (firebaseUser?.displayName != null && firebaseUser?.email != null) {
                                                     Text(
                                                         text = firebaseUser?.email ?: "",
-                                                        fontSize = 11.sp,
+                                                        style = MaterialTheme.typography.bodySmall,
                                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                                     )
                                                 }
                                                 Text(
                                                     text = "UID: ${firebaseUser?.uid?.take(12)}...",
-                                                    fontSize = 10.sp,
+                                                    style = MaterialTheme.typography.labelSmall,
                                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                                 )
                                             }
@@ -416,15 +403,15 @@ fun SettingsScreen(
                                                 Toast.makeText(context, "Signed out of Firebase", Toast.LENGTH_SHORT).show()
                                             }
                                         ) {
-                                            Icon(Icons.Default.Logout, contentDescription = null, modifier = Modifier.size(14.dp), tint = SunsetCoral)
+                                            Icon(Icons.Default.Logout, contentDescription = null, modifier = Modifier.size(14.dp), tint = TextSecondary)
                                             Spacer(modifier = Modifier.width(4.dp))
-                                            Text("Sign Out", color = SunsetCoral, fontSize = 11.sp)
+                                            Text("Sign Out", color = TextSecondary, style = MaterialTheme.typography.labelMedium)
                                         }
                                     }
 
-                                    Spacer(modifier = Modifier.height(10.dp))
-                                    Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-                                    Spacer(modifier = Modifier.height(10.dp))
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    HorizontalDivider(color = LuxuryBorder)
+                                    Spacer(modifier = Modifier.height(8.dp))
 
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
@@ -434,9 +421,9 @@ fun SettingsScreen(
                                         Column {
                                             Text(
                                                 text = "Firestore Sync: Ready",
-                                                fontSize = 11.sp,
+                                                style = MaterialTheme.typography.bodySmall,
                                                 fontWeight = FontWeight.Medium,
-                                                color = MaterialTheme.colorScheme.onSurface
+                                                color = TextPrimary
                                             )
                                             val lastTimeFormatted = remember(lastSyncTimestamp) {
                                                 val sdf = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
@@ -444,8 +431,8 @@ fun SettingsScreen(
                                             }
                                             Text(
                                                 text = "Last synced: $lastTimeFormatted",
-                                                fontSize = 10.sp,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = TextSecondary
                                             )
                                         }
 
@@ -463,21 +450,25 @@ fun SettingsScreen(
                                             },
                                             enabled = !isSyncingNow,
                                             shape = RoundedCornerShape(10.dp),
-                                            colors = ButtonDefaults.buttonColors(containerColor = CelestialLapis),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = LuxuryCardElevated,
+                                                contentColor = TextPrimary
+                                            ),
+                                            border = BorderStroke(1.dp, LuxuryBorder),
                                             modifier = Modifier.testTag("sync_to_firestore_button")
                                         ) {
                                             if (isSyncingNow) {
                                                 CircularProgressIndicator(
-                                                    color = Color.White,
+                                                    color = ChampagneGold,
                                                     modifier = Modifier.size(14.dp),
                                                     strokeWidth = 2.dp
                                                 )
-                                                Spacer(modifier = Modifier.width(6.dp))
-                                                Text("Syncing...", fontSize = 11.sp, color = Color.White)
-                                            } else {
-                                                Icon(Icons.Default.Sync, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
                                                 Spacer(modifier = Modifier.width(4.dp))
-                                                Text("Sync All Data", fontSize = 11.sp, color = Color.White, fontWeight = FontWeight.Bold)
+                                                Text("Syncing...", style = MaterialTheme.typography.labelMedium, color = TextPrimary)
+                                            } else {
+                                                Icon(Icons.Default.Sync, contentDescription = null, tint = ChampagneGold, modifier = Modifier.size(14.dp))
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Text("Sync All Data", style = MaterialTheme.typography.labelMedium, color = TextPrimary, fontWeight = FontWeight.Medium)
                                             }
                                         }
                                     }
@@ -487,22 +478,21 @@ fun SettingsScreen(
                             // Signed Out Clean View with Link to Dedicated Auth Screens
                             Surface(
                                 shape = RoundedCornerShape(12.dp),
-                                color = MaterialTheme.colorScheme.surface,
-                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                                color = LuxurySurface,
+                                border = BorderStroke(1.dp, LuxuryBorder),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Column(modifier = Modifier.padding(14.dp)) {
+                                Column(modifier = Modifier.padding(12.dp)) {
                                     Text(
                                         text = "Cloud Account Not Connected",
-                                        fontWeight = FontWeight.SemiBold,
-                                        fontSize = 13.sp,
-                                        color = MaterialTheme.colorScheme.onSurface
+                                        style = MaterialTheme.typography.titleSmall,
+                                        color = TextPrimary
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
                                         text = "Sign in to back up your custom itineraries, sync wallet points across devices, and share memories.",
-                                        fontSize = 11.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = TextSecondary,
                                         lineHeight = 16.sp
                                     )
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -510,9 +500,10 @@ fun SettingsScreen(
                                         onClick = onNavigateToAuth,
                                         shape = RoundedCornerShape(10.dp),
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = CelestialLapis,
-                                            contentColor = Color.White
+                                            containerColor = LuxuryCardElevated,
+                                            contentColor = TextPrimary
                                         ),
+                                        border = BorderStroke(1.dp, LuxuryBorder),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .testTag("settings_open_auth_button")
@@ -520,15 +511,15 @@ fun SettingsScreen(
                                         Icon(
                                             imageVector = Icons.Default.AccountCircle,
                                             contentDescription = null,
-                                            tint = VenetianGold,
+                                            tint = ChampagneGold,
                                             modifier = Modifier.size(18.dp)
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(
                                             text = "Sign In or Register",
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 12.sp,
-                                            color = VenetianGoldLight
+                                            fontWeight = FontWeight.Medium,
+                                            style = MaterialTheme.typography.labelMedium,
+                                            color = TextPrimary
                                         )
                                     }
                                 }
@@ -539,8 +530,8 @@ fun SettingsScreen(
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = msg,
-                                fontSize = 10.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                style = MaterialTheme.typography.labelSmall,
+                                color = TextSecondary
                             )
                         }
                     }
@@ -552,10 +543,11 @@ fun SettingsScreen(
             // ==========================================
             item {
                 Card(
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(14.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        containerColor = LuxuryCard
                     ),
+                    border = BorderStroke(1.dp, LuxuryBorder),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -564,13 +556,13 @@ fun SettingsScreen(
                                 modifier = Modifier
                                     .size(32.dp)
                                     .clip(CircleShape)
-                                    .background(VenetianGold.copy(alpha = 0.2f)),
+                                    .background(LuxuryCardElevated),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Key,
                                     contentDescription = null,
-                                    tint = VenetianGold,
+                                    tint = ChampagneGold,
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
@@ -578,21 +570,21 @@ fun SettingsScreen(
                             Column {
                                 Text(
                                     text = "AI Engine & Custom API Keys",
-                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
                                 )
                                 Text(
                                     text = "Bring Your Own Key (BYOK) for unlimited itineraries & custom quotas",
-                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+                                    style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         // Gemini API Key Input
                         Text(
                             text = "Google Gemini API Key (Recommended)",
-                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold, color = VenetianGold)
+                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium, color = TextPrimary)
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         OutlinedTextField(
@@ -686,7 +678,7 @@ fun SettingsScreen(
                             )
                         )
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.padding(top = 4.dp)
@@ -697,10 +689,10 @@ fun SettingsScreen(
                                 tint = EmeraldGreen,
                                 modifier = Modifier.size(14.dp)
                             )
-                            Spacer(modifier = Modifier.width(6.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = "Keys are securely encrypted and stored locally in on-device keystore.",
-                                fontSize = 11.sp,
+                                style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -743,12 +735,12 @@ fun SettingsScreen(
                                 )
                                 Text(
                                     text = "Choose your AI travel narrator, pacing, and speech characteristics",
-                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         // Voice Selection Cards
                         Text(
@@ -786,11 +778,11 @@ fun SettingsScreen(
                                             Text(
                                                 text = profile.name,
                                                 fontWeight = FontWeight.Bold,
-                                                fontSize = 14.sp,
+                                                style = MaterialTheme.typography.bodyMedium,
                                                 color = if (isSelected) VenetianGold else MaterialTheme.colorScheme.onSurface
                                             )
                                             if (isSelected) {
-                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Spacer(modifier = Modifier.width(4.dp))
                                                 Icon(
                                                     imageVector = Icons.Default.Check,
                                                     contentDescription = "Selected",
@@ -801,16 +793,16 @@ fun SettingsScreen(
                                         }
                                         Text(
                                             text = profile.epithet,
-                                            fontSize = 11.sp,
+                                            style = MaterialTheme.typography.bodySmall,
                                             fontWeight = FontWeight.Medium,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                         Text(
                                             text = profile.description,
-                                            fontSize = 11.sp,
+                                            style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                                             lineHeight = 14.sp,
-                                            modifier = Modifier.padding(top = 2.dp)
+                                            modifier = Modifier.padding(top = 4.dp)
                                         )
                                     }
 
@@ -819,7 +811,9 @@ fun SettingsScreen(
                                             selectedVoiceId = profile.id
                                             viewModel.previewVoiceSample(profile.id, voiceSpeed, voicePitch)
                                         },
-                                        modifier = Modifier.size(36.dp)
+                                        modifier = Modifier
+                                            .size(36.dp)
+                                            .minimumInteractiveComponentSize()
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.PlayArrow,
@@ -832,7 +826,7 @@ fun SettingsScreen(
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         // Voice Speed Slider
                         Row(
@@ -953,12 +947,12 @@ fun SettingsScreen(
                                 )
                                 Text(
                                     text = "Select model temperature, creative exploration, and reasoning mode",
-                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         // Default Model Selector Dropdown
                         Text(
@@ -978,7 +972,7 @@ fun SettingsScreen(
                                     .testTag("model_selector_dropdown")
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -1012,7 +1006,7 @@ fun SettingsScreen(
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         // Temperature Slider
                         Row(
@@ -1043,7 +1037,7 @@ fun SettingsScreen(
                             modifier = Modifier.testTag("temperature_slider")
                         )
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         // Dynamic Weather & Crowd Rebooking Toggle
                         Row(
@@ -1108,12 +1102,12 @@ fun SettingsScreen(
                                 )
                                 Text(
                                     text = "Measurement systems, currency display, and sensory comfort",
-                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         // Default Currency
                         Text(
@@ -1132,7 +1126,7 @@ fun SettingsScreen(
                                     .testTag("currency_selector_dropdown")
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -1175,7 +1169,7 @@ fun SettingsScreen(
                                     .testTag("units_selector_dropdown")
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -1199,7 +1193,7 @@ fun SettingsScreen(
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         // Offline Room Cache Toggle
                         Row(
@@ -1226,7 +1220,7 @@ fun SettingsScreen(
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         // Sensory Reduced Motion Toggle
                         Row(
@@ -1253,7 +1247,7 @@ fun SettingsScreen(
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         // Haptic Feedback Toggle
                         Row(
@@ -1299,11 +1293,11 @@ fun SettingsScreen(
                             text = "Data Management & Keystore",
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                         )
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             OutlinedButton(
                                 onClick = {

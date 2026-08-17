@@ -2,6 +2,7 @@ package com.example.ui.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -73,12 +74,7 @@ import com.example.data.model.ProactiveSuggestionEntity
 import com.example.data.model.TripEntity
 import com.example.data.model.TripFeedbackEntity
 import com.example.data.model.UserPreferenceEntity
-import com.example.ui.theme.AmberGold
-import com.example.ui.theme.EmeraldGreen
-import com.example.ui.theme.Navy900
-import com.example.ui.theme.OceanBlue
-import com.example.ui.theme.SunsetCoral
-import com.example.ui.theme.TealAccent
+import com.example.ui.theme.*
 import com.example.viewmodel.TravelViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -100,7 +96,7 @@ fun TravelerPreferenceDialog(
     Surface(
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 8.dp,
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = Modifier
             .fillMaxSize()
             .padding(12.dp)
@@ -122,13 +118,13 @@ fun TravelerPreferenceDialog(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(Brush.linearGradient(listOf(Color(0xFF8B5CF6), OceanBlue))),
+                            .background(LuxuryCardElevated),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Psychology,
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = ChampagneGold,
                             modifier = Modifier.size(22.dp)
                         )
                     }
@@ -137,15 +133,13 @@ fun TravelerPreferenceDialog(
                         Text(
                             text = "AI Traveler DNA & Preference Learning",
                             style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp
+                                fontWeight = FontWeight.Bold
                             )
                         )
                         Text(
                             text = "Analyzes past trips, feedback & loyalty synergies",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 11.sp
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }
@@ -176,13 +170,13 @@ fun TravelerPreferenceDialog(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = notification ?: "",
-                            style = MaterialTheme.typography.labelSmall.copy(color = EmeraldGreen, fontWeight = FontWeight.SemiBold)
+                            style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Navigation Tabs
             Row(
@@ -194,10 +188,10 @@ fun TravelerPreferenceDialog(
                     FilterChip(
                         selected = activeTab == index,
                         onClick = { activeTab = index },
-                        label = { Text(tabName, fontSize = 11.sp, fontWeight = if (activeTab == index) FontWeight.Bold else FontWeight.Normal) },
+                        label = { Text(tabName, style = MaterialTheme.typography.bodySmall, fontWeight = if (activeTab == index) FontWeight.Bold else FontWeight.Normal) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = OceanBlue.copy(alpha = 0.2f),
-                            selectedLabelColor = OceanBlue
+                            selectedLabelColor = WaypointCyan
                         ),
                         modifier = Modifier.testTag("pref_tab_$index")
                     )
@@ -253,7 +247,7 @@ fun LearnedDnaSection(
     ) {
         // AI Synthesis Card
         Card(
-            shape = RoundedCornerShape(18.dp),
+            shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -277,27 +271,27 @@ fun LearnedDnaSection(
                         color = OceanBlue.copy(alpha = 0.15f)
                     ) {
                         Text(
-                            text = "${preference?.totalTripsAnalyzed ?: 0} Data Points Learned",
-                            style = MaterialTheme.typography.labelSmall.copy(color = OceanBlue, fontWeight = FontWeight.Bold),
+                            text = "Based on ${preference?.totalTripsAnalyzed ?: 0} trips",
+                            style = MaterialTheme.typography.labelSmall.copy(color = WaypointCyan, fontWeight = FontWeight.Bold),
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     text = preference?.learnedInsightsSummary ?: "Set up your preferences or plan your first journey to build your Traveler DNA profile.",
-                    style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 20.sp, fontSize = 13.sp)
+                    style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 20.sp)
                 )
 
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Button(
                     onClick = onReanalyze,
                     enabled = !isAnalyzing,
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6)),
+                    colors = ButtonDefaults.buttonColors(containerColor = CompassLilac),
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("reanalyze_preferences_button")
@@ -305,11 +299,11 @@ fun LearnedDnaSection(
                     if (isAnalyzing) {
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Re-analyzing Trips with Gemini...", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        Text("Re-analyzing Trips with Gemini...", style = MaterialTheme.typography.labelLarge)
                     } else {
                         Icon(Icons.Default.Refresh, null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Re-Synthesize Behavioral DNA", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        Text("Re-analyze", style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }
@@ -327,16 +321,16 @@ fun LearnedDnaSection(
         val affinities = if (preference != null && preference.totalTripsAnalyzed > 0) {
             val list = mutableListOf<AffinityItem>()
             if (preference.pacingPreference.isNotBlank()) {
-                list.add(AffinityItem(preference.pacingPreference, 95, EmeraldGreen, "Learned pacing profile"))
+                list.add(AffinityItem(preference.pacingPreference, EmeraldGreen, "Learned pacing profile"))
             }
             if (preference.preferredHotelTypes.isNotBlank()) {
-                list.add(AffinityItem(preference.preferredHotelTypes, 92, OceanBlue, "Preferred accommodation style"))
+                list.add(AffinityItem(preference.preferredHotelTypes, OceanBlue, "Preferred accommodation style"))
             }
             if (preference.preferredAirlines.isNotBlank()) {
-                list.add(AffinityItem(preference.preferredAirlines, 90, AmberGold, "Target airline loyalty programs"))
+                list.add(AffinityItem(preference.preferredAirlines, AmberGold, "Target airline loyalty programs"))
             }
             if (preference.dietaryPreferences.isNotBlank()) {
-                list.add(AffinityItem(preference.dietaryPreferences, 88, Color(0xFFEC4899), "Dietary & allergen safety parameters"))
+                list.add(AffinityItem(preference.dietaryPreferences, WaxSealCrimson, "Dietary & allergen safety parameters"))
             }
             list
         } else {
@@ -350,14 +344,14 @@ fun LearnedDnaSection(
             }
         } else {
             Surface(
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(12.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = "No behavioral affinity data yet. Complete trips or rate past journeys to build your Traveler DNA.",
-                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant),
-                    modifier = Modifier.padding(14.dp)
+                    style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                    modifier = Modifier.padding(12.dp)
                 )
             }
         }
@@ -366,7 +360,6 @@ fun LearnedDnaSection(
 
 data class AffinityItem(
     val label: String,
-    val scorePercent: Int,
     val color: Color,
     val reason: String
 )
@@ -374,36 +367,28 @@ data class AffinityItem(
 @Composable
 fun AffinityScoreRow(item: AffinityItem) {
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = item.label, style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(item.color)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "${item.scorePercent}% Match",
-                    style = MaterialTheme.typography.labelSmall.copy(color = item.color, fontWeight = FontWeight.Bold)
+                    text = item.label,
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
             Spacer(modifier = Modifier.height(4.dp))
-            androidx.compose.material3.LinearProgressIndicator(
-                progress = { item.scorePercent / 100f },
-                color = item.color,
-                trackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(5.dp)
-                    .clip(CircleShape)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = item.reason,
-                style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+                style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
             )
         }
     }
@@ -443,7 +428,7 @@ fun StatedPreferencesSection(
             .verticalScroll(scrollState)
     ) {
         // Preferred Airlines
-        Text("Preferred Airlines & Alliances", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        Text("Preferred Airlines & Alliances", style = MaterialTheme.typography.labelLarge)
         Spacer(modifier = Modifier.height(4.dp))
         OutlinedTextField(
             value = airlines,
@@ -457,7 +442,7 @@ fun StatedPreferencesSection(
         Spacer(modifier = Modifier.height(12.dp))
 
         // Preferred Lodging
-        Text("Preferred Hotel & Lodging Types", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        Text("Preferred Hotel & Lodging Types", style = MaterialTheme.typography.labelLarge)
         Spacer(modifier = Modifier.height(4.dp))
         OutlinedTextField(
             value = lodgingTypes,
@@ -471,16 +456,16 @@ fun StatedPreferencesSection(
         Spacer(modifier = Modifier.height(12.dp))
 
         // Activity Level
-        Text("Activity Level & Energy", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        Text("Activity Level & Energy", style = MaterialTheme.typography.labelLarge)
         Spacer(modifier = Modifier.height(4.dp))
         activityLevels.forEach { lvl ->
             val isSelected = activityLevel.contains(lvl.substringBefore(" ("), ignoreCase = true)
             Surface(
-                shape = RoundedCornerShape(10.dp),
+                shape = RoundedCornerShape(12.dp),
                 color = if (isSelected) OceanBlue.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 3.dp)
+                    .padding(vertical = 4.dp)
                     .clickable { activityLevel = lvl }
             ) {
                 Row(
@@ -490,7 +475,7 @@ fun StatedPreferencesSection(
                     Icon(
                         imageVector = if (isSelected) Icons.Default.TrendingUp else Icons.Default.Schedule,
                         contentDescription = null,
-                        tint = if (isSelected) OceanBlue else MaterialTheme.colorScheme.onSurfaceVariant,
+                        tint = if (isSelected) WaypointCyan else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -498,7 +483,7 @@ fun StatedPreferencesSection(
                         text = lvl,
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            color = if (isSelected) OceanBlue else MaterialTheme.colorScheme.onSurface
+                            color = if (isSelected) WaypointCyan else MaterialTheme.colorScheme.onSurface
                         )
                     )
                 }
@@ -508,16 +493,16 @@ fun StatedPreferencesSection(
         Spacer(modifier = Modifier.height(12.dp))
 
         // Pacing Schedule
-        Text("Daily Pacing Schedule", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        Text("Daily Pacing Schedule", style = MaterialTheme.typography.labelLarge)
         Spacer(modifier = Modifier.height(4.dp))
         pacingOptions.forEach { opt ->
             val isSelected = pacing.contains(opt.substringBefore(" ("), ignoreCase = true)
             Surface(
-                shape = RoundedCornerShape(10.dp),
+                shape = RoundedCornerShape(12.dp),
                 color = if (isSelected) TealAccent.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 3.dp)
+                    .padding(vertical = 4.dp)
                     .clickable { pacing = opt }
             ) {
                 Row(
@@ -545,12 +530,12 @@ fun StatedPreferencesSection(
         Spacer(modifier = Modifier.height(12.dp))
 
         // Dietary & Transit
-        Text("Dietary Preferences & Allergies", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        Text("Dietary Preferences & Allergies", style = MaterialTheme.typography.labelLarge)
         Spacer(modifier = Modifier.height(4.dp))
         OutlinedTextField(
             value = dietary,
             onValueChange = { dietary = it },
-            leadingIcon = { Icon(Icons.Default.Fastfood, null, tint = Color(0xFFEC4899)) },
+            leadingIcon = { Icon(Icons.Default.Fastfood, null, tint = WaxSealCrimson) },
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
@@ -560,7 +545,7 @@ fun StatedPreferencesSection(
 
         // Wheelchair Accessibility & Mobility
         var wheelchair by remember(preference) { mutableStateOf(preference.wheelchairRequirements) }
-        Text("Wheelchair & Mobility Requirements", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        Text("Wheelchair & Mobility Requirements", style = MaterialTheme.typography.labelLarge)
         Spacer(modifier = Modifier.height(4.dp))
         OutlinedTextField(
             value = wheelchair,
@@ -575,7 +560,7 @@ fun StatedPreferencesSection(
 
         // Family Age Brackets & Composition
         var familyAges by remember(preference) { mutableStateOf(preference.familyAgeBrackets) }
-        Text("Family Age Brackets & Party Composition", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        Text("Family Age Brackets & Party Composition", style = MaterialTheme.typography.labelLarge)
         Spacer(modifier = Modifier.height(4.dp))
         OutlinedTextField(
             value = familyAges,
@@ -590,12 +575,12 @@ fun StatedPreferencesSection(
 
         // Sensory Needs & Rest Intervals
         var sensoryNotes by remember(preference) { mutableStateOf(preference.sensoryAndMobilityNotes) }
-        Text("Sensory & Rest Interval Notes", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        Text("Sensory & Rest Interval Notes", style = MaterialTheme.typography.labelLarge)
         Spacer(modifier = Modifier.height(4.dp))
         OutlinedTextField(
             value = sensoryNotes,
             onValueChange = { sensoryNotes = it },
-            leadingIcon = { Icon(Icons.Default.Psychology, null, tint = Color(0xFF8B5CF6)) },
+            leadingIcon = { Icon(Icons.Default.Psychology, null, tint = CompassLilac) },
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
@@ -603,7 +588,7 @@ fun StatedPreferencesSection(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Text("Transit & Mobility Preference", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        Text("Transit & Mobility Preference", style = MaterialTheme.typography.labelLarge)
         Spacer(modifier = Modifier.height(4.dp))
         OutlinedTextField(
             value = transit,
@@ -633,8 +618,8 @@ fun StatedPreferencesSection(
                     )
                 )
             },
-            shape = RoundedCornerShape(14.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = OceanBlue),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = OceanBlue, contentColor = CartographyDarkBase),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp)
@@ -642,7 +627,7 @@ fun StatedPreferencesSection(
         ) {
             Icon(Icons.Default.AutoAwesome, null, tint = AmberGold)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Save & Update AI Planner", fontWeight = FontWeight.Bold)
+            Text("Save preferences", fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -694,11 +679,11 @@ fun FeedbackAndRatingsSection(
             ) {
                 Icon(if (isAddingNewFeedback) Icons.Default.Close else Icons.Default.Add, null, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(4.dp))
-                Text(if (isAddingNewFeedback) "Cancel" else "Rate a Trip", fontSize = 12.sp)
+                Text(if (isAddingNewFeedback) "Cancel" else "Rate a Trip", style = MaterialTheme.typography.labelMedium)
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Add feedback card
         AnimatedVisibility(visible = isAddingNewFeedback) {
@@ -709,8 +694,8 @@ fun FeedbackAndRatingsSection(
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
             ) {
-                Column(modifier = Modifier.padding(14.dp)) {
-                    Text("Select Completed Trip to Rate", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Select Completed Trip to Rate", style = MaterialTheme.typography.labelLarge)
                     Spacer(modifier = Modifier.height(6.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -720,15 +705,15 @@ fun FeedbackAndRatingsSection(
                             FilterChip(
                                 selected = selectedTripId == t.id,
                                 onClick = { selectedTripId = t.id },
-                                label = { Text(t.destination, fontSize = 11.sp) }
+                                label = { Text(t.destination, style = MaterialTheme.typography.bodySmall) }
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     // Star Rating
-                    Text("Overall Experience Rating", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    Text("Overall Experience Rating", style = MaterialTheme.typography.labelLarge)
                     Row(
                         modifier = Modifier.padding(vertical = 6.dp),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -736,11 +721,11 @@ fun FeedbackAndRatingsSection(
                         (1..5).forEach { star ->
                             IconButton(
                                 onClick = { rating = star },
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(48.dp)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Star,
-                                    contentDescription = null,
+                                    contentDescription = "Rate $star stars",
                                     tint = if (star <= rating) AmberGold else MaterialTheme.colorScheme.outline,
                                     modifier = Modifier.size(24.dp)
                                 )
@@ -751,7 +736,7 @@ fun FeedbackAndRatingsSection(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Liked Aspects
-                    Text("What did you love? (Teaches AI your affinities)", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    Text("What did you love? (Teaches AI your affinities)", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(4.dp))
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         presetLikedOptions.forEach { tag ->
@@ -759,11 +744,11 @@ fun FeedbackAndRatingsSection(
                             FilterChip(
                                 selected = selected,
                                 onClick = { if (selected) likedTags.remove(tag) else likedTags.add(tag) },
-                                label = { Text(tag, fontSize = 10.sp) },
+                                label = { Text(tag, style = MaterialTheme.typography.labelSmall) },
                                 leadingIcon = { Icon(Icons.Default.ThumbUp, null, modifier = Modifier.size(12.dp), tint = EmeraldGreen) },
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = EmeraldGreen.copy(alpha = 0.2f),
-                                    selectedLabelColor = EmeraldGreen
+                                    selectedLabelColor = MaterialTheme.colorScheme.onSurface
                                 )
                             )
                         }
@@ -772,7 +757,7 @@ fun FeedbackAndRatingsSection(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Disliked Aspects
-                    Text("What could be improved? (AI will avoid in future)", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    Text("What could be improved? (AI will avoid in future)", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(4.dp))
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         presetDislikedOptions.forEach { tag ->
@@ -780,11 +765,11 @@ fun FeedbackAndRatingsSection(
                             FilterChip(
                                 selected = selected,
                                 onClick = { if (selected) dislikedTags.remove(tag) else dislikedTags.add(tag) },
-                                label = { Text(tag, fontSize = 10.sp) },
+                                label = { Text(tag, style = MaterialTheme.typography.labelSmall) },
                                 leadingIcon = { Icon(Icons.Default.ThumbDown, null, modifier = Modifier.size(12.dp), tint = SunsetCoral) },
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = SunsetCoral.copy(alpha = 0.2f),
-                                    selectedLabelColor = SunsetCoral
+                                    selectedLabelColor = MaterialTheme.colorScheme.onSurface
                                 )
                             )
                         }
@@ -820,12 +805,12 @@ fun FeedbackAndRatingsSection(
                             isAddingNewFeedback = false
                         },
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = OceanBlue),
+                        colors = ButtonDefaults.buttonColors(containerColor = OceanBlue, contentColor = CartographyDarkBase),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Icon(Icons.Default.AutoAwesome, null, tint = AmberGold)
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Submit & Train AI Travel Model", fontWeight = FontWeight.Bold)
+                        Text("Submit feedback", fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -834,12 +819,12 @@ fun FeedbackAndRatingsSection(
         // List of feedbacks
         if (feedbacks.isEmpty()) {
             Surface(
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(12.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "No past feedbacks yet. Complete a trip and rate it to teach the AI your personalized preferences!",
+                    text = "No trip feedback yet. Complete a trip and rate it to teach the AI your personalized preferences!",
                     style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                     modifier = Modifier.padding(16.dp)
                 )
@@ -847,7 +832,7 @@ fun FeedbackAndRatingsSection(
         } else {
             feedbacks.forEach { fb ->
                 FeedbackCardItem(feedback = fb, onDelete = { onDeleteFeedback(fb.id) })
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
@@ -863,7 +848,7 @@ fun FeedbackCardItem(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(14.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -872,11 +857,11 @@ fun FeedbackCardItem(
                 Column {
                     Text(
                         text = feedback.destination,
-                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = OceanBlue)
+                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = WaypointCyan)
                     )
                     Text(
                         text = feedback.tripTitle,
-                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                     )
                 }
 
@@ -885,8 +870,8 @@ fun FeedbackCardItem(
                         Icon(Icons.Default.Star, null, tint = AmberGold, modifier = Modifier.size(14.dp))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    IconButton(onClick = onDelete, modifier = Modifier.size(24.dp)) {
-                        Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(16.dp))
+                    IconButton(onClick = onDelete, modifier = Modifier.size(48.dp)) {
+                        Icon(Icons.Default.Delete, "Delete feedback", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
                     }
                 }
             }
@@ -899,7 +884,7 @@ fun FeedbackCardItem(
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = "Liked: ${feedback.likedAspects}",
-                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp)
+                        style = MaterialTheme.typography.labelMedium
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
@@ -911,7 +896,7 @@ fun FeedbackCardItem(
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = "Avoided: ${feedback.dislikedAspects}",
-                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp)
+                        style = MaterialTheme.typography.labelMedium
                     )
                 }
                 Spacer(modifier = Modifier.height(6.dp))
@@ -920,14 +905,14 @@ fun FeedbackCardItem(
             if (feedback.feedbackNotes.isNotBlank()) {
                 Text(
                     text = "\"${feedback.feedbackNotes}\"",
-                    style = MaterialTheme.typography.bodySmall.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic, fontSize = 12.sp)
+                    style = MaterialTheme.typography.labelMedium.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
             // Learned AI Takeaway Pill
             Surface(
-                shape = RoundedCornerShape(10.dp),
+                shape = RoundedCornerShape(12.dp),
                 color = OceanBlue.copy(alpha = 0.12f),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -935,11 +920,11 @@ fun FeedbackCardItem(
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.AutoAwesome, null, tint = OceanBlue, modifier = Modifier.size(14.dp))
+                    Icon(Icons.Default.AutoAwesome, null, tint = WaypointCyan, modifier = Modifier.size(14.dp))
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = feedback.learnedActionableTakeaway,
-                        style = MaterialTheme.typography.labelSmall.copy(color = OceanBlue, fontWeight = FontWeight.SemiBold, fontSize = 11.sp)
+                        style = MaterialTheme.typography.labelMedium.copy(color = WaypointCyan)
                     )
                 }
             }
@@ -965,7 +950,7 @@ fun ProactiveSuggestionsSection(
         )
         Text(
             text = "Generated automatically by matching your learned Traveler DNA with loyalty points & timeshares",
-            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+            style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -982,11 +967,11 @@ fun ProactiveSuggestionsSection(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("No Proactive Proposals Yet", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    Text("No Proactive Proposals Yet", style = MaterialTheme.typography.labelLarge)
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         "As you plan trips and save preferences, Gemini will automatically synthesize tailored vacation proposals matching your travel style.",
-                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                     )
                 }
             }
@@ -1000,7 +985,7 @@ fun ProactiveSuggestionCard(
     onPlanNow: () -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -1013,11 +998,11 @@ fun ProactiveSuggestionCard(
             ) {
                 Surface(
                     shape = RoundedCornerShape(8.dp),
-                    color = Color(0xFF8B5CF6).copy(alpha = 0.2f)
+                    color = CompassLilac.copy(alpha = 0.2f)
                 ) {
                     Text(
                         text = suggestion.heroTag,
-                        style = MaterialTheme.typography.labelSmall.copy(color = Color(0xFF8B5CF6), fontWeight = FontWeight.Bold),
+                        style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold),
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
@@ -1040,34 +1025,34 @@ fun ProactiveSuggestionCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = suggestion.title,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "${suggestion.destination} • ${suggestion.durationDays} Days • ${suggestion.season}",
-                style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             // Rationale
             Surface(
-                shape = RoundedCornerShape(10.dp),
+                shape = RoundedCornerShape(12.dp),
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "💡 ${suggestion.rationale}",
-                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, lineHeight = 17.sp),
-                    modifier = Modifier.padding(10.dp)
+                    text = suggestion.rationale,
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.padding(8.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Details Grid
             Row(
@@ -1075,11 +1060,11 @@ fun ProactiveSuggestionCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("✈️ Airline Loyalty", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant))
+                    Text("Airline Loyalty", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant))
                     Text(suggestion.suggestedAirline, style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold))
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("🏡 Lodging", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant))
+                    Text("Lodging", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant))
                     Text(suggestion.suggestedLodging, style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold))
                 }
             }
@@ -1097,7 +1082,7 @@ fun ProactiveSuggestionCard(
                         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     Text(
-                        text = "💰 Points Savings: ~$${suggestion.pointsSavingsUsd.toInt()}",
+                        text = "Points Savings: ~$${suggestion.pointsSavingsUsd.toInt()}",
                         style = MaterialTheme.typography.labelSmall.copy(color = EmeraldGreen, fontWeight = FontWeight.Bold)
                     )
                 }
@@ -1105,12 +1090,12 @@ fun ProactiveSuggestionCard(
                 Button(
                     onClick = onPlanNow,
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = OceanBlue),
+                    colors = ButtonDefaults.buttonColors(containerColor = OceanBlue, contentColor = CartographyDarkBase),
                     modifier = Modifier.testTag("plan_proactive_trip_btn_${suggestion.id}")
                 ) {
                     Icon(Icons.Default.AutoAwesome, null, tint = AmberGold, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Plan This Trip", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    Text("Plan This Trip", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                 }
             }
         }

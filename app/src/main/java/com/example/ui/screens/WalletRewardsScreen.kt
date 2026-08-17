@@ -1,7 +1,7 @@
 package com.example.ui.screens
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,11 +25,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.Sync
@@ -41,7 +39,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -50,6 +47,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -60,7 +58,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -68,18 +65,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.data.model.ConnectedAccountEntity
 import com.example.data.model.ExpenseEntity
 import com.example.ui.components.CategoryIconBadge
-import com.example.ui.theme.AmberGold
-import com.example.ui.theme.DarkSurfaceCard
-import com.example.ui.theme.EmeraldGreen
-import com.example.ui.theme.Navy900
-import com.example.ui.theme.OceanBlue
-import com.example.ui.theme.PurpleAccent
-import com.example.ui.theme.SkyBlueLight
-import com.example.ui.theme.SunsetCoral
-import com.example.ui.theme.TealAccent
+import com.example.ui.theme.*
 import com.example.viewmodel.TravelViewModel
 
 @Composable
@@ -109,7 +99,7 @@ fun WalletRewardsScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 6.dp),
+                .padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -135,16 +125,12 @@ fun WalletRewardsScreen(
                 Column {
                     Text(
                         text = "Marco Wallet & Rewards",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 17.sp
-                        )
+                        style = MaterialTheme.typography.titleLarge
                     )
                     Text(
                         text = "Points, Timeshares & FX Ledger",
                         style = MaterialTheme.typography.bodySmall.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 11.sp
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                 }
@@ -154,37 +140,41 @@ fun WalletRewardsScreen(
                 onClick = {
                     if (selectedTab == 0) isAddAccountDialogOpen = true else isAddExpenseDialogOpen = true
                 },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = OceanBlue),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = LuxuryCardElevated,
+                    contentColor = TextPrimary
+                ),
+                border = BorderStroke(1.dp, LuxuryBorder),
                 modifier = Modifier.testTag("wallet_top_add_button")
             ) {
-                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                Icon(Icons.Default.Add, contentDescription = null, tint = ChampagneGold, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = if (selectedTab == 0) "+ Account" else "+ Expense",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
+                    text = if (selectedTab == 0) "Add Account" else "Add Expense",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Medium
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Tab Selector
         TabRow(
             selectedTabIndex = selectedTab,
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = OceanBlue
+            containerColor = LuxurySurface,
+            contentColor = TextPrimary
         ) {
             Tab(
                 selected = selectedTab == 0,
                 onClick = { selectedTab = 0 },
-                text = { Text("Loyalty & Timeshares (${accounts.size})", fontWeight = FontWeight.Bold) }
+                text = { Text("Loyalty & Timeshares (${accounts.size})", fontWeight = FontWeight.Medium) }
             )
             Tab(
                 selected = selectedTab == 1,
                 onClick = { selectedTab = 1 },
-                text = { Text("Multi-Currency Ledger", fontWeight = FontWeight.Bold) }
+                text = { Text("Multi-Currency Ledger", fontWeight = FontWeight.Medium) }
             )
         }
 
@@ -241,17 +231,17 @@ fun AccountsAndRewardsView(
     onDeleteAccount: (Long) -> Unit
 ) {
     LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier.fillMaxSize()
     ) {
         // AI Optimizer Banner Card
         item {
             Card(
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Navy900),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(18.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -267,63 +257,65 @@ fun AccountsAndRewardsView(
                             ) {
                                 Icon(Icons.Default.AutoAwesome, null, tint = AmberGold, modifier = Modifier.size(20.dp))
                             }
-                            Spacer(modifier = Modifier.width(10.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "AI Rewards & Timeshare Optimizer",
                                 style = MaterialTheme.typography.titleMedium.copy(
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 15.sp
+                                    color = TextAtlasPrimary,
+                                    fontWeight = FontWeight.Bold
                                 )
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Gemini analyzes all connected airline miles, hotel points, timeshare trading power (RCI/II), and credit card rewards to calculate optimal redemption sweet spots.",
                         style = MaterialTheme.typography.bodySmall.copy(
-                            color = Color.White.copy(alpha = 0.85f),
-                            fontSize = 12.sp
+                            color = TextAtlasPrimary.copy(alpha = 0.85f)
                         )
                     )
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Button(
                         onClick = onRunOptimizer,
                         enabled = !isOptimizing,
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = AmberGold),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = LuxuryCardElevated,
+                            contentColor = TextPrimary
+                        ),
+                        border = BorderStroke(1.dp, LuxuryBorder),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         if (isOptimizing) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(18.dp),
-                                color = Navy900,
-                                strokeWidth = 2.dp
+                                 modifier = Modifier.size(18.dp),
+                                 color = ChampagneGold,
+                                 strokeWidth = 2.dp
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Calculating Point Valuations...", color = Navy900, fontWeight = FontWeight.Bold)
+                            Text("Calculating Point Valuations...", color = TextPrimary, fontWeight = FontWeight.Medium)
                         } else {
-                            Icon(Icons.Default.Sync, null, tint = Navy900, modifier = Modifier.size(18.dp))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text("Calculate Optimal Redemption Plan", color = Navy900, fontWeight = FontWeight.Bold)
+                            Icon(Icons.Default.Sync, null, tint = ChampagneGold, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Calculate Optimal Redemption Plan", color = TextPrimary, fontWeight = FontWeight.Medium)
                         }
                     }
 
                     optimizerResult?.let { result ->
                         Spacer(modifier = Modifier.height(12.dp))
                         Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = Color.White.copy(alpha = 0.1f),
+                            shape = RoundedCornerShape(10.dp),
+                            color = LuxurySurface,
+                            border = BorderStroke(1.dp, LuxuryBorder),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
                                 text = result,
                                 style = MaterialTheme.typography.bodySmall.copy(
-                                    color = Color.White,
-                                    fontSize = 12.sp,
+                                    color = TextPrimary,
                                     lineHeight = 18.sp
                                 ),
                                 modifier = Modifier.padding(12.dp)
@@ -342,18 +334,23 @@ fun AccountsAndRewardsView(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Connected Travel & Loyalty Portfolios",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    text = "Connected Portfolios",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    modifier = Modifier.weight(1f)
                 )
 
                 Button(
                     onClick = onAddAccount,
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = OceanBlue)
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = LuxuryCardElevated,
+                        contentColor = TextPrimary
+                    ),
+                    border = BorderStroke(1.dp, LuxuryBorder)
                 ) {
-                    Icon(Icons.Default.Add, null, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.Add, null, tint = ChampagneGold, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Link Account", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text("Link Account", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Medium)
                 }
             }
         }
@@ -411,9 +408,10 @@ fun AccountItemCard(
     onDelete: () -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -429,18 +427,16 @@ fun AccountItemCard(
                 Column {
                     Text(
                         text = account.providerName,
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     Text(
                         text = "${account.accountNumberMasked} • ${account.tierStatus}",
-                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                     )
                     Text(
                         text = "${account.balanceValue} ${account.unitLabel}",
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            color = OceanBlue,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 13.sp
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            color = WaypointCyan
                         )
                     )
                 }
@@ -448,7 +444,7 @@ fun AccountItemCard(
 
             Column(horizontalAlignment = Alignment.End) {
                 Surface(
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(12.dp),
                     color = EmeraldGreen.copy(alpha = 0.12f)
                 ) {
                     Text(
@@ -463,7 +459,9 @@ fun AccountItemCard(
                 Spacer(modifier = Modifier.height(4.dp))
                 IconButton(
                     onClick = onDelete,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier
+                        .size(24.dp)
+                        .minimumInteractiveComponentSize()
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
@@ -486,80 +484,61 @@ fun ExpensesAndWalletView(
     val totalSpentUsd = expenses.sumOf { it.amountUsd }
 
     LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier.fillMaxSize()
     ) {
         // Digital Contactless Card Simulation
         item {
             Card(
-                shape = RoundedCornerShape(22.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = CartographyCardElevated),
+                border = BorderStroke(1.dp, ContourBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(22.dp))
-                        .background(Brush.linearGradient(listOf(Navy900, Color(0xFF1E3A8A), OceanBlue)))
-                        .padding(20.dp)
-                ) {
-                    Column {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Marco Multi-Currency Pass",
-                                style = MaterialTheme.typography.titleSmall.copy(
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            )
-                            Icon(Icons.Default.Nfc, null, tint = AmberGold, modifier = Modifier.size(24.dp))
-                        }
-
-                        Spacer(modifier = Modifier.height(20.dp))
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
-                            text = "••••  ••••  ••••  9482",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                color = Color.White,
-                                letterSpacing = 2.sp,
-                                fontWeight = FontWeight.SemiBold
+                            text = "Marco Multi-Currency Pass",
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Bold
                             )
                         )
+                        Icon(Icons.Default.Nfc, null, tint = AmberGold, modifier = Modifier.size(24.dp))
+                    }
 
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.Bottom
-                        ) {
-                            Column {
-                                Text(
-                                    text = "TOTAL RECORDED SPEND",
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        color = Color.White.copy(alpha = 0.7f),
-                                        fontSize = 9.sp
-                                    )
-                                )
-                                Text(
-                                    text = "$${String.format("%.2f", totalSpentUsd)} USD",
-                                    style = MaterialTheme.typography.titleMedium.copy(
-                                        color = EmeraldGreen,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                )
-                            }
-
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        Column {
                             Text(
-                                text = "Zero FX Fee Auto-Lock",
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    color = AmberGold,
+                                text = "Total recorded spend",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "$${String.format("%.2f", totalSpentUsd)} USD",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    color = TextAtlasPrimary,
                                     fontWeight = FontWeight.Bold
                                 )
                             )
                         }
+
+                        Text(
+                            text = "Zero FX Fee Auto-Lock",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                color = TextAtlasPrimary,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
                     }
                 }
             }
@@ -580,11 +559,14 @@ fun ExpensesAndWalletView(
                 Button(
                     onClick = onAddExpense,
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = OceanBlue)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = OceanBlue,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
                 ) {
                     Icon(Icons.Default.Receipt, null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Log Expense", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text("Log Expense", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -641,19 +623,20 @@ fun ExpenseItemCard(
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp),
+                .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 CategoryIconBadge(category = expense.category, size = 36)
-                Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     Text(
                         text = expense.title,
@@ -661,7 +644,7 @@ fun ExpenseItemCard(
                     )
                     Text(
                         text = "${expense.category} • Paid with ${expense.paidBy}",
-                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                     )
                 }
             }
@@ -676,15 +659,19 @@ fun ExpenseItemCard(
                         Text(
                             text = "≈ $${String.format("%.2f", expense.amountUsd)} USD",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                color = EmeraldGreen,
-                                fontSize = 10.sp
+                                color = EmeraldGreen
                             )
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.width(6.dp))
-                IconButton(onClick = onDelete, modifier = Modifier.size(24.dp)) {
+                Spacer(modifier = Modifier.width(8.dp))
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .minimumInteractiveComponentSize()
+                ) {
                     Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(16.dp))
                 }
             }
@@ -707,8 +694,9 @@ fun AddAccountDialog(
 
     val categories = listOf("AIRLINE", "HOTEL", "TIMESHARE", "CREDIT_CARD", "CAMPING", "OTA", "TRANSIT")
 
+    Dialog(onDismissRequest = onDismiss) {
     Surface(
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surface,
         tonalElevation = 8.dp,
         modifier = Modifier
@@ -725,11 +713,11 @@ fun AddAccountDialog(
                 IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, null) }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Category picker
             Text("Program Type:", style = MaterialTheme.typography.labelSmall)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 categories.forEach { cat ->
                     FilterChip(
                         selected = category == cat,
@@ -742,7 +730,7 @@ fun AddAccountDialog(
                                 else -> "pts"
                             }
                         },
-                        label = { Text(cat, fontSize = 10.sp) }
+                        label = { Text(cat, style = MaterialTheme.typography.labelSmall) }
                     )
                 }
             }
@@ -764,17 +752,21 @@ fun AddAccountDialog(
             Button(
                 onClick = {
                     if (name.isNotBlank() && balance.isNotBlank()) {
-                        onConfirm(category, name, accountNumber.ifBlank { "•••• 8912" }, balance, unit, tier)
+                        onConfirm(category, name, accountNumber, balance, unit, tier)
                     }
                 },
                 enabled = name.isNotBlank() && balance.isNotBlank(),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = OceanBlue),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = OceanBlue,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Sync Account to VoyageAI", fontWeight = FontWeight.Bold)
+                Text("Sync account to Marco", fontWeight = FontWeight.Bold)
             }
         }
+    }
     }
 }
 
@@ -794,8 +786,9 @@ fun AddExpenseDialog(
     val categories = listOf("Food", "Flights", "Lodging", "Transit", "Activities", "Timeshare Fees", "Shopping")
     val currencies = listOf("USD", "EUR", "JPY", "GBP", "CAD", "CHF", "AUD")
 
+    Dialog(onDismissRequest = onDismiss) {
     Surface(
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surface,
         tonalElevation = 8.dp,
         modifier = Modifier
@@ -812,7 +805,7 @@ fun AddExpenseDialog(
                 IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, null) }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text("Expense Title (e.g. Sushi Dinner, Rental Car)") }, modifier = Modifier.fillMaxWidth())
 
@@ -861,7 +854,7 @@ fun AddExpenseDialog(
                     FilterChip(
                         selected = category == cat,
                         onClick = { category = cat },
-                        label = { Text(cat, fontSize = 11.sp) }
+                        label = { Text(cat, style = MaterialTheme.typography.labelMedium) }
                     )
                 }
             }
@@ -880,11 +873,15 @@ fun AddExpenseDialog(
                 },
                 enabled = title.isNotBlank() && (amountText.toDoubleOrNull() ?: 0.0) > 0,
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = OceanBlue),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = OceanBlue,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Save Expense to Ledger", fontWeight = FontWeight.Bold)
             }
         }
+    }
     }
 }

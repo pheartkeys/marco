@@ -62,20 +62,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ui.theme.AmberGold
-import com.example.ui.theme.AntiqueBrass
-import com.example.ui.theme.CelestialLapis
-import com.example.ui.theme.EmeraldGreen
-import com.example.ui.theme.MediterraneanAzure
-import com.example.ui.theme.OceanBlue
-import com.example.ui.theme.ParchmentSand
-import com.example.ui.theme.SilkRoadJade
-import com.example.ui.theme.SunsetCoral
-import com.example.ui.theme.TealAccent
-import com.example.ui.theme.TerracottaMap
-import com.example.ui.theme.VenetianGold
-import com.example.ui.theme.VenetianGoldDeep
-import com.example.ui.theme.VenetianGoldLight
+import com.example.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlin.math.cos
 import kotlin.math.sin
@@ -96,7 +83,7 @@ val FamousTravelersQuotes = listOf(
         epithet = "Venetian Silk Road Trailblazer",
         workOrJourney = "The Travels of Marco Polo (Il Milione)",
         quote = "I did not tell half of what I saw, for I knew I would not be believed.",
-        yearOrEra = "1271 – 1295 CE",
+        yearOrEra = "1271-1295 CE",
         routeSummary = "Venice → Persia → Pamir Mountains → Xanadu & China",
         iconEmoji = "📜"
     ),
@@ -104,8 +91,8 @@ val FamousTravelersQuotes = listOf(
         explorerName = "Ibn Battuta",
         epithet = "The Great Medieval Wayfarer",
         workOrJourney = "A Gift to Those Who Contemplate the Wonders of Cities (The Rihla)",
-        quote = "Traveling – it leaves you speechless, then turns you into a storyteller.",
-        yearOrEra = "1325 – 1354 CE",
+        quote = "Traveling. It leaves you speechless, then turns you into a storyteller.",
+        yearOrEra = "1325-1354 CE",
         routeSummary = "Tangier → Mecca → Samarkand → Maldives → Beijing",
         iconEmoji = "🌙"
     ),
@@ -114,7 +101,7 @@ val FamousTravelersQuotes = listOf(
         epithet = "Record-Breaking Circumnavigator",
         workOrJourney = "Around the World in Seventy-Two Days",
         quote = "Energy rightly applied and directed will accomplish anything.",
-        yearOrEra = "1889 – 1890 CE",
+        yearOrEra = "1889-1890 CE",
         routeSummary = "New York → London → Brindisi → Singapore → San Francisco",
         iconEmoji = "🧭"
     ),
@@ -141,7 +128,7 @@ val FamousTravelersQuotes = listOf(
         epithet = "Pilgrim of the Great Tang",
         workOrJourney = "Great Tang Records on the Western Regions / Journey to the West",
         quote = "The mind is the origin of all things; from fearless steps is the path across the desert forged.",
-        yearOrEra = "627 – 645 CE",
+        yearOrEra = "627-645 CE",
         routeSummary = "Chang'an → Taklamakan Desert → Tian Shan → Nalanda",
         iconEmoji = "🏯"
     ),
@@ -150,7 +137,7 @@ val FamousTravelersQuotes = listOf(
         epithet = "Victorian Wilderness Pioneer & Geographer",
         workOrJourney = "A Lady's Life in the Rocky Mountains & Unbeaten Tracks in Japan",
         quote = "I have only one ambition: to see as much of the wondrous world as I can before I leave it.",
-        yearOrEra = "1873 – 1897 CE",
+        yearOrEra = "1873-1897 CE",
         routeSummary = "Rocky Mountains → Hawaii → Hokkaido → Yangtze River",
         iconEmoji = "🏔️"
     ),
@@ -168,7 +155,7 @@ val FamousTravelersQuotes = listOf(
         epithet = "Legend of the Endurance",
         workOrJourney = "Imperial Trans-Antarctic Expedition (South)",
         quote = "Difficulties are just things to overcome, after all. By endurance we conquer.",
-        yearOrEra = "1914 – 1917 CE",
+        yearOrEra = "1914-1917 CE",
         routeSummary = "Weddell Sea → Elephant Island → South Georgia Crossing",
         iconEmoji = "❄️"
     )
@@ -389,20 +376,20 @@ fun ExplorerVoyageLoadingCard(
     val quoteItem = FamousTravelersQuotes[currentQuoteIndex]
 
     Card(
-        shape = RoundedCornerShape(22.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = modifier
             .fillMaxWidth()
             .border(
-                width = 1.2.dp,
-                brush = Brush.linearGradient(listOf(VenetianGold.copy(alpha = 0.5f), AntiqueBrass.copy(alpha = 0.2f))),
-                shape = RoundedCornerShape(22.dp)
+                width = 1.dp,
+                color = ContourBorder,
+                shape = RoundedCornerShape(20.dp)
             )
             .testTag("explorer_voyage_loading_card")
     ) {
         Column(
-            modifier = Modifier.padding(18.dp),
+            modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Header Bar: "MARCO • EXPEDITION CONCIERGE"
@@ -413,11 +400,9 @@ fun ExplorerVoyageLoadingCard(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "MARCO",
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontWeight = FontWeight.Black,
-                            letterSpacing = 2.sp,
-                            fontSize = 13.sp,
+                        text = "Marco",
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.Bold,
                             color = VenetianGold
                         )
                     )
@@ -427,11 +412,9 @@ fun ExplorerVoyageLoadingCard(
                         color = VenetianGold.copy(alpha = 0.15f)
                     ) {
                         Text(
-                            text = "EXPEDITIONS",
-                            style = MaterialTheme.typography.labelSmall.copy(
+                            text = "Expeditions",
+                            style = MaterialTheme.typography.labelMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                letterSpacing = 1.sp,
-                                fontSize = 9.sp,
                                 color = VenetianGold
                             ),
                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -450,22 +433,21 @@ fun ExplorerVoyageLoadingCard(
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "Navigating",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            color = VenetianGoldLight,
-                            fontSize = 11.sp
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            color = VenetianGoldLight
                         )
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Animated Astrolabe Canvas & Sailing Wave Loader
             Box(
                 modifier = Modifier
                     .size(96.dp)
                     .clip(CircleShape)
-                    .background(Brush.radialGradient(listOf(CelestialLapis, Color(0xFF0F172A)))),
+                    .background(LuxuryCardElevated),
                 contentAlignment = Alignment.Center
             ) {
                 MarcoAstrolabeLoadingAnimation(sizeDp = 90)
@@ -476,9 +458,8 @@ fun ExplorerVoyageLoadingCard(
             // Live Action Status
             Text(
                 text = statusMessage,
-                style = MaterialTheme.typography.titleSmall.copy(
+                style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 ),
                 textAlign = TextAlign.Center
@@ -487,13 +468,12 @@ fun ExplorerVoyageLoadingCard(
             Text(
                 text = subStatus,
                 style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 ),
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Great Travelers Literary Quote Carousel
             AnimatedContent(
@@ -514,20 +494,23 @@ fun ExplorerVoyageLoadingCard(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            Text(text = traveler.iconEmoji, fontSize = 15.sp)
+                            Icon(
+                                imageVector = Icons.Default.Explore,
+                                contentDescription = null,
+                                tint = VenetianGold,
+                                modifier = Modifier.size(16.dp)
+                            )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = traveler.explorerName,
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 12.sp,
                                     color = VenetianGold
                                 )
                             )
                             Text(
                                 text = " • ${traveler.yearOrEra}",
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    fontSize = 10.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             )
@@ -539,7 +522,6 @@ fun ExplorerVoyageLoadingCard(
                             text = "“${traveler.quote}”",
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontStyle = FontStyle.Italic,
-                                fontSize = 11.5.sp,
                                 lineHeight = 16.sp,
                                 textAlign = TextAlign.Center
                             ),
@@ -564,7 +546,6 @@ fun ExplorerVoyageLoadingCard(
                             Text(
                                 text = traveler.routeSummary,
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    fontSize = 9.5.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = TealAccent
                                 )
@@ -741,7 +722,6 @@ fun MarcoConciergeTypingIndicator(
             Text(
                 text = "Marco is charting response...",
                 style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = 11.5.sp,
                     fontWeight = FontWeight.Medium,
                     color = VenetianGoldLight
                 )

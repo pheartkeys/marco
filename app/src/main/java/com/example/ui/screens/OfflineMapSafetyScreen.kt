@@ -65,15 +65,8 @@ import androidx.compose.ui.unit.sp
 import com.example.data.model.EmergencyAlertEntity
 import com.example.data.model.isTripInProgress
 import com.example.ui.components.CategoryIconBadge
-import com.example.ui.theme.AmberGold
-import com.example.ui.theme.EmeraldGreen
-import com.example.ui.theme.Navy900
-import com.example.ui.theme.OceanBlue
+import com.example.ui.theme.*
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import com.example.ui.theme.PurpleAccent
-import com.example.ui.theme.SkyBlueLight
-import com.example.ui.theme.SunsetCoral
-import com.example.ui.theme.TealAccent
 import com.example.viewmodel.TravelViewModel
 
 @Composable
@@ -249,14 +242,14 @@ fun OfflineMapSafetyScreen(
                             .fillMaxWidth()
                             .height(180.dp)
                             .clip(RoundedCornerShape(16.dp))
-                            .background(Color(0xFF0F172A))
+                            .background(Color(0xFF0A0A0A))
                     ) {
                         Canvas(modifier = Modifier.fillMaxSize()) {
                             // Draw grid lines
                             val step = 40.dp.toPx()
                             for (x in 0..(size.width / step).toInt()) {
                                 drawLine(
-                                    color = Color(0xFF1E293B),
+                                    color = Color(0xFF1C1C1C),
                                     start = Offset(x * step, 0f),
                                     end = Offset(x * step, size.height),
                                     strokeWidth = 1f
@@ -264,7 +257,7 @@ fun OfflineMapSafetyScreen(
                             }
                             for (y in 0..(size.height / step).toInt()) {
                                 drawLine(
-                                    color = Color(0xFF1E293B),
+                                    color = Color(0xFF1C1C1C),
                                     start = Offset(0f, y * step),
                                     end = Offset(size.width, y * step),
                                     strokeWidth = 1f
@@ -273,23 +266,22 @@ fun OfflineMapSafetyScreen(
 
                             // Draw destination path
                             drawLine(
-                                color = OceanBlue.copy(alpha = 0.6f),
+                                color = ChampagneGold.copy(alpha = 0.6f),
                                 start = Offset(size.width * 0.2f, size.height * 0.7f),
                                 end = Offset(size.width * 0.5f, size.height * 0.4f),
-                                strokeWidth = 3f
+                                strokeWidth = 2f
                             )
                             drawLine(
-                                color = OceanBlue.copy(alpha = 0.6f),
+                                color = ChampagneGold.copy(alpha = 0.6f),
                                 start = Offset(size.width * 0.5f, size.height * 0.4f),
                                 end = Offset(size.width * 0.8f, size.height * 0.3f),
-                                strokeWidth = 3f
+                                strokeWidth = 2f
                             )
 
                             // Draw Pin markers
-                            drawCircle(color = OceanBlue, radius = 10f, center = Offset(size.width * 0.2f, size.height * 0.7f))
-                            drawCircle(color = AmberGold, radius = 12f, center = Offset(size.width * 0.5f, size.height * 0.4f))
-                            drawCircle(color = EmeraldGreen, radius = 10f, center = Offset(size.width * 0.8f, size.height * 0.3f))
-                            drawCircle(color = SunsetCoral, radius = 10f, center = Offset(size.width * 0.35f, size.height * 0.25f))
+                            drawCircle(color = TextPrimary, radius = 6f, center = Offset(size.width * 0.2f, size.height * 0.7f))
+                            drawCircle(color = ChampagneGold, radius = 7f, center = Offset(size.width * 0.5f, size.height * 0.4f))
+                            drawCircle(color = TextSecondary, radius = 6f, center = Offset(size.width * 0.8f, size.height * 0.3f))
                         }
 
                         // Map overlays

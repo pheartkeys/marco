@@ -3,6 +3,7 @@ package com.example.ui.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +30,7 @@ import com.example.data.model.TripEntity
 import com.example.data.model.WalletBalanceEntity
 import com.example.data.model.WalletTransactionEntity
 import com.example.data.security.WalletSecurityManager
+import com.example.ui.theme.*
 
 /**
  * Real-Time Budget Tracking Widget & Currency Converter Card for Marco Wallet.
@@ -71,7 +72,8 @@ fun ChatBudgetTrackerWidget(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 6.dp)
@@ -94,20 +96,16 @@ fun ChatBudgetTrackerWidget(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(42.dp)
+                            .size(38.dp)
                             .clip(CircleShape)
-                            .background(
-                                Brush.linearGradient(
-                                    colors = listOf(Color(0xFF0F9D58), Color(0xFF00796B))
-                                )
-                            ),
+                            .background(LuxuryCardElevated),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.AccountBalanceWallet,
                             contentDescription = "Marco Wallet",
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
+                            tint = ChampagneGold,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                     Column {
@@ -118,31 +116,30 @@ fun ChatBudgetTrackerWidget(
                             Text(
                                 text = "Marco Real-Time Wallet",
                                 style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp
+                                    fontWeight = FontWeight.SemiBold
                                 )
                             )
                             Surface(
                                 shape = RoundedCornerShape(6.dp),
-                                color = Color(0xFFE8F5E9)
+                                color = LuxurySurface,
+                                border = BorderStroke(1.dp, LuxuryBorder)
                             ) {
                                 Row(
                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(3.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Lock,
                                         contentDescription = "AES-256 Encrypted",
-                                        tint = Color(0xFF2E7D32),
+                                        tint = ChampagneGold,
                                         modifier = Modifier.size(11.dp)
                                     )
                                     Text(
                                         text = "AES-256 Keystore",
                                         style = MaterialTheme.typography.labelSmall.copy(
-                                            color = Color(0xFF2E7D32),
-                                            fontWeight = FontWeight.SemiBold,
-                                            fontSize = 9.sp
+                                            color = TextSecondary,
+                                            fontWeight = FontWeight.Medium
                                         )
                                     )
                                 }
@@ -151,8 +148,7 @@ fun ChatBudgetTrackerWidget(
                         Text(
                             text = "${trip?.destination ?: "Active Trip"} Multi-Currency Ledger",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 12.sp
+                                color = TextSecondary
                             )
                         )
                     }
@@ -165,17 +161,18 @@ fun ChatBudgetTrackerWidget(
                     Icon(
                         imageVector = Icons.Default.VolumeUp,
                         contentDescription = "Read Budget Summary",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = TextSecondary
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Main Spend Progress Card
             Surface(
                 shape = RoundedCornerShape(14.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f),
+                color = LuxurySurface,
+                border = BorderStroke(1.dp, LuxuryBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
@@ -192,14 +189,14 @@ fun ChatBudgetTrackerWidget(
                             Text(
                                 text = "Available Balance",
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = TextSecondary
                                 )
                             )
                             Text(
                                 text = "$${String.format("%,.2f", remainingBudgetUsd)} USD",
                                 style = MaterialTheme.typography.headlineSmall.copy(
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = MaterialTheme.colorScheme.primary
+                                    fontWeight = FontWeight.Bold,
+                                    color = TextPrimary
                                 )
                             )
                         }
@@ -207,13 +204,14 @@ fun ChatBudgetTrackerWidget(
                             Text(
                                 text = "Spent / Allocated",
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = TextSecondary
                                 )
                             )
                             Text(
                                 text = "$${String.format("%,.0f", totalSpentUsd)} / $${String.format("%,.0f", effectiveBudget)}",
                                 style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Medium,
+                                    color = TextPrimary
                                 )
                             )
                         }
@@ -225,10 +223,10 @@ fun ChatBudgetTrackerWidget(
                         progress = { animatedProgress },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(8.dp)
-                            .clip(RoundedCornerShape(4.dp)),
-                        color = if (spendProgress > 0.85f) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-                        trackColor = MaterialTheme.colorScheme.surfaceVariant
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp)),
+                        color = if (spendProgress > 0.85f) StatusCrimson else ChampagneGold,
+                        trackColor = LuxuryBorder
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -246,13 +244,13 @@ fun ChatBudgetTrackerWidget(
                             Icon(
                                 imageVector = Icons.Default.Savings,
                                 contentDescription = null,
-                                tint = Color(0xFF0F9D58),
+                                tint = ChampagneGold,
                                 modifier = Modifier.size(14.dp)
                             )
                             Text(
                                 text = "Points & Status Savings:",
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    color = Color(0xFF0F9D58),
+                                    color = TextSecondary,
                                     fontWeight = FontWeight.Medium
                                 )
                             )
@@ -260,8 +258,8 @@ fun ChatBudgetTrackerWidget(
                         Text(
                             text = "+$${String.format("%,.2f", totalLoyaltySavingsUsd)} USD Saved",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                color = Color(0xFF0F9D58),
-                                fontWeight = FontWeight.Bold
+                                color = TextPrimary,
+                                fontWeight = FontWeight.SemiBold
                             )
                         )
                     }
@@ -320,14 +318,12 @@ fun ChatBudgetTrackerWidget(
                             Text(
                                 text = "${balance.currencySymbol}${String.format("%,.0f", balance.availableBalance)}",
                                 style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.ExtraBold,
-                                    fontSize = 14.sp
+                                    fontWeight = FontWeight.ExtraBold
                                 )
                             )
                             Text(
                                 text = "Spent ${balance.currencySymbol}${String.format("%,.0f", balance.spentAmount)}",
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    fontSize = 9.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             )
@@ -343,9 +339,14 @@ fun ChatBudgetTrackerWidget(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                OutlinedButton(
+                Button(
                     onClick = { isConverterExpanded = !isConverterExpanded },
                     shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = LuxuryCardElevated,
+                        contentColor = TextPrimary
+                    ),
+                    border = BorderStroke(1.dp, LuxuryBorder),
                     modifier = Modifier
                         .weight(1f)
                         .testTag("open_fx_converter_btn")
@@ -353,19 +354,25 @@ fun ChatBudgetTrackerWidget(
                     Icon(
                         imageVector = Icons.Default.CurrencyExchange,
                         contentDescription = null,
+                        tint = ChampagneGold,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = if (isConverterExpanded) "Hide FX" else "Live FX Rates",
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Medium
                     )
                 }
 
                 Button(
                     onClick = { isQuickExpenseSheetOpen = true },
                     shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = LuxuryCardElevated,
+                        contentColor = TextPrimary
+                    ),
+                    border = BorderStroke(1.dp, LuxuryBorder),
                     modifier = Modifier
                         .weight(1f)
                         .testTag("quick_add_expense_btn")
@@ -373,12 +380,14 @@ fun ChatBudgetTrackerWidget(
                     Icon(
                         imageVector = Icons.Default.AddCircleOutline,
                         contentDescription = null,
+                        tint = ChampagneGold,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = "Log Expense",
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
@@ -394,7 +403,7 @@ fun ChatBudgetTrackerWidget(
                         .padding(12.dp)
                 ) {
                     Text(
-                        text = "💱 Real-Time Foreign Exchange Calculator",
+                        text = "Real-Time Foreign Exchange Calculator",
                         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -505,10 +514,9 @@ fun ChatBudgetTrackerWidget(
                             }
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "💡 Tip: Always choose local currency at foreign card readers to bypass 3-5% DCC terminal conversion fees.",
+                                text = "Tip: Always choose local currency at foreign card readers to bypass 3-5% DCC terminal conversion fees.",
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.9f),
-                                    fontSize = 10.sp
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.9f)
                                 )
                             )
                         }
@@ -531,7 +539,7 @@ fun ChatBudgetTrackerWidget(
                 Text(
                     text = "AES Auth Valid",
                     style = MaterialTheme.typography.labelSmall.copy(
-                        color = Color(0xFF2E7D32),
+                        color = WayfinderEmerald,
                         fontWeight = FontWeight.SemiBold
                     )
                 )
@@ -594,17 +602,15 @@ fun ChatBudgetTrackerWidget(
                                         Text(
                                             text = tx.paymentMethod,
                                             style = MaterialTheme.typography.labelSmall.copy(
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                fontSize = 10.sp
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
                                         )
                                         if (tx.loyaltySavingsUsd > 0) {
                                             Text(
                                                 text = "Saved $${tx.loyaltySavingsUsd.toInt()}",
                                                 style = MaterialTheme.typography.labelSmall.copy(
-                                                    color = Color(0xFF0F9D58),
-                                                    fontWeight = FontWeight.Bold,
-                                                    fontSize = 10.sp
+                                                    color = WayfinderEmerald,
+                                                    fontWeight = FontWeight.Bold
                                                 )
                                             )
                                         }
@@ -620,8 +626,7 @@ fun ChatBudgetTrackerWidget(
                                 Text(
                                     text = "${tx.currencyCode} ${String.format("%.0f", tx.amountOriginal)}",
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        fontSize = 10.sp
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 )
                             }
@@ -679,7 +684,6 @@ fun ChatBudgetTrackerWidget(
                         text = "• Hardware-backed Android Keystore AES-256 GCM encryption.\n• Card tokens and receipt hashes are encrypted at rest in local Room database.\n• Zero plaintext transmission of sensitive multi-currency credit line details.",
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 10.sp,
                             lineHeight = 14.sp
                         )
                     )
@@ -691,8 +695,12 @@ fun ChatBudgetTrackerWidget(
             // Tap-through Navigation to Full Wallet & Points / Timeshare Cards
             Button(
                 onClick = onOpenFullWallet,
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F9D58)),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = LuxuryCardElevated,
+                    contentColor = TextPrimary
+                ),
+                border = BorderStroke(1.dp, LuxuryBorder),
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("open_full_wallet_view_btn")
@@ -700,15 +708,14 @@ fun ChatBudgetTrackerWidget(
                 Icon(
                     imageVector = Icons.Default.AccountBalanceWallet,
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = ChampagneGold,
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Manage Cards, Points & Timeshares →",
                     style = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        fontWeight = FontWeight.Medium
                     )
                 )
             }
@@ -767,7 +774,7 @@ fun QuickAddExpenseSheetContent(
             .padding(bottom = 32.dp)
     ) {
         Text(
-            text = "💳 Log Expense to Marco Wallet",
+            text = "Log Expense to Marco Wallet",
             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
         )
         Text(
@@ -843,7 +850,7 @@ fun QuickAddExpenseSheetContent(
                 FilterChip(
                     selected = category == cat,
                     onClick = { category = cat },
-                    label = { Text(cat, fontSize = 11.sp) }
+                    label = { Text(cat, style = MaterialTheme.typography.labelMedium) }
                 )
             }
         }

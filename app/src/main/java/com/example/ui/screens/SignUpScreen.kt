@@ -45,7 +45,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -76,15 +78,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.ui.theme.CelestialLapis
-import com.example.ui.theme.ElegantDarkBackground
-import com.example.ui.theme.ElegantDarkSurface
-import com.example.ui.theme.ElegantError
-import com.example.ui.theme.EmeraldGreen
-import com.example.ui.theme.SunsetCoral
-import com.example.ui.theme.VenetianGold
-import com.example.ui.theme.VenetianGoldLight
+import com.example.ui.theme.*
 import com.example.viewmodel.TravelViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -105,18 +99,18 @@ fun SignUpScreen(
     var confirmPassword by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
     var showConfirmPassword by remember { mutableStateOf(false) }
-    var selectedTravelStyle by remember { mutableStateOf("🏝️ Luxury Resorts") }
+    var selectedTravelStyle by remember { mutableStateOf("Luxury Resorts") }
     var agreeToTerms by remember { mutableStateOf(true) }
 
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val travelStyles = listOf(
-        "🏝️ Luxury Resorts",
-        "👨‍👩‍👧 Family Explorer",
-        "🎒 Adventure Backpacker",
-        "💼 Business Nomad",
-        "🏛️ Cultural Historian"
+        "Luxury Resorts",
+        "Family Explorer",
+        "Adventure Backpacker",
+        "Business Nomad",
+        "Cultural Historian"
     )
 
     val scrollState = rememberScrollState()
@@ -124,15 +118,7 @@ fun SignUpScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        CelestialLapis.copy(alpha = 0.85f),
-                        ElegantDarkBackground,
-                        ElegantDarkBackground
-                    )
-                )
-            )
+            .background(LuxuryDarkBase)
             .statusBarsPadding()
             .navigationBarsPadding()
             .imePadding()
@@ -155,12 +141,12 @@ fun SignUpScreen(
                     modifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.6f))
+                        .background(LuxuryCard)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onSurface,
+                        tint = TextPrimary,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -170,10 +156,10 @@ fun SignUpScreen(
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
-                        text = "Sign In Instead",
-                        color = VenetianGold,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold
+                        text = "Sign In",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = ChampagneGold,
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
@@ -185,22 +171,15 @@ fun SignUpScreen(
                 modifier = Modifier
                     .size(72.dp)
                     .clip(CircleShape)
-                    .background(
-                        Brush.linearGradient(
-                            listOf(
-                                CelestialLapis,
-                                Color(0xFF0F172A)
-                            )
-                        )
-                    )
-                    .border(2.dp, VenetianGold.copy(alpha = 0.6f), CircleShape),
+                    .background(LuxuryCardElevated)
+                    .border(1.dp, LuxuryBorder, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Explore,
                     contentDescription = "Marco Emblem",
-                    tint = VenetianGold,
-                    modifier = Modifier.size(40.dp)
+                    tint = ChampagneGold,
+                    modifier = Modifier.size(36.dp)
                 )
             }
 
@@ -209,7 +188,6 @@ fun SignUpScreen(
             Text(
                 text = "Join Marco Expeditions",
                 style = MaterialTheme.typography.headlineSmall.copy(
-                    fontWeight = FontWeight.ExtraBold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             )
@@ -217,11 +195,10 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "Unlock live AI travel concierges, cross-device itinerary sync, timeshare wallets, and offline maps.",
-                fontSize = 13.sp,
+                text = "Get AI trip planning, itinerary sync, and offline maps.",
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = 18.sp,
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
 
@@ -248,7 +225,6 @@ fun SignUpScreen(
                         text = "Create Your Account",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     )
@@ -272,8 +248,8 @@ fun SignUpScreen(
                             ) {
                                 Text(
                                     text = msg,
-                                    color = SunsetCoral,
-                                    fontSize = 12.sp,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onErrorContainer,
                                     modifier = Modifier.padding(12.dp)
                                 )
                             }
@@ -283,8 +259,7 @@ fun SignUpScreen(
                     // Full Name / Traveler Name
                     Text(
                         text = "Traveler Name",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(6.dp))
@@ -294,7 +269,7 @@ fun SignUpScreen(
                             name = it
                             errorMessage = null
                         },
-                        placeholder = { Text("e.g. Marco Polo", fontSize = 13.sp) },
+                        placeholder = { Text("e.g. Marco Polo", style = MaterialTheme.typography.bodyMedium) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Person,
@@ -322,13 +297,12 @@ fun SignUpScreen(
                         )
                     )
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     // Email Address
                     Text(
                         text = "Email Address",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(6.dp))
@@ -338,7 +312,7 @@ fun SignUpScreen(
                             email = it
                             errorMessage = null
                         },
-                        placeholder = { Text("traveler@example.com", fontSize = 13.sp) },
+                        placeholder = { Text("traveler@example.com", style = MaterialTheme.typography.bodyMedium) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Email,
@@ -367,13 +341,12 @@ fun SignUpScreen(
                         )
                     )
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     // Password
                     Text(
                         text = "Password (min 6 characters)",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(6.dp))
@@ -383,7 +356,7 @@ fun SignUpScreen(
                             password = it
                             errorMessage = null
                         },
-                        placeholder = { Text("••••••••", fontSize = 13.sp) },
+                        placeholder = { Text("••••••••", style = MaterialTheme.typography.bodyMedium) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Lock,
@@ -423,13 +396,12 @@ fun SignUpScreen(
                         )
                     )
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     // Confirm Password
                     Text(
                         text = "Confirm Password",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(6.dp))
@@ -439,7 +411,7 @@ fun SignUpScreen(
                             confirmPassword = it
                             errorMessage = null
                         },
-                        placeholder = { Text("••••••••", fontSize = 13.sp) },
+                        placeholder = { Text("••••••••", style = MaterialTheme.typography.bodyMedium) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Lock,
@@ -484,52 +456,57 @@ fun SignUpScreen(
                     // Traveler Style Persona Selector
                     Text(
                         text = "Your Primary Travel Style",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         travelStyles.forEach { style ->
                             val isSelected = style == selectedTravelStyle
-                            Surface(
-                                shape = RoundedCornerShape(10.dp),
-                                color = if (isSelected) CelestialLapis else MaterialTheme.colorScheme.surface,
-                                border = androidx.compose.foundation.BorderStroke(
-                                    1.dp,
-                                    if (isSelected) VenetianGold else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-                                ),
-                                modifier = Modifier.clickable { selectedTravelStyle = style }
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-                                ) {
-                                    if (isSelected) {
+                            FilterChip(
+                                selected = isSelected,
+                                onClick = { selectedTravelStyle = style },
+                                label = {
+                                    Text(
+                                        text = style,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                },
+                                leadingIcon = if (isSelected) {
+                                    {
                                         Icon(
                                             imageVector = Icons.Default.Check,
                                             contentDescription = null,
-                                            tint = VenetianGold,
                                             modifier = Modifier.size(12.dp)
                                         )
-                                        Spacer(modifier = Modifier.width(4.dp))
                                     }
-                                    Text(
-                                        text = style,
-                                        fontSize = 11.sp,
-                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                        color = if (isSelected) VenetianGoldLight else MaterialTheme.colorScheme.onSurface
-                                    )
-                                }
-                            }
+                                } else {
+                                    null
+                                },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    containerColor = MaterialTheme.colorScheme.surface,
+                                    labelColor = MaterialTheme.colorScheme.onSurface,
+                                    selectedContainerColor = CelestialLapis,
+                                    selectedLabelColor = VenetianGoldLight
+                                ),
+                                border = FilterChipDefaults.filterChipBorder(
+                                    enabled = true,
+                                    selected = isSelected,
+                                    borderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                                    selectedBorderColor = VenetianGold,
+                                    borderWidth = 1.dp,
+                                    selectedBorderWidth = 1.dp
+                                )
+                            )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     // Terms Checkbox
                     Row(
@@ -541,12 +518,12 @@ fun SignUpScreen(
                             onCheckedChange = { agreeToTerms = it },
                             colors = CheckboxDefaults.colors(
                                 checkedColor = VenetianGold,
-                                checkmarkColor = Color.Black
+                                checkmarkColor = CartographyDarkBase
                             )
                         )
                         Text(
                             text = "I agree to Cloud Sync Terms and Offline Safety Policy",
-                            fontSize = 11.sp,
+                            style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -593,7 +570,7 @@ fun SignUpScreen(
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(50.dp)
+                            .height(48.dp)
                             .testTag("signup_submit_button")
                     ) {
                         if (isLoading) {
@@ -603,12 +580,11 @@ fun SignUpScreen(
                                 strokeWidth = 2.dp
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Creating Account...", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                            Text("Creating Account...", style = MaterialTheme.typography.labelLarge)
                         } else {
                             Text(
                                 text = "Create Marco Account",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.labelLarge,
                                 color = VenetianGoldLight
                             )
                         }
@@ -621,17 +597,18 @@ fun SignUpScreen(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Divider(
+                        HorizontalDivider(
                             modifier = Modifier.weight(1f),
                             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
                         )
                         Text(
-                            text = "  OR  ",
-                            fontSize = 11.sp,
+                            text = "OR",
+                            style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 8.dp)
                         )
-                        Divider(
+                        HorizontalDivider(
                             modifier = Modifier.weight(1f),
                             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
                         )
@@ -679,14 +656,14 @@ fun SignUpScreen(
                     ) {
                         Text(
                             text = "G",
-                            fontSize = 16.sp,
+                            style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Black,
                             color = EmeraldGreen
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Sign Up with Google",
-                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold
                         )
                     }
@@ -703,12 +680,12 @@ fun SignUpScreen(
             ) {
                 Text(
                     text = "Already have an account? ",
-                    fontSize = 13.sp,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = "Sign In",
-                    fontSize = 13.sp,
+                    style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
                     color = VenetianGold,
                     modifier = Modifier

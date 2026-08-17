@@ -2,7 +2,9 @@ package com.example.ui.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,6 +45,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -52,16 +55,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.data.model.VendorCallLogEntity
 import com.example.ui.components.CategoryIconBadge
 import com.example.ui.components.LiveAudioWaveform
 import com.example.ui.theme.AmberGold
+import com.example.ui.theme.CartographyCardElevated
+import com.example.ui.theme.ContourBorder
 import com.example.ui.theme.DarkSurfaceCard
 import com.example.ui.theme.EmeraldGreen
 import com.example.ui.theme.Navy900
@@ -125,6 +128,7 @@ fun VendorCallScreen(
                 IconButton(
                     onClick = onNavigateBack,
                     modifier = Modifier
+                        .minimumInteractiveComponentSize()
                         .size(40.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.surfaceVariant)
@@ -140,16 +144,12 @@ fun VendorCallScreen(
                 Column {
                     Text(
                         text = "Vendor Concierge & Telephony",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 17.sp
-                        )
+                        style = MaterialTheme.typography.titleLarge
                     )
                     Text(
                         text = "Automated AI Calls, Bookings & ADA Inquiries",
                         style = MaterialTheme.typography.bodySmall.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 11.sp
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                 }
@@ -161,18 +161,19 @@ fun VendorCallScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(22.dp))
-                    .background(Brush.horizontalGradient(listOf(Navy900, Color(0xFF1E3A8A), AmberGold)))
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(CartographyCardElevated)
+                    .border(1.dp, ContourBorder, RoundedCornerShape(16.dp))
                     .padding(20.dp)
             ) {
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Surface(
-                            shape = RoundedCornerShape(20.dp),
+                            shape = RoundedCornerShape(12.dp),
                             color = AmberGold.copy(alpha = 0.25f)
                         ) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(Icons.Default.PhoneInTalk, null, tint = AmberGold, modifier = Modifier.size(14.dp))
@@ -188,21 +189,18 @@ fun VendorCallScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Vendor Voice Calling Studio",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Your AI travel agent directly phones hotels, airlines, and campsites to verify amenities, pool status, and family accessibility.",
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            color = Color.White.copy(alpha = 0.85f),
-                            fontSize = 12.sp
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                 }
@@ -213,7 +211,7 @@ fun VendorCallScreen(
         if (isCallActive) {
             item {
                 Card(
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = Navy900),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -235,8 +233,8 @@ fun VendorCallScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "LIVE OUTBOUND CALL IN PROGRESS",
-                                style = MaterialTheme.typography.labelSmall.copy(
+                                text = "Live outbound call",
+                                style = MaterialTheme.typography.labelMedium.copy(
                                     color = SunsetCoral,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -253,16 +251,15 @@ fun VendorCallScreen(
                         )
                         Text(
                             text = "Inquiry: $inquiryTopic",
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                color = SkyBlueLight,
-                                fontSize = 12.sp
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                color = SkyBlueLight
                             )
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
                         LiveAudioWaveform(modifier = Modifier.padding(vertical = 8.dp), barCount = 11)
 
-                        Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
                         Surface(
                             shape = RoundedCornerShape(12.dp),
                             color = Color.White.copy(alpha = 0.1f),
@@ -277,7 +274,7 @@ fun VendorCallScreen(
                                     color = AmberGold,
                                     strokeWidth = 2.dp
                                 )
-                                Spacer(modifier = Modifier.width(10.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = callProgressStep,
                                     style = MaterialTheme.typography.bodySmall.copy(color = Color.White)
@@ -292,12 +289,13 @@ fun VendorCallScreen(
         // New Dispatch Card
         item {
             Card(
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                border = BorderStroke(1.dp, ContourBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(18.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "Configure Outbound Voice Inquiry",
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
@@ -307,7 +305,7 @@ fun VendorCallScreen(
 
                     // Preset Vendors chips
                     Text("Quick Select Vendor:", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant))
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         presetVendors.forEach { (name, cat) ->
                             val isSelected = vendorName == name
@@ -317,19 +315,19 @@ fun VendorCallScreen(
                                     vendorName = name
                                     vendorCategory = cat
                                 },
-                                label = { Text(name, fontSize = 12.sp) },
+                                label = { Text(name) },
                                 leadingIcon = {
                                     CategoryIconBadge(category = cat, size = 20)
                                 },
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = OceanBlue.copy(alpha = 0.18f),
-                                    selectedLabelColor = OceanBlue
+                                    selectedLabelColor = SkyBlueLight
                                 )
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     OutlinedTextField(
                         value = vendorName,
@@ -340,23 +338,23 @@ fun VendorCallScreen(
                         singleLine = true
                     )
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     // Inquiry Topic
                     Text("Select or customize inquiry:", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant))
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     presetQuestions.take(3).forEach { q ->
                         Surface(
-                            shape = RoundedCornerShape(10.dp),
+                            shape = RoundedCornerShape(12.dp),
                             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 2.dp)
+                                .padding(vertical = 4.dp)
                                 .clickable { inquiryTopic = q }
                         ) {
                             Text(
                                 text = "• $q",
-                                style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
+                                style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(8.dp)
                             )
                         }
@@ -385,11 +383,11 @@ fun VendorCallScreen(
                             )
                         },
                         enabled = !isCallActive && vendorName.isNotBlank() && inquiryTopic.isNotBlank(),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = AmberGold),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(50.dp)
+                            .height(48.dp)
                             .testTag("dispatch_call_button")
                     ) {
                         Icon(imageVector = Icons.Default.PhoneInTalk, contentDescription = null, tint = Navy900)
@@ -397,8 +395,7 @@ fun VendorCallScreen(
                         Text(
                             text = "Dispatch AI Agent to Call Vendor",
                             color = Navy900,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
@@ -410,8 +407,7 @@ fun VendorCallScreen(
             Text(
                 text = "Verified Call Logs & Transcripts (${callLogs.size})",
                 style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontWeight = FontWeight.Bold
                 )
             )
         }
@@ -436,9 +432,10 @@ fun CallLogCard(
     var isExpanded by remember { mutableStateOf(false) }
 
     Card(
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -457,7 +454,7 @@ fun CallLogCard(
                     ) {
                         Icon(Icons.Default.CheckCircle, null, tint = EmeraldGreen, modifier = Modifier.size(18.dp))
                     }
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Column {
                         Text(
                             text = log.vendorName,
@@ -475,35 +472,34 @@ fun CallLogCard(
                     color = EmeraldGreen.copy(alpha = 0.15f)
                 ) {
                     Text(
-                        text = "CONFIRMED",
+                        text = "Confirmed",
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = EmeraldGreen,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 10.sp
+                            fontWeight = FontWeight.Bold
                         ),
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = "Inquiry: ${log.inquiryTopic}",
                 style = MaterialTheme.typography.bodySmall.copy(
                     fontWeight = FontWeight.SemiBold,
-                    color = OceanBlue
+                    color = SkyBlueLight
                 )
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
             Surface(
-                shape = RoundedCornerShape(10.dp),
+                shape = RoundedCornerShape(12.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(10.dp)) {
+                Column(modifier = Modifier.padding(8.dp)) {
                     Text(
                         text = "Outcome: ${log.callSummaryOutcome}",
                         style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium)
@@ -513,8 +509,7 @@ fun CallLogCard(
                         Text(
                             text = "Details: ${log.confirmedDetails}",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = TealAccent,
-                                fontSize = 11.sp
+                                color = TealAccent
                             )
                         )
                     }
@@ -536,21 +531,23 @@ fun CallLogCard(
                     Text(
                         text = if (isExpanded) "Hide Full Transcript" else "View Audio Transcript",
                         style = MaterialTheme.typography.labelSmall.copy(
-                            color = OceanBlue,
+                            color = SkyBlueLight,
                             fontWeight = FontWeight.Bold
                         )
                     )
                     Icon(
                         imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                         contentDescription = null,
-                        tint = OceanBlue,
+                        tint = SkyBlueLight,
                         modifier = Modifier.size(16.dp)
                     )
                 }
 
                 IconButton(
                     onClick = onListen,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier
+                        .minimumInteractiveComponentSize()
+                        .size(32.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.VolumeUp,
@@ -565,19 +562,16 @@ fun CallLogCard(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 10.dp)
+                        .padding(top = 8.dp)
                 ) {
                     Surface(
-                        shape = RoundedCornerShape(10.dp),
-                        color = Navy900.copy(alpha = 0.08f),
+                        shape = RoundedCornerShape(12.dp),
+                        color = Navy900,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
                             text = log.audioTranscript,
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontSize = 12.sp,
-                                lineHeight = 18.sp
-                            ),
+                            style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(12.dp)
                         )
                     }

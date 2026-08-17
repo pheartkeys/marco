@@ -1,7 +1,7 @@
 package com.example.ui.screens
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -59,26 +59,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Settings
 import com.example.data.model.ProactiveSuggestionEntity
 import com.example.ui.components.ExplorerVoyageLoadingCard
-import com.example.ui.theme.AmberGold
-import com.example.ui.theme.EmeraldGreen
-import com.example.ui.theme.Navy900
-import com.example.ui.theme.OceanBlue
-import com.example.ui.theme.SkyBlueLight
-import com.example.ui.theme.TealAccent
-import com.example.ui.theme.VenetianGold
+import com.example.ui.theme.CartographyDarkBase
+import com.example.ui.theme.CompassLilac
+import com.example.ui.theme.ContourBorder
+import com.example.ui.theme.MaritimeBlue
+import com.example.ui.theme.NavigationalGold
+import com.example.ui.theme.SilkRoadTeal
+import com.example.ui.theme.SunsetCoral
+import com.example.ui.theme.WayfinderEmerald
+import com.example.ui.theme.WaypointCyan
 import com.example.viewmodel.TravelViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -139,7 +138,8 @@ fun PlanTripDialog(
     Surface(
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 8.dp,
+        tonalElevation = 0.dp,
+        border = BorderStroke(1.dp, ContourBorder),
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
@@ -162,30 +162,26 @@ fun PlanTripDialog(
                         modifier = Modifier
                             .size(40.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(Brush.linearGradient(listOf(OceanBlue, TealAccent))),
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.AutoAwesome,
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(22.dp)
                         )
                     }
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = "AI Travel Agent Planner",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp
-                            )
+                            text = "Plan New Expedition",
+                            style = MaterialTheme.typography.titleLarge
                         )
                         Text(
-                            text = "Learned Preferences • Loyalty • Logistics",
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 12.sp
+                            text = "Personalized Itinerary & Logistics",
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }
@@ -199,12 +195,13 @@ fun PlanTripDialog(
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Traveler DNA Active Banner
             Surface(
-                shape = RoundedCornerShape(14.dp),
-                color = Color(0xFF8B5CF6).copy(alpha = 0.12f),
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { isPreferenceStudioOpen = true }
@@ -218,14 +215,14 @@ fun PlanTripDialog(
                         modifier = Modifier.weight(1f),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Psychology, null, tint = Color(0xFF8B5CF6), modifier = Modifier.size(20.dp))
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Icon(Icons.Default.Psychology, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                         Column {
                             Text(
-                                text = "✨ Traveler DNA Active (${userPref?.totalTripsAnalyzed ?: 2} Trips Analyzed)",
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF8B5CF6)
+                                text = userPref?.let { "Traveler Profile (${it.totalTripsAnalyzed} Trips Analyzed)" } ?: "Traveler Profile",
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             )
                             val dnaSummary = listOfNotNull(
@@ -236,7 +233,6 @@ fun PlanTripDialog(
                             Text(
                                 text = dnaSummary,
                                 style = MaterialTheme.typography.bodySmall.copy(
-                                    fontSize = 11.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 ),
                                 maxLines = 1
@@ -246,23 +242,23 @@ fun PlanTripDialog(
 
                     Text(
                         text = "Edit DNA",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            color = OceanBlue,
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            color = WaypointCyan,
                             fontWeight = FontWeight.Bold
                         )
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Proactive Suggestions Quick Carousel
             if (proactiveSuggestions.isNotEmpty()) {
                 Text(
-                    text = "🌟 AI Proactive Proposals (Based on your feedback)",
+                    text = "AI Proactive Proposals (based on your feedback)",
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                 )
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -283,23 +279,23 @@ fun PlanTripDialog(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
                                         text = "${sug.matchScorePercent}% Match",
-                                        style = MaterialTheme.typography.labelSmall.copy(color = EmeraldGreen, fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                                        style = MaterialTheme.typography.labelSmall.copy(color = WayfinderEmerald, fontWeight = FontWeight.Bold)
                                     )
-                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         text = "Save $${sug.pointsSavingsUsd.toInt()}",
-                                        style = MaterialTheme.typography.labelSmall.copy(color = AmberGold, fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                                        style = MaterialTheme.typography.labelSmall.copy(color = NavigationalGold, fontWeight = FontWeight.Bold)
                                     )
                                 }
                                 Text(
                                     text = sug.destination,
-                                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
                                 )
                             }
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -310,16 +306,16 @@ fun PlanTripDialog(
                 onValueChange = { destination = it },
                 label = { Text("Destination & Region") },
                 leadingIcon = {
-                    Icon(imageVector = Icons.Default.LocationOn, contentDescription = null, tint = OceanBlue)
+                    Icon(imageVector = Icons.Default.LocationOn, contentDescription = null, tint = MaritimeBlue)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("destination_input"),
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(12.dp),
                 singleLine = true
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Duration & Budget Row
             Row(
@@ -355,14 +351,14 @@ fun PlanTripDialog(
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Travelers & Children
             Text(
                 text = "Travelers & Family Members",
                 style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
             )
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -379,23 +375,25 @@ fun PlanTripDialog(
                     ) {
                         Text("Adults: $adultsCount", fontWeight = FontWeight.Medium)
                         Row {
-                            Box(
-                                modifier = Modifier
-                                    .size(28.dp)
-                                    .clip(CircleShape)
-                                    .background(OceanBlue.copy(alpha = 0.2f))
-                                    .clickable { if (adultsCount > 1) adultsCount-- },
-                                contentAlignment = Alignment.Center
-                            ) { Text("-", fontWeight = FontWeight.Bold) }
+                            IconButton(onClick = { if (adultsCount > 1) adultsCount-- }) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(28.dp)
+                                        .clip(CircleShape)
+                                        .background(MaritimeBlue.copy(alpha = 0.2f)),
+                                    contentAlignment = Alignment.Center
+                                ) { Text("-", fontWeight = FontWeight.Bold) }
+                            }
                             Spacer(modifier = Modifier.width(8.dp))
-                            Box(
-                                modifier = Modifier
-                                    .size(28.dp)
-                                    .clip(CircleShape)
-                                    .background(OceanBlue.copy(alpha = 0.2f))
-                                    .clickable { if (adultsCount < 10) adultsCount++ },
-                                contentAlignment = Alignment.Center
-                            ) { Text("+", fontWeight = FontWeight.Bold) }
+                            IconButton(onClick = { if (adultsCount < 10) adultsCount++ }) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(28.dp)
+                                        .clip(CircleShape)
+                                        .background(MaritimeBlue.copy(alpha = 0.2f)),
+                                    contentAlignment = Alignment.Center
+                                ) { Text("+", fontWeight = FontWeight.Bold) }
+                            }
                         }
                     }
                 }
@@ -411,41 +409,43 @@ fun PlanTripDialog(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.ChildCare, null, modifier = Modifier.size(16.dp), tint = Color(0xFFEC4899))
+                            Icon(Icons.Default.ChildCare, null, modifier = Modifier.size(16.dp), tint = SunsetCoral)
                             Spacer(modifier = Modifier.width(4.dp))
                             Text("Kids: $childrenCount", fontWeight = FontWeight.Medium)
                         }
                         Row {
-                            Box(
-                                modifier = Modifier
-                                    .size(28.dp)
-                                    .clip(CircleShape)
-                                    .background(OceanBlue.copy(alpha = 0.2f))
-                                    .clickable { if (childrenCount > 0) childrenCount-- },
-                                contentAlignment = Alignment.Center
-                            ) { Text("-", fontWeight = FontWeight.Bold) }
+                            IconButton(onClick = { if (childrenCount > 0) childrenCount-- }) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(28.dp)
+                                        .clip(CircleShape)
+                                        .background(MaritimeBlue.copy(alpha = 0.2f)),
+                                    contentAlignment = Alignment.Center
+                                ) { Text("-", fontWeight = FontWeight.Bold) }
+                            }
                             Spacer(modifier = Modifier.width(8.dp))
-                            Box(
-                                modifier = Modifier
-                                    .size(28.dp)
-                                    .clip(CircleShape)
-                                    .background(OceanBlue.copy(alpha = 0.2f))
-                                    .clickable { if (childrenCount < 8) childrenCount++ },
-                                contentAlignment = Alignment.Center
-                            ) { Text("+", fontWeight = FontWeight.Bold) }
+                            IconButton(onClick = { if (childrenCount < 8) childrenCount++ }) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(28.dp)
+                                        .clip(CircleShape)
+                                        .background(MaritimeBlue.copy(alpha = 0.2f)),
+                                    contentAlignment = Alignment.Center
+                                ) { Text("+", fontWeight = FontWeight.Bold) }
+                            }
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Family & Accessibility Logistics
             Text(
                 text = "Family Logistics & Accessibility Needs",
                 style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
             )
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -457,7 +457,7 @@ fun PlanTripDialog(
                         onClick = {
                             if (selected) selectedAccessibility.remove(opt) else selectedAccessibility.add(opt)
                         },
-                        label = { Text(opt, fontSize = 12.sp) },
+                        label = { Text(opt, style = MaterialTheme.typography.labelMedium) },
                         leadingIcon = {
                             Icon(
                                 imageVector = if (opt.contains("Stroller") || opt.contains("Sensory")) Icons.Default.ChildCare else Icons.Default.Accessible,
@@ -466,21 +466,21 @@ fun PlanTripDialog(
                             )
                         },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = TealAccent.copy(alpha = 0.2f),
-                            selectedLabelColor = TealAccent
+                            selectedContainerColor = SilkRoadTeal.copy(alpha = 0.2f),
+                            selectedLabelColor = SilkRoadTeal
                         )
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // APIs & Rewards Programs to Optimize
             Text(
                 text = "Integrate Loyalty, Timeshares & Campground APIs",
                 style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
             )
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -492,10 +492,10 @@ fun PlanTripDialog(
                         onClick = {
                             if (selected) selectedIntegrations.remove(opt) else selectedIntegrations.add(opt)
                         },
-                        label = { Text(opt, fontSize = 11.sp) },
+                        label = { Text(opt, style = MaterialTheme.typography.labelMedium) },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = AmberGold.copy(alpha = 0.2f),
-                            selectedLabelColor = AmberGold
+                            selectedContainerColor = NavigationalGold.copy(alpha = 0.2f),
+                            selectedLabelColor = NavigationalGold
                         )
                     )
                 }
@@ -508,7 +508,7 @@ fun PlanTripDialog(
                     statusMessage = "Marco is charting $destination...",
                     subStatus = "Synthesizing $durationDays-day expedition coordinates, points & accessibility"
                 )
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
             // Submit Button with AI Thinking State
@@ -534,27 +534,24 @@ fun PlanTripDialog(
                 enabled = !isGenerating && destination.isNotBlank(),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = VenetianGold
+                    containerColor = NavigationalGold
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(54.dp)
+                    .height(56.dp)
                     .testTag("generate_itinerary_button")
             ) {
                 if (isGenerating) {
                     Text(
                         text = "Marco Expedition Engine Active...",
-                        color = Color.White,
                         fontWeight = FontWeight.Bold
                     )
                 } else {
-                    Icon(imageVector = Icons.Default.AutoAwesome, contentDescription = null, tint = Color.White)
+                    Icon(imageVector = Icons.Default.AutoAwesome, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Generate Tailored Trip Itinerary",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
