@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -1118,114 +1119,159 @@ fun ConciergeChatScreen(
             }
         }
 
-        // CHAT INPUT BAR
+        // CHAT INPUT BAR (Unified Full-Width Papercraft Composer)
         Surface(
-            color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 6.dp,
+            color = CartographySurface,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Row(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
-                // Quick Action '+' Button
-                IconButton(
-                    onClick = { isQuickActionSheetOpen = true },
-                    modifier = Modifier
-                        .size(42.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .testTag("open_quick_actions_button")
+                Surface(
+                    color = CartographyCard,
+                    shape = RoundedCornerShape(18.dp),
+                    border = BorderStroke(1.dp, ContourBorder),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Quick Actions",
-                        tint = OceanBlue,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(6.dp))
-
-                // Voice STT Input Button
-                var isListeningVoice by remember { mutableStateOf(false) }
-                IconButton(
-                    onClick = {
-                        isListeningVoice = !isListeningVoice
-                        if (isListeningVoice) {
-                            inputText = "Show me the antique parchment map and emergency hospital coordinates"
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 10.dp)
+                    ) {
+                        // Multi-line Text Input Area (spans full width)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 36.dp, max = 130.dp)
+                        ) {
+                            if (inputText.isEmpty()) {
+                                Text(
+                                    text = if (activeChatStreamTab == 1)
+                                        "Message crew or ask Marco for group ideas..."
+                                    else
+                                        "Message AI or ask 'Plan trip to Tokyo'...",
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        color = TextAtlasSubtle,
+                                        fontSize = 14.sp
+                                    ),
+                                    modifier = Modifier.padding(top = 2.dp)
+                                )
+                            }
+                            androidx.compose.foundation.text.BasicTextField(
+                                value = inputText,
+                                onValueChange = { inputText = it },
+                                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                                    color = TextAtlasPrimary,
+                                    fontSize = 14.sp,
+                                    lineHeight = 20.sp
+                                ),
+                                cursorBrush = androidx.compose.ui.graphics.SolidColor(NavigationalGold),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag("chat_input_field")
+                            )
                         }
-                    },
-                    modifier = Modifier
-                        .size(42.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (isListeningVoice) VenetianGold.copy(alpha = 0.25f) else MaterialTheme.colorScheme.surfaceVariant
-                        )
-                        .testTag("voice_input_button")
-                ) {
-                    Icon(
-                        imageVector = if (isListeningVoice) Icons.Default.Mic else Icons.Default.MicOff,
-                        contentDescription = "Voice Input",
-                        tint = if (isListeningVoice) VenetianGold else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
 
-                Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                // Text Input Box
-                OutlinedTextField(
-                    value = inputText,
-                    onValueChange = { inputText = it },
-                    placeholder = {
-                        Text(
-                            "Message AI or ask 'Plan trip to Tokyo'...",
-                            fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag("chat_input_field"),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = OceanBlue,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
-                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                    ),
-                    maxLines = 3
-                )
+                        // Bottom Actions Row (Contained inside the text input box)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Bottom-Left Corner: '+' Quick Action & Mic Button
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                // '+' Quick Action Button
+                                Box(
+                                    modifier = Modifier
+                                        .size(34.dp)
+                                        .clip(CircleShape)
+                                        .background(CartographyCardElevated)
+                                        .border(1.dp, ContourBorderSubtle, CircleShape)
+                                        .clickable { isQuickActionSheetOpen = true }
+                                        .testTag("open_quick_actions_button"),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Add,
+                                        contentDescription = "Quick Actions",
+                                        tint = NavigationalGold,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                                // Voice STT Mic Button
+                                var isListeningVoice by remember { mutableStateOf(false) }
+                                Box(
+                                    modifier = Modifier
+                                        .size(34.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            if (isListeningVoice) NavigationalGold.copy(alpha = 0.25f)
+                                            else CartographyCardElevated
+                                        )
+                                        .border(
+                                            1.dp,
+                                            if (isListeningVoice) NavigationalGold else ContourBorderSubtle,
+                                            CircleShape
+                                        )
+                                        .clickable {
+                                            isListeningVoice = !isListeningVoice
+                                            if (isListeningVoice) {
+                                                inputText = "Show me the antique parchment map and emergency hospital coordinates"
+                                            }
+                                        }
+                                        .testTag("voice_input_button"),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = if (isListeningVoice) Icons.Default.Mic else Icons.Default.MicOff,
+                                        contentDescription = "Voice Input",
+                                        tint = if (isListeningVoice) NavigationalGold else TextAtlasSecondary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            }
 
-                // Send Button
-                IconButton(
-                    onClick = {
-                        if (inputText.isNotBlank()) {
-                            val msg = inputText
-                            inputText = ""
-                            viewModel.sendChatMessage(msg)
+                            // Bottom-Right Corner: Send Button
+                            val canSend = inputText.isNotBlank() && !isTyping
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        if (canSend) NavigationalGold else CartographyCardElevated
+                                    )
+                                    .border(
+                                        1.dp,
+                                        if (canSend) NavigationalGold else ContourBorderSubtle,
+                                        CircleShape
+                                    )
+                                    .clickable(enabled = canSend) {
+                                        if (inputText.isNotBlank()) {
+                                            val msg = inputText
+                                            inputText = ""
+                                            viewModel.sendChatMessage(msg)
+                                        }
+                                    }
+                                    .testTag("send_message_button"),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.Send,
+                                    contentDescription = "Send Message",
+                                    tint = if (canSend) CartographyDarkBase else TextAtlasSubtle,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
                         }
-                    },
-                    enabled = inputText.isNotBlank() && !isTyping,
-                    modifier = Modifier
-                        .size(42.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (inputText.isNotBlank() && !isTyping) OceanBlue else MaterialTheme.colorScheme.surfaceVariant
-                        )
-                        .testTag("send_message_button")
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Send,
-                        contentDescription = "Send Message",
-                        tint = if (inputText.isNotBlank() && !isTyping) Color.White else MaterialTheme.colorScheme.outline,
-                        modifier = Modifier.size(18.dp)
-                    )
+                    }
                 }
             }
         }
