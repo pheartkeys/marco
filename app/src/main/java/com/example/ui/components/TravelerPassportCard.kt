@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.UserPreferenceEntity
@@ -84,7 +85,13 @@ fun TravelerPassportCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                // weight(fill = false) lets the identity block yield width to the serial chip
+                // instead of squeezing it until the monospace serial wraps onto a second line and
+                // collides with the label beneath it (visible at ~344dp on a folded device).
+                Row(
+                    modifier = Modifier.weight(1f, fill = false),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Box(
                         modifier = Modifier
                             .size(32.dp)
@@ -104,14 +111,20 @@ fun TravelerPassportCard(
                     Column {
                         Text(
                             text = "MARCO EXPEDITIONS",
+                            maxLines = 1,
+                            softWrap = false,
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = ChampagneGold,
                                 letterSpacing = 1.2.sp
                             )
                         )
+                        // "OFFICIAL" earns nothing here and is what pushes this row over budget at
+                        // ~344dp; the empty-state card already reads "TRAVELER PASSPORT".
                         Text(
-                            text = "OFFICIAL TRAVELER PASSPORT",
+                            text = "TRAVELER PASSPORT",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Medium,
                                 color = TextSecondary,
@@ -129,13 +142,15 @@ fun TravelerPassportCard(
                 ) {
                     Text(
                         text = serialNumber,
+                        maxLines = 1,
+                        softWrap = false,
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontFamily = FontFamily.Monospace,
                             fontWeight = FontWeight.Bold,
                             color = TextSecondary,
-                            fontSize = 10.sp
+                            fontSize = 9.sp
                         ),
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
                     )
                 }
             }

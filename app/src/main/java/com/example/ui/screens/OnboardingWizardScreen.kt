@@ -603,16 +603,6 @@ private fun Step1OriginSection(
                 .testTag("onboarding_airport_input")
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Airport Quick Suggestions
-        Text(
-            text = "Major Hubs:",
-            style = MaterialTheme.typography.labelSmall.copy(color = TextMuted, fontWeight = FontWeight.Bold)
-        )
-
-        Spacer(modifier = Modifier.height(6.dp))
-
         val filteredAirports = remember(airportQuery) {
             if (airportQuery.isBlank()) {
                 PreferenceConstants.MAJOR_AIRPORTS.take(8)
@@ -623,6 +613,20 @@ private fun Step1OriginSection(
                             it.name.contains(airportQuery.trim(), ignoreCase = true)
                 }.take(6)
             }
+        }
+
+        // Airport Quick Suggestions — the header only renders when there is a list beneath it.
+        // Once an airport is picked the list filters to empty, and an orphaned "Major Hubs:"
+        // label sitting above a screen of blank space reads as a rendering failure.
+        if (filteredAirports.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = "Major Hubs:",
+                style = MaterialTheme.typography.labelSmall.copy(color = TextMuted, fontWeight = FontWeight.Bold)
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
