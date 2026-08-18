@@ -108,8 +108,8 @@ fun InviteMemberDialog(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Traveler Name", color = TextMuted) },
-                    placeholder = { Text("e.g. Jordan Vance", color = TextMuted) },
+                    label = { Text("First Name", color = TextMuted) },
+                    placeholder = { Text("Given name only", color = TextMuted) },
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = ChampagneGold,

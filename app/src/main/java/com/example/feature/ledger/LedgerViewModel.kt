@@ -30,6 +30,19 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
+ * Explicit state for [LedgerViewModel.derivedBalances]. A ledger currency is a decision the group
+ * makes, not a computation — so there is no "Ready" state with a guessed currency. See
+ * [TripLedgerConfigEntity.confirmedAtTimestamp].
+ */
+sealed interface LedgerBalancesState {
+    /** The group has not confirmed a ledger model/currency yet. The UI should prompt to configure it. */
+    data object NotConfigured : LedgerBalancesState
+
+    /** A confirmed currency exists; [balances] were computed against it. */
+    data class Ready(val balances: List<TravelerBalance>) : LedgerBalancesState
+}
+
+/**
  * Feature ViewModel for Trip Ledger, Pooling, and Settlements.
  * Obtains its repositories cleanly from [MarcoRepositories] without touching [TravelViewModel].
  */
@@ -73,24 +86,40 @@ class LedgerViewModel(application: Application) : AndroidViewModel(application) 
 
     /**
      * Derived per-traveler balances computed on the fly using the active [SettlementEngine].
+     *
+     * [TripLedgerConfigEntity.confirmedAtTimestamp] == 0 means the group has not confirmed a
+     * ledger currency yet — there is no honest currency to compute in, so this surfaces
+     * [LedgerBalancesState.NotConfigured] instead of guessing one. The UI renders that as a
+     * prompt to configure the ledger, not as an empty or zeroed balance sheet.
      */
-    val derivedBalances: StateFlow<List<TravelerBalance>> = combine(
+    val derivedBalances: StateFlow<LedgerBalancesState> = combine(
         ledgerConfig,
         ledgerEntries,
         splitRules,
         contributions,
         travelers
     ) { config, entries, rules, contribs, travs ->
-        val model = config?.let { LedgerModel.fromStringOrNull(it.ledgerModel) } ?: LedgerModel.SPLIT_SETTLE
-        val currency = config?.normalizedCurrency?.ifBlank { "USD" } ?: "USD"
-        val engine = SettlementEngines.forModel(model)
-        val travelerIds = travs.map { it.id }
-        engine.balances(entries, rules, contribs, travelerIds, currency)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+        val currency = config?.normalizedCurrency?.takeIf { it.isNotBlank() }
+        if (config == null || config.confirmedAtTimestamp == 0L || currency == null) {
+            LedgerBalancesState.NotConfigured
+        } else {
+            val model = LedgerModel.fromStringOrNull(config.ledgerModel) ?: LedgerModel.SPLIT_SETTLE
+            val engine = SettlementEngines.forModel(model)
+            val travelerIds = travs.map { it.id }
+            LedgerBalancesState.Ready(engine.balances(entries, rules, contribs, travelerIds, currency))
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), LedgerBalancesState.NotConfigured)
 
-    fun updateLedgerModel(model: LedgerModel, normalizedCurrency: String = "USD") {
+    /**
+     * Confirms the trip's ledger model and currency. This is a human decision — there is no
+     * fallback currency; the caller must supply the one the group actually chose.
+     */
+    fun updateLedgerModel(model: LedgerModel, normalizedCurrency: String) {
         val tripId = _currentTripId.value
         if (tripId == 0L) return
+        require(normalizedCurrency.isNotBlank()) {
+            "The group must choose a currency before confirming a ledger model."
+        }
         viewModelScope.launch(Dispatchers.IO) {
             val existing = ledgerRepository.getLedgerConfig(tripId)
             val updated = existing?.copy(
@@ -112,7 +141,7 @@ class LedgerViewModel(application: Application) : AndroidViewModel(application) 
         nativeUnitLabel: String,
         description: String = "",
         proposedAmount: Double = 0.0,
-        proposedCurrency: String = "USD",
+        proposedCurrency: String = "",
         proposalSource: ContributionProposalSource = ContributionProposalSource.USER_SUPPLIED
     ) {
         val tripId = _currentTripId.value
@@ -128,7 +157,9 @@ class LedgerViewModel(application: Application) : AndroidViewModel(application) 
                 nativeUnitLabel = nativeUnitLabel,
                 offeredAtTimestamp = System.currentTimeMillis()
             )
-            if (proposedAmount > 0.0) {
+            // A proposal without a currency is not a proposal — leave the offer unvalued rather
+            // than guessing one (see ContributionEntity.withProposedValue, which requires it).
+            if (proposedAmount > 0.0 && proposedCurrency.isNotBlank()) {
                 entity = entity.withProposedValue(proposedAmount, proposedCurrency, proposalSource)
             }
             ledgerRepository.upsertContribution(entity)
@@ -169,8 +200,11 @@ class LedgerViewModel(application: Application) : AndroidViewModel(application) 
         if (tripId == 0L) return
         viewModelScope.launch(Dispatchers.IO) {
             val config = ledgerRepository.getLedgerConfig(tripId)
-            val normCurrency = config?.normalizedCurrency ?: "USD"
-            val isDirect = currency.equals(normCurrency, ignoreCase = true)
+            // No configured currency (or the group hasn't confirmed one) means this entry cannot
+            // be normalized yet. Store it as-incurred and leave the normalized columns at their
+            // "not converted" defaults rather than assuming USD.
+            val configuredCurrency = config?.normalizedCurrency?.takeIf { it.isNotBlank() }
+            val isDirect = configuredCurrency != null && currency.equals(configuredCurrency, ignoreCase = true)
 
             val entry = LedgerEntryEntity(
                 tripId = tripId,
@@ -178,7 +212,8 @@ class LedgerViewModel(application: Application) : AndroidViewModel(application) 
                 amountOriginal = amountOriginal,
                 originalCurrency = currency,
                 amountNormalized = if (isDirect) amountOriginal else 0.0,
-                normalizedCurrency = if (isDirect) normCurrency else "",
+                // isDirect is only true when configuredCurrency is non-null (see above).
+                normalizedCurrency = if (isDirect) configuredCurrency!! else "",
                 exchangeRate = if (isDirect) 1.0 else 0.0,
                 category = category,
                 description = description,
@@ -198,8 +233,15 @@ class LedgerViewModel(application: Application) : AndroidViewModel(application) 
         if (tripId == 0L) return
         viewModelScope.launch(Dispatchers.IO) {
             val config = ledgerRepository.getLedgerConfig(tripId)
-            val model = config?.let { LedgerModel.fromStringOrNull(it.ledgerModel) } ?: LedgerModel.SPLIT_SETTLE
-            val currency = config?.normalizedCurrency?.ifBlank { "USD" } ?: "USD"
+            val currency = config?.normalizedCurrency?.takeIf { it.isNotBlank() }
+            if (config == null || config.confirmedAtTimestamp == 0L || currency == null) {
+                // The group hasn't confirmed a ledger model/currency yet — there is nothing
+                // honest to settle in, so clear any stale proposed transfers instead of
+                // computing one in an assumed currency.
+                ledgerRepository.replaceProposedSettlements(tripId, emptyList())
+                return@launch
+            }
+            val model = LedgerModel.fromStringOrNull(config.ledgerModel) ?: LedgerModel.SPLIT_SETTLE
             val engine = SettlementEngines.forModel(model)
 
             val entries = ledgerRepository.getLedgerEntries(tripId)

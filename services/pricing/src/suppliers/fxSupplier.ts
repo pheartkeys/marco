@@ -1,43 +1,52 @@
 import { PriceQuote, QuoteConfidence, QuoteRequest, QuoteResult } from '../types';
 
-// Curated reference rates with timestamp
-const BASE_FX_RATES_TO_USD: Record<string, number> = {
-  USD: 1.0,
-  EUR: 1.08,
-  GBP: 1.28,
-  JPY: 0.0067,
-  CAD: 0.74,
-  CHF: 1.13,
-  AUD: 0.65,
-  SGD: 0.75
-};
+/**
+ * FX supplier — a real live call to a currency-conversion API (exchangerate-api.com's v6 pair
+ * endpoint), never a hardcoded rate table. If FX_API_KEY is unset, or the live call fails or
+ * returns something unusable, this reports UNAVAILABLE with a reason. It never falls back to a
+ * synthesized rate: a stale or guessed exchange rate is worse than an honest gap, because a
+ * silently wrong rate corrupts every downstream conversion that trusts it.
+ */
+const EXCHANGERATE_API_BASE = 'https://v6.exchangerate-api.com/v6';
 
 export async function fetchFxQuote(request: QuoteRequest): Promise<QuoteResult> {
-  const targetCurrency = (request.preferredCurrency || request.locality || 'USD').toUpperCase();
-  const baseCurrency = (request.tier || 'USD').toUpperCase();
+  const targetCurrency = (request.preferredCurrency || request.locality || '').toUpperCase();
+  const baseCurrency = (request.tier || '').toUpperCase();
 
-  const baseToUsd = BASE_FX_RATES_TO_USD[baseCurrency];
-  const targetToUsd = BASE_FX_RATES_TO_USD[targetCurrency];
-
-  if (!baseToUsd || !targetToUsd) {
+  if (!targetCurrency || !baseCurrency) {
     return {
       status: 'UNAVAILABLE',
-      reason: `Currency pair ${baseCurrency}/${targetCurrency} is not supported.`
+      reason: 'FX quote requires both a base currency (tier) and a target currency (preferredCurrency).'
     };
   }
 
-  // 1 unit of baseCurrency in targetCurrency
-  const rate = baseToUsd / targetToUsd;
+  const apiKey = process.env.FX_API_KEY;
+  if (!apiKey) {
+    return { status: 'UNAVAILABLE', reason: 'FX supplier is not configured (FX_API_KEY missing).' };
+  }
 
-  return {
-    status: 'AVAILABLE',
-    quote: {
-      amount: Math.round(rate * 10000) / 10000,
+  try {
+    const response = await fetch(`${EXCHANGERATE_API_BASE}/${apiKey}/pair/${baseCurrency}/${targetCurrency}`);
+    if (!response.ok) {
+      return { status: 'UNAVAILABLE', reason: `FX supplier returned HTTP ${response.status}.` };
+    }
+
+    const data: any = await response.json();
+    if (data.result !== 'success' || typeof data.conversion_rate !== 'number') {
+      const errorType = typeof data['error-type'] === 'string' ? data['error-type'] : 'no usable rate';
+      return { status: 'UNAVAILABLE', reason: `FX supplier error: ${errorType}.` };
+    }
+
+    const quote: PriceQuote = {
+      amount: data.conversion_rate,
       currency: targetCurrency,
-      source: 'PRICING_SERVICE_FX',
+      source: 'EXCHANGERATE_API',
       fetchedAtTimestamp: Date.now(),
       confidence: QuoteConfidence.ESTIMATED,
-      asOfLabel: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
-    }
-  };
+      asOfLabel: typeof data.time_last_update_utc === 'string' ? data.time_last_update_utc : ''
+    };
+    return { status: 'AVAILABLE', quote };
+  } catch (err: any) {
+    return { status: 'UNAVAILABLE', reason: `FX supplier request failed: ${err?.message || 'network error'}` };
+  }
 }

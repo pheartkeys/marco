@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -290,9 +291,16 @@ fun MemberChipsGrid(
     ) {
         memberships.forEach { membership ->
             val traveler = travelersById[membership.travelerId]
-            val name = traveler?.displayName?.ifBlank { "Member #${membership.travelerId}" } ?: "Traveler"
+            if (traveler == null) {
+                // The membership row references a traveler id with no matching TravelerEntity.
+                // That is a data-integrity gap, not a person with no name yet — render it as an
+                // unresolved reference so the bug is visible, never as a normal-looking member.
+                UnresolvedMemberChip(travelerId = membership.travelerId)
+                return@forEach
+            }
+            val name = traveler.displayName.ifBlank { "Member #${membership.travelerId}" }
             val role = TripRole.fromStringOrNull(membership.role) ?: TripRole.TRAVELER
-            val ageBand = TravelerAgeBand.fromStringOrNull(traveler?.ageBand ?: "")
+            val ageBand = TravelerAgeBand.fromStringOrNull(traveler.ageBand)
 
             Surface(
                 color = LuxuryCardElevated,
@@ -354,6 +362,40 @@ fun MemberChipsGrid(
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Renders a membership row whose [TravelerEntity] is missing entirely — a data-integrity gap,
+ * not an unnamed traveler. Deliberately styled unlike a normal member chip (muted, warning icon,
+ * explicit "unresolved" text) so it never reads as a real, if nameless, member.
+ */
+@Composable
+private fun UnresolvedMemberChip(travelerId: Long) {
+    Surface(
+        color = LuxuryCardElevated,
+        shape = RoundedCornerShape(20.dp),
+        border = BorderStroke(1.dp, TextMuted)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Warning,
+                contentDescription = "Unresolved traveler reference",
+                tint = TextMuted,
+                modifier = Modifier.size(14.dp)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = "Unresolved traveler (id $travelerId)",
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color = TextMuted,
+                    fontWeight = FontWeight.Medium
+                )
+            )
         }
     }
 }

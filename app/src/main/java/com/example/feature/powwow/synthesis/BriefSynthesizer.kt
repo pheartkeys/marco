@@ -1,10 +1,7 @@
 package com.example.feature.powwow.synthesis
 
-import com.example.data.model.BriefAgreement
-import com.example.data.model.BriefPosition
 import com.example.data.model.BriefReadinessItem
-import com.example.data.model.BriefResolution
-import com.example.data.model.BriefTension
+import com.example.data.model.PowWowSessionEntity
 import com.example.data.model.PowWowTranscriptEntity
 import com.example.data.model.TravelerEntity
 import com.example.data.model.TripBriefEntity
@@ -15,84 +12,55 @@ import com.example.data.model.TripBriefPayloads
  * unvarnished [TripBriefEntity].
  *
  * Core rule: Conflicts and differences are never averaged away into bland compromises; they are
- * stated cleanly as named [BriefTension] items with attributed member stances and DNA evidence.
+ * stated cleanly as named [com.example.data.model.BriefTension] items with attributed member stances and DNA evidence.
+ * If the transcripts contain no agreements or tensions, an honest empty brief is produced — never
+ * fabricated filler.
  */
 object BriefSynthesizer {
 
-    fun synthesizeBrief(
+    suspend fun synthesizeBrief(
         tripId: Long,
         ideaId: Long = 0L,
         version: Int = 1,
         transcripts: List<PowWowTranscriptEntity>,
-        travelers: List<TravelerEntity>
+        travelers: List<TravelerEntity>,
+        sessions: List<PowWowSessionEntity> = emptyList(),
+        dnaClauses: Map<Long, String> = emptyMap(),
+        engine: BriefSynthesisEngine = FirebaseGeminiBriefSynthesisEngine()
     ): TripBriefEntity {
         val sessionIdsCsv = transcripts.map { it.sessionId }.joinToString(",")
+        val sessionToTraveler = sessions.associate { it.id to it.travelerId }
 
-        // 1. Synthesize Agreements
-        val agreements = mutableListOf<BriefAgreement>()
-        if (transcripts.isNotEmpty()) {
-            agreements.add(
-                BriefAgreement(
-                    statement = "Group desires dedicated morning exploration blocks combined with unhurried cultural dinners.",
-                    supportingTravelerIds = travelers.map { it.id },
-                    evidenceSource = "BOTH"
-                )
-            )
-            agreements.add(
-                BriefAgreement(
-                    statement = "Agreement on maintaining a shared digital expense pool with transparent individual logging.",
-                    supportingTravelerIds = travelers.map { it.id },
-                    evidenceSource = "TRANSCRIPT"
-                )
+        val contributions = transcripts.mapNotNull { t ->
+            if (t.transcriptText.isBlank()) return@mapNotNull null
+            val travelerId = sessionToTraveler[t.sessionId]
+                ?: travelers.firstOrNull()?.id
+                ?: return@mapNotNull null
+            val displayName = travelers.find { it.id == travelerId }?.displayName
+                ?.ifBlank { "Traveler $travelerId" } ?: "Traveler $travelerId"
+            TranscriptContribution(
+                travelerId = travelerId,
+                displayName = displayName,
+                transcriptText = t.transcriptText
             )
         }
 
-        // 2. Synthesize Named Tensions & Positions with DNA Evidence
-        val tensions = mutableListOf<BriefTension>()
-        val resolutions = mutableListOf<BriefResolution>()
-
-        if (travelers.size >= 2) {
-            val t1 = travelers[0]
-            val t2 = travelers[1]
-
-            tensions.add(
-                BriefTension(
-                    tensionId = "tension_pacing_1",
-                    topic = "Daily Pace: High-Intensity Sightseeing vs. Leisurely Spa Recovery",
-                    positions = listOf(
-                        BriefPosition(
-                            travelerId = t1.id,
-                            stance = "Wants multi-site historical trails starting at sunrise.",
-                            dnaEvidence = "Travel Style: High-Intensity Cultural Trail"
-                        ),
-                        BriefPosition(
-                            travelerId = t2.id,
-                            stance = "Prefers late mornings, 1-2 curated activities max per day.",
-                            dnaEvidence = "Travel Style: Slow-Paced Relaxation"
-                        )
-                    ),
-                    stakes = "Risk of exhaustion or frustration if pacing is forced into a single rigid schedule."
-                )
-            )
-
-            resolutions.add(
-                BriefResolution(
-                    tensionId = "tension_pacing_1",
-                    proposal = "Split mornings: early excursion group departs at 08:00; leisure group rejoins for lunch at 13:00.",
-                    state = "PROPOSED"
-                )
-            )
+        val synthesisResult = if (contributions.isNotEmpty()) {
+            engine.synthesize(contributions, dnaClauses)
+        } else {
+            BriefSynthesisResult.EMPTY
         }
 
-        // 3. Readiness Checklist
+        // Readiness Checklist - accurately derived from actual state
         val readiness = mutableListOf<BriefReadinessItem>()
+        val nonBlankTranscripts = transcripts.count { it.transcriptText.isNotBlank() }
         readiness.add(
             BriefReadinessItem(
                 key = "READINESS_POW_WOW",
                 label = "Pow Wow Brain Dumps",
-                isSatisfied = transcripts.isNotEmpty(),
+                isSatisfied = nonBlankTranscripts > 0,
                 isCritical = true,
-                detail = if (transcripts.isNotEmpty()) "${transcripts.size} sessions transcribed" else "Pending member capture"
+                detail = if (nonBlankTranscripts > 0) "$nonBlankTranscripts member sessions transcribed" else "Pending member capture"
             )
         )
         readiness.add(
@@ -114,10 +82,14 @@ object BriefSynthesizer {
             )
         )
 
-        val summary = if (transcripts.isNotEmpty()) {
-            "Synthesized from ${transcripts.size} member Pow Wow sessions. Found ${agreements.size} shared alignments and ${tensions.size} key planning tension."
+        val summary = if (synthesisResult.summary.isNotBlank()) {
+            synthesisResult.summary
+        } else if (synthesisResult.agreements.isNotEmpty() || synthesisResult.tensions.isNotEmpty()) {
+            "Synthesized ${synthesisResult.agreements.size} shared alignments and ${synthesisResult.tensions.size} key planning tensions from ${contributions.size} member transcripts."
+        } else if (transcripts.isNotEmpty()) {
+            "Transcripts analyzed; no consensus alignments or explicit tensions were derived from the current recordings."
         } else {
-            "Preliminary brief initialized from crew profiles. Conduct Pow Wow sessions to elicit deeper alignments."
+            "Preliminary brief initialized. Conduct Pow Wow sessions to elicit deeper alignments."
         }
 
         return TripBriefEntity(
@@ -126,9 +98,9 @@ object BriefSynthesizer {
             version = version,
             generatedAtTimestamp = System.currentTimeMillis(),
             sourceSessionIdsCsv = sessionIdsCsv,
-            agreementsJson = TripBriefPayloads.encodeAgreements(agreements),
-            tensionsJson = TripBriefPayloads.encodeTensions(tensions),
-            resolutionsJson = TripBriefPayloads.encodeResolutions(resolutions),
+            agreementsJson = TripBriefPayloads.encodeAgreements(synthesisResult.agreements),
+            tensionsJson = TripBriefPayloads.encodeTensions(synthesisResult.tensions),
+            resolutionsJson = TripBriefPayloads.encodeResolutions(synthesisResult.resolutions),
             readinessJson = TripBriefPayloads.encodeReadiness(readiness),
             summaryText = summary
         )

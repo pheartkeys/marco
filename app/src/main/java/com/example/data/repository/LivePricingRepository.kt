@@ -1,5 +1,6 @@
 package com.example.data.repository
 
+import com.example.BuildConfig
 import com.example.data.local.PricingDao
 import com.example.data.model.PriceQuote
 import com.example.data.model.PriceQuoteCacheEntity
@@ -19,19 +20,33 @@ import java.net.URL
  *
  * Honors the load-bearing rule: every quote carries its [QuoteConfidence] tier and timestamp.
  * If a quote cannot be obtained, it returns [QuoteResult.Unavailable] — never a fabricated figure.
+ *
+ * [serviceBaseUrl] is configuration, not a fabricated default: it comes from `BuildConfig`, which
+ * the Secrets Gradle Plugin populates from `.env` (falling back to `.env.example`'s
+ * `PRICING_SERVICE_BASE_URL`, empty by default). There is deliberately no hardcoded emulator or
+ * production address here — an unset URL means quotes are unavailable rather than silently
+ * pointed at an address that cannot possibly be reached from a physical device or production.
+ * Prefer an `https://` target for anything other than a developer's own local/emulator override.
  */
 class LivePricingRepository(
     private val pricingDao: PricingDao,
-    private val serviceBaseUrl: String = "http://10.0.2.2:8085" // Default Android emulator host loopback
+    private val serviceBaseUrl: String? = BuildConfig.PRICING_SERVICE_BASE_URL.ifBlank { null }
 ) : PricingRepository {
 
     override suspend fun quote(request: QuoteRequest): QuoteResult = withContext(Dispatchers.IO) {
         // 1. Check local cache first
         val cached = cachedQuote(request)
 
-        // 2. Attempt remote live quote
+        // 2. No pricing service configured — never fabricate a target or an amount.
+        val baseUrl = serviceBaseUrl
+        if (baseUrl.isNullOrBlank()) {
+            return@withContext cached?.let { QuoteResult.Available(it) }
+                ?: QuoteResult.Unavailable("No pricing service is configured.")
+        }
+
+        // 3. Attempt remote live quote
         try {
-            val url = URL("$serviceBaseUrl/quote")
+            val url = URL("$baseUrl/quote")
             val connection = (url.openConnection() as HttpURLConnection).apply {
                 requestMethod = "POST"
                 connectTimeout = 3000
@@ -60,22 +75,15 @@ class LivePricingRepository(
                 val status = json.optString("status", "UNAVAILABLE")
 
                 if (status == "AVAILABLE" && json.has("quote")) {
-                    val qJson = json.getJSONObject("quote")
-                    val confidenceStr = qJson.optString("confidence", "ESTIMATED")
-                    val confidence = QuoteConfidence.fromStringOrNull(confidenceStr) ?: QuoteConfidence.ESTIMATED
-
-                    val liveQuote = PriceQuote(
-                        amount = qJson.optDouble("amount", 0.0),
-                        currency = qJson.optString("currency", request.preferredCurrency.ifBlank { "USD" }),
-                        source = qJson.optString("source", "PRICING_SERVICE"),
-                        fetchedAtTimestamp = qJson.optLong("fetchedAtTimestamp", System.currentTimeMillis()),
-                        confidence = confidence,
-                        asOfLabel = qJson.optString("asOfLabel", "")
-                    )
-
-                    // Cache live quote
-                    cacheQuote(request, liveQuote)
-                    return@withContext QuoteResult.Available(liveQuote)
+                    val liveQuote = parseTrustworthyQuote(json.getJSONObject("quote"))
+                    if (liveQuote != null) {
+                        cacheQuote(request, liveQuote)
+                        return@withContext QuoteResult.Available(liveQuote)
+                    }
+                    // The service said AVAILABLE but the payload is missing mandatory provenance
+                    // (confidence/currency/amount/fetch time) — falling back rather than inventing it.
+                    return@withContext cached?.let { QuoteResult.Available(it) }
+                        ?: QuoteResult.Unavailable("Pricing service returned an incomplete quote.")
                 } else {
                     val reason = json.optString("reason", "Live quote unavailable for this request")
                     if (cached != null) {
@@ -114,6 +122,48 @@ class LivePricingRepository(
                 fetchedAtTimestamp = quote.fetchedAtTimestamp,
                 asOfLabel = quote.asOfLabel
             )
+        )
+    }
+
+    /**
+     * Parses a `quote` object from the pricing service into a [PriceQuote], treating every
+     * provenance field as mandatory rather than papering over a gap with a plausible default:
+     *
+     * - an absent or unrecognized `confidence` resolves to [QuoteConfidence.UNKNOWN], which
+     *   [QuoteConfidence.hasFigure] rejects — an unlabelled figure is not a figure;
+     * - an absent or blank `currency` makes the quote unusable, never assumed to be USD;
+     * - a missing `amount` is not the same as a `0.0` quote, so it is rejected rather than
+     *   rendered as free;
+     * - a missing `fetchedAtTimestamp` is not "now" — [PriceQuote.fetchedAtTimestamp] is the
+     *   mandatory context that lets a surface show a quote's age, so a service that omits it
+     *   gets no timestamp invented on its behalf.
+     *
+     * Returns null when the payload cannot support an honestly-labelled quote; the caller falls
+     * back to the cache (still labelled with its own true age) or [QuoteResult.Unavailable].
+     */
+    private fun parseTrustworthyQuote(qJson: JSONObject): PriceQuote? {
+        val confidence = QuoteConfidence.fromStringOrNull(qJson.optString("confidence", ""))
+            ?: QuoteConfidence.UNKNOWN
+        if (!confidence.hasFigure) return null
+
+        val currency = qJson.optString("currency", "")
+        if (currency.isBlank()) return null
+
+        if (!qJson.has("amount")) return null
+        val amount = qJson.optDouble("amount", Double.NaN)
+        if (amount.isNaN()) return null
+
+        if (!qJson.has("fetchedAtTimestamp")) return null
+        val fetchedAtTimestamp = qJson.optLong("fetchedAtTimestamp", 0L)
+        if (fetchedAtTimestamp <= 0L) return null
+
+        return PriceQuote(
+            amount = amount,
+            currency = currency,
+            source = qJson.optString("source", "PRICING_SERVICE"),
+            fetchedAtTimestamp = fetchedAtTimestamp,
+            confidence = confidence,
+            asOfLabel = qJson.optString("asOfLabel", "")
         )
     }
 }

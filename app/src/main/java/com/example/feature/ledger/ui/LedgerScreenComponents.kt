@@ -185,12 +185,17 @@ fun ContributionCard(
 
 /**
  * Agreement recording modal with signatories multi-select and numeric keypad.
+ *
+ * [ledgerCurrency] is the trip's confirmed ledger currency (empty when the group hasn't confirmed
+ * one yet). An agreement can only be recorded in that currency — there is no assumed fallback, so
+ * recording is disabled until it is set.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RecordAgreementDialog(
     contribution: ContributionEntity,
     travelers: List<TravelerEntity>,
+    ledgerCurrency: String,
     onDismiss: () -> Unit,
     onConfirmAgreement: (amount: Double, currency: String, agreedByTravelerIds: List<Long>) -> Unit
 ) {
@@ -226,9 +231,14 @@ fun RecordAgreementDialog(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Displayed amount
+                // Displayed amount — never assumes a currency; if the group hasn't confirmed one
+                // yet, say so instead of labelling the figure USD.
                 Text(
-                    text = if (amountText.isNotBlank()) "$$amountText USD" else "$0.00 USD",
+                    text = if (ledgerCurrency.isBlank()) {
+                        "Ledger currency not set"
+                    } else {
+                        "${amountText.ifBlank { "0.00" }} $ledgerCurrency"
+                    },
                     style = MaterialTheme.typography.headlineMedium.copy(
                         color = ChampagneGold,
                         fontWeight = FontWeight.Bold,
@@ -308,8 +318,8 @@ fun RecordAgreementDialog(
                     Button(
                         onClick = {
                             val amount = amountText.toDoubleOrNull() ?: 0.0
-                            if (amount > 0.0 && selectedSignatories.isNotEmpty()) {
-                                onConfirmAgreement(amount, "USD", selectedSignatories.toList())
+                            if (amount > 0.0 && selectedSignatories.isNotEmpty() && ledgerCurrency.isNotBlank()) {
+                                onConfirmAgreement(amount, ledgerCurrency, selectedSignatories.toList())
                                 onDismiss()
                             }
                         },
@@ -317,7 +327,9 @@ fun RecordAgreementDialog(
                             containerColor = ChampagneGold,
                             contentColor = LuxuryDarkBase
                         ),
-                        enabled = (amountText.toDoubleOrNull() ?: 0.0) > 0.0 && selectedSignatories.isNotEmpty()
+                        enabled = (amountText.toDoubleOrNull() ?: 0.0) > 0.0 &&
+                            selectedSignatories.isNotEmpty() &&
+                            ledgerCurrency.isNotBlank()
                     ) {
                         Text("Sign & Record", fontWeight = FontWeight.Bold)
                     }
@@ -360,7 +372,12 @@ fun SettlementSummaryCard(
             // Per-person balance breakdown
             balances.forEach { b ->
                 val traveler = travelersById[b.travelerId]
-                val name = traveler?.displayName ?: "Traveler #${b.travelerId}"
+                // A blank name on a real traveler row is "unnamed yet" — id-based label is fine.
+                // A traveler id with no row at all is a data-integrity gap and must not be
+                // rendered as though it were a normal member.
+                val isUnresolved = traveler == null
+                val name = traveler?.displayName?.ifBlank { "Member #${b.travelerId}" }
+                    ?: "Unresolved traveler (id ${b.travelerId})"
                 val isCreditor = b.net > 0.01
                 val isDebtor = b.net < -0.01
 
@@ -372,13 +389,24 @@ fun SettlementSummaryCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text(
-                            text = name,
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                color = TextPrimary,
-                                fontWeight = FontWeight.Medium
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (isUnresolved) {
+                                Icon(
+                                    imageVector = Icons.Default.Warning,
+                                    contentDescription = "Unresolved traveler reference",
+                                    tint = TextMuted,
+                                    modifier = Modifier.size(12.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                            }
+                            Text(
+                                text = name,
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    color = if (isUnresolved) TextMuted else TextPrimary,
+                                    fontWeight = FontWeight.Medium
+                                )
                             )
-                        )
+                        }
                         if (b.pointsContributedQuantity > 0.0) {
                             Text(
                                 text = "${String.format(Locale.US, "%.0f", b.pointsContributedQuantity)} pts contributed",
@@ -429,8 +457,6 @@ fun SettlementSummaryCard(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 settlements.forEach { s ->
-                    val fromName = travelersById[s.fromTravelerId]?.displayName ?: "Member #${s.fromTravelerId}"
-                    val toName = travelersById[s.toTravelerId]?.displayName ?: "Member #${s.toTravelerId}"
                     val isPaid = s.state.equals(SettlementState.PAID.value, ignoreCase = true)
 
                     Surface(
@@ -449,12 +475,9 @@ fun SettlementSummaryCard(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = fromName,
-                                    style = MaterialTheme.typography.bodySmall.copy(
-                                        color = TextPrimary,
-                                        fontWeight = FontWeight.Medium
-                                    )
+                                TravelerNameLabel(
+                                    traveler = travelersById[s.fromTravelerId],
+                                    travelerId = s.fromTravelerId
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Icon(
@@ -464,12 +487,9 @@ fun SettlementSummaryCard(
                                     modifier = Modifier.size(12.dp)
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text(
-                                    text = toName,
-                                    style = MaterialTheme.typography.bodySmall.copy(
-                                        color = TextPrimary,
-                                        fontWeight = FontWeight.Medium
-                                    )
+                                TravelerNameLabel(
+                                    traveler = travelersById[s.toTravelerId],
+                                    travelerId = s.toTravelerId
                                 )
                             }
 
@@ -513,5 +533,38 @@ fun SettlementSummaryCard(
                 }
             }
         }
+    }
+}
+
+/**
+ * Renders a traveler's name inline. A real traveler with a blank name is genuinely unnamed yet
+ * and gets an id-based label ("Member #12"). A traveler id with no matching row at all is a
+ * data-integrity gap, not an unnamed person, so it renders as an explicit unresolved reference
+ * rather than a plausible-looking name.
+ */
+@Composable
+private fun TravelerNameLabel(traveler: TravelerEntity?, travelerId: Long) {
+    if (traveler == null) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Default.Warning,
+                contentDescription = "Unresolved traveler reference",
+                tint = TextMuted,
+                modifier = Modifier.size(12.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = "Unresolved (id $travelerId)",
+                style = MaterialTheme.typography.bodySmall.copy(color = TextMuted)
+            )
+        }
+    } else {
+        Text(
+            text = traveler.displayName.ifBlank { "Member #$travelerId" },
+            style = MaterialTheme.typography.bodySmall.copy(
+                color = TextPrimary,
+                fontWeight = FontWeight.Medium
+            )
+        )
     }
 }

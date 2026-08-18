@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.data.di.MarcoRepositories
 import com.example.data.model.PowWowSessionEntity
 import com.example.data.model.PowWowSessionState
+import com.example.data.model.PreferenceWeights
 import com.example.data.model.TravelerAgeBand
 import com.example.data.model.TripBriefEntity
 import com.example.data.repository.ConsentStatus
@@ -33,6 +34,7 @@ class PowWowViewModel(application: Application) : AndroidViewModel(application) 
 
     private val powWowRepository = MarcoRepositories.powWow(application)
     private val partyRepository = MarcoRepositories.party(application)
+    private val travelRepository = MarcoRepositories.travel(application)
 
     private val captureManager = AudioCaptureManager(application)
     private val transcriber = PowWowTranscriber(powWowRepository)
@@ -123,7 +125,7 @@ class PowWowViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun stopAndTranscribe(sessionId: Long, promptNotes: String = "") {
+    fun stopAndTranscribe(sessionId: Long) {
         val file = captureManager.stopRecording() ?: activeRecordingFile
         if (file == null || !file.exists()) {
             viewModelScope.launch(Dispatchers.IO) {
@@ -135,7 +137,7 @@ class PowWowViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch(Dispatchers.IO) {
             val durationSec = recordingDuration.value / 10
             powWowRepository.markRecordingComplete(sessionId, durationSec)
-            transcriber.transcribeAndPurgeAudio(sessionId, file, promptNotes)
+            transcriber.transcribeAndPurgeAudio(sessionId, file)
             activeRecordingFile = null
         }
     }
@@ -166,12 +168,35 @@ class PowWowViewModel(application: Application) : AndroidViewModel(application) 
                 emptyList()
             }
 
+            val userPref = travelRepository.getUserPreferencesSync()
+            val dnaClauses = mutableMapOf<Long, String>()
+            if (userPref != null && userPref.ownerTravelerId != 0L) {
+                val motivationClause = PreferenceWeights.formatWeightsClause(
+                    "Motivation",
+                    PreferenceWeights.decodeWeights(userPref.motivationWeightsJson)
+                )
+                val styleClause = PreferenceWeights.formatWeightsClause(
+                    "Travel Style",
+                    PreferenceWeights.decodeWeights(userPref.travelStyleWeightsJson)
+                )
+                val pacingClause = PreferenceWeights.formatWeightsClause(
+                    "Pacing",
+                    PreferenceWeights.decodeWeights(userPref.pacingWeightsJson)
+                )
+                val clauses = listOfNotNull(motivationClause, styleClause, pacingClause).joinToString("; ")
+                if (clauses.isNotBlank()) {
+                    dnaClauses[userPref.ownerTravelerId] = clauses
+                }
+            }
+
             val brief = BriefSynthesizer.synthesizeBrief(
                 tripId = tripId,
                 ideaId = ideaId,
                 version = (latestBrief.value?.version ?: 0) + 1,
                 transcripts = transcripts,
-                travelers = travelers
+                travelers = travelers,
+                sessions = sessionsList,
+                dnaClauses = dnaClauses
             )
 
             powWowRepository.insertBrief(brief)
