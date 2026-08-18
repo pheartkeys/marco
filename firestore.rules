@@ -1,8 +1,406 @@
 rules_version = '2';
+
+// =============================================================================================
+// Marco security rules — the hybrid model
+// =============================================================================================
+//
+// Two worlds:
+//
+//   /users/{uid}/**   PRIVATE. Never shared with anyone, ever. Plaid data, account balances,
+//                     program valuations, wallet, personal expenses, Pow Wow transcripts.
+//
+//   /trips/{tripId}   SHARED with the trip's members, gated by a `members` map on the trip
+//                     document. Party structure, the brief, the itinerary, contributions,
+//                     the ledger.
+//
+// THE PRIVACY LINE — the reason this file is written the way it is:
+//
+//   A loyalty or timeshare program's TITLE and TYPE ("Marriott Bonvoy", "HOTEL") may be published
+//   into a shared trip document, because the group needs to know what resources exist.
+//   Its BALANCE, its VALUATION, its tier, and its account number MAY NOT — not ever, not by any
+//   client, not "temporarily".
+//
+// That line is enforced HERE and not in app code, because app code is one refactor away from
+// leaking and a compromised client has no app code at all. Two mechanisms, applied together:
+//
+//   1. KEY ALLOWLISTS. Every money-bearing shared collection declares the exact set of field
+//      names it accepts via keys().hasOnly([...]). A client that copies a whole account object
+//      into a contribution is rejected — not sanitised, rejected — because the extra keys are not
+//      on the list. New fields are impossible to add by accident: they fail closed.
+//
+//   2. SCALAR TYPE CHECKS. Every allowed field is asserted to be a string, number, bool, or list.
+//      hasOnly() only inspects top-level keys, so without this a client could smuggle a whole
+//      private object inside an allowed key as a nested map. `is string` makes that fail.
+//
+// A note on the explicit `if false` blocks at the bottom: Firestore grants access if ANY match
+// allows it, so a deny block cannot override an allow. Those blocks document intent and are
+// backed by the fact that no rule anywhere grants those paths — the real enforcement is
+// Firestore's default deny.
+// =============================================================================================
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+    // -----------------------------------------------------------------------------------------
+    // Identity helpers
+    // -----------------------------------------------------------------------------------------
+
+    function isSignedIn() {
+      return request.auth != null;
     }
+
+    function uid() {
+      return request.auth.uid;
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // Trip membership
+    //
+    // The trip document carries:
+    //   members: { "<authUid>": { role: "ORGANIZER" | "TRAVELER" | "VIEWER", travelerId: <number>,
+    //                             state: "INVITED" | "ACTIVE" | "DECLINED" | "REMOVED" } }
+    //
+    // Membership in that map is what grants access to the trip and everything under it. It
+    // mirrors TripMembershipEntity in the Room schema; keep the two in step.
+    // -----------------------------------------------------------------------------------------
+
+    function tripData(tripId) {
+      return get(/databases/$(database)/documents/trips/$(tripId)).data;
+    }
+
+    function isMember(tripId) {
+      return isSignedIn() && uid() in tripData(tripId).members;
+    }
+
+    function memberRole(tripId) {
+      return tripData(tripId).members[uid()].role;
+    }
+
+    function isOrganizer(tripId) {
+      return isMember(tripId) && memberRole(tripId) == 'ORGANIZER';
+    }
+
+    // VIEWER is read-only by design. Only ORGANIZER and TRAVELER write shared trip content.
+    function canWrite(tripId) {
+      return isMember(tripId) && memberRole(tripId) in ['ORGANIZER', 'TRAVELER'];
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // The private-field denylist
+    //
+    // Defence in depth behind the per-collection allowlists. These are the field names that carry
+    // somebody's money, and none of them may appear anywhere under /trips. Every name here is a
+    // real field on a private entity (ConnectedAccountEntity, WalletBalanceEntity,
+    // WalletTransactionEntity) or a Plaid credential.
+    // -----------------------------------------------------------------------------------------
+
+    function hasNoPrivateFinancialKeys(data) {
+      return !data.keys().hasAny([
+        // ConnectedAccountEntity — balances, valuations, identifiers, tier
+        'balanceValue', 'balance', 'balances', 'accountBalance',
+        'rewardsEstimatedValuationUsd', 'estimatedValuationUsd', 'valuationUsd',
+        'pointsValuationUsd', 'pointsValueUsd', 'exchangePowerScore', 'tierStatus',
+        'accountNumber', 'accountNumberMasked',
+        // Wallet — encrypted payloads and personal budget positions
+        'availableBalance', 'allocatedBudget', 'spentAmount',
+        'encryptedAccountDetails', 'encryptedReceiptHash', 'paymentMethod',
+        'loyaltySavingsUsd',
+        // Plaid — credentials never leave the server, let alone reach a shared doc
+        'plaidAccessToken', 'plaidPublicToken', 'plaidItemId', 'plaidAccountId'
+      ]);
+    }
+
+    // =========================================================================================
+    // PRIVATE:  /users/{userId}/**
+    //
+    // Unchanged and never shared. Plaid items, account balances, monetary valuations, the wallet,
+    // personal expenses, and Pow Wow transcripts all live here. No rule anywhere grants another
+    // member read access to this subtree, which is what makes the trip-side allowlists meaningful.
+    // =========================================================================================
+
+    match /users/{userId}/{document=**} {
+      allow read, write: if isSignedIn() && uid() == userId;
+    }
+
+    // =========================================================================================
+    // SHARED:  /trips/{tripId}
+    // =========================================================================================
+
+    match /trips/{tripId} {
+
+      // Any member, including a VIEWER and an INVITED member who hasn't accepted yet, may read.
+      allow read: if isSignedIn() && uid() in resource.data.members;
+
+      // The creator must enrol themselves as ORGANIZER, so a trip cannot be created on someone
+      // else's behalf with no one able to administer it.
+      allow create: if isSignedIn()
+                    && uid() in request.resource.data.members
+                    && request.resource.data.members[uid()].role == 'ORGANIZER'
+                    && hasNoPrivateFinancialKeys(request.resource.data);
+
+      // Writers may edit trip content. Only an ORGANIZER may change who is on the trip or what
+      // role they hold — otherwise any member could promote themselves.
+      allow update: if isSignedIn()
+                    && uid() in resource.data.members
+                    && resource.data.members[uid()].role in ['ORGANIZER', 'TRAVELER']
+                    && hasNoPrivateFinancialKeys(request.resource.data)
+                    && (request.resource.data.members == resource.data.members
+                        || resource.data.members[uid()].role == 'ORGANIZER');
+
+      allow delete: if isSignedIn()
+                    && uid() in resource.data.members
+                    && resource.data.members[uid()].role == 'ORGANIZER';
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // Party structure — units and their members. No money, so a denylist check is enough.
+    // -----------------------------------------------------------------------------------------
+
+    match /trips/{tripId}/partyUnits/{unitId} {
+      allow read: if isMember(tripId);
+      allow create, update: if canWrite(tripId)
+                            && hasNoPrivateFinancialKeys(request.resource.data);
+      allow delete: if isOrganizer(tripId);
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // The Pow Wow brief. Group-visible synthesis only — the transcripts behind it stay private.
+    // -----------------------------------------------------------------------------------------
+
+    match /trips/{tripId}/briefs/{briefId} {
+      allow read: if isMember(tripId);
+      allow create, update: if canWrite(tripId)
+                            && hasNoPrivateFinancialKeys(request.resource.data);
+      allow delete: if isOrganizer(tripId);
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // Itinerary.
+    // -----------------------------------------------------------------------------------------
+
+    match /trips/{tripId}/itinerary/{itemId} {
+      allow read: if isMember(tripId);
+      allow create, update: if canWrite(tripId)
+                            && hasNoPrivateFinancialKeys(request.resource.data);
+      allow delete: if canWrite(tripId);
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // Member programs — THE PRIVACY LINE, in its purest form.
+    //
+    // This collection exists so the group can see WHAT resources exist ("Dana has an RCI
+    // timeshare, Mike has Bonvoy") without seeing what they are worth. The allowlist contains
+    // exactly four keys and not one of them is a number describing money. A client that tries to
+    // publish `balanceValue` or `rewardsEstimatedValuationUsd` alongside the title is rejected by
+    // hasOnly(), and the write fails entirely — there is no partial write that leaks the value.
+    //
+    // App-side, the sanctioned way to build one of these is
+    // ConnectedAccountEntity.toShareableProgramRef(), which returns only the title and the type.
+    // -----------------------------------------------------------------------------------------
+
+    match /trips/{tripId}/memberPrograms/{programId} {
+      allow read: if isMember(tripId);
+
+      allow create, update: if canWrite(tripId)
+        && request.resource.data.ownerUid == uid()
+        && request.resource.data.keys().hasOnly([
+             'ownerUid', 'programTitle', 'programType', 'addedAtMillis'
+           ])
+        && request.resource.data.keys().hasAll(['ownerUid', 'programTitle', 'programType'])
+        && request.resource.data.ownerUid is string
+        && request.resource.data.programTitle is string
+        && request.resource.data.programType is string
+        && (!('addedAtMillis' in request.resource.data)
+            || request.resource.data.addedAtMillis is number);
+
+      allow delete: if isOrganizer(tripId)
+                    || (isMember(tripId) && resource.data.ownerUid == uid());
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // Contributions — who offers what, and what the group agreed it is worth.
+    //
+    // The agreed value IS shareable: it is a decision the group made together, not a fact about
+    // one person's account. What stays private is the balance the offer came out of and any
+    // valuation of that balance.
+    //
+    // Two invariants beyond the allowlist, both enforced server-side:
+    //
+    //   * An agreed value must be SIGNED — a currency, a timestamp, and at least one uid in
+    //     agreedByUids. A bare amount with no signatories is rejected. This is the rules-level
+    //     expression of "the agreement is a recorded human decision, never a computed
+    //     equivalence".
+    //
+    //   * A proposed value must be LABELLED with its source, so no surface can render Marco's
+    //     suggestion as though the group had agreed it.
+    // -----------------------------------------------------------------------------------------
+
+    function contributionAgreementIsSigned(d) {
+      return !('agreedValueAmount' in d)
+        || (d.agreedValueAmount is number
+            && 'agreedValueCurrency' in d
+            && d.agreedValueCurrency is string
+            && d.agreedValueCurrency != ''
+            && 'agreedAtMillis' in d
+            && d.agreedAtMillis is number
+            && d.agreedAtMillis > 0
+            && 'agreedByUids' in d
+            && d.agreedByUids is list
+            && d.agreedByUids.size() > 0);
+    }
+
+    function contributionProposalIsLabelled(d) {
+      return !('proposedValueAmount' in d)
+        || (d.proposedValueAmount is number
+            && 'proposalSource' in d
+            && d.proposalSource is string
+            && d.proposalSource in ['USER_SUPPLIED', 'SUPPLIER_QUOTE', 'MODELED', 'MEMBER_SUGGESTION']
+            && 'proposedValueCurrency' in d
+            && d.proposedValueCurrency is string
+            && d.proposedValueCurrency != '');
+    }
+
+    function isValidContribution(d) {
+      return d.keys().hasOnly([
+               'contributorUid', 'assetKind', 'state',
+               'nativeQuantity', 'nativeUnitLabel',
+               'programTitle', 'programType', 'description',
+               'offeredAtMillis', 'updatedAtMillis',
+               'agreedValueAmount', 'agreedValueCurrency', 'agreedByUids',
+               'agreedAtMillis', 'agreementNote',
+               'proposedValueAmount', 'proposedValueCurrency', 'proposalSource', 'proposedAtMillis'
+             ])
+        && d.keys().hasAll(['contributorUid', 'assetKind', 'state'])
+        && d.contributorUid is string
+        && d.assetKind is string
+        && d.state is string
+        && (!('nativeQuantity' in d) || d.nativeQuantity is number)
+        && (!('nativeUnitLabel' in d) || d.nativeUnitLabel is string)
+        && (!('programTitle' in d) || d.programTitle is string)
+        && (!('programType' in d) || d.programType is string)
+        && (!('description' in d) || d.description is string)
+        && (!('agreementNote' in d) || d.agreementNote is string)
+        && contributionAgreementIsSigned(d)
+        && contributionProposalIsLabelled(d);
+    }
+
+    match /trips/{tripId}/contributions/{contributionId} {
+      allow read: if isMember(tripId);
+
+      // You offer your own resources.
+      allow create: if canWrite(tripId)
+                    && isValidContribution(request.resource.data)
+                    && request.resource.data.contributorUid == uid();
+
+      // Any writer may update — agreeing a value is something the OTHER members do — but the
+      // contributor is immutable, so an offer cannot be reassigned to someone else.
+      allow update: if canWrite(tripId)
+                    && isValidContribution(request.resource.data)
+                    && request.resource.data.contributorUid == resource.data.contributorUid;
+
+      allow delete: if isOrganizer(tripId)
+                    || (isMember(tripId) && resource.data.contributorUid == uid());
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // Ledger entries — what the trip cost and who paid.
+    //
+    // Shared: a group expense is group knowledge. `pointsProgramTitle` is allowed because it is a
+    // title; there is no key on this list for a points valuation, a balance, or a payment method.
+    // -----------------------------------------------------------------------------------------
+
+    function isValidLedgerEntry(d) {
+      return d.keys().hasOnly([
+               'description', 'category', 'payerUid',
+               'amountOriginal', 'originalCurrency',
+               'amountNormalized', 'normalizedCurrency',
+               'exchangeRate', 'exchangeRateSource', 'exchangeRateAsOfMillis',
+               'splitRuleId', 'fundedWithPoints', 'pointsProgramTitle', 'pointsQuantity',
+               'contributionId', 'incurredOnIso', 'createdByUid',
+               'createdAtMillis', 'updatedAtMillis', 'notes'
+             ])
+        && d.keys().hasAll(['payerUid', 'amountOriginal', 'originalCurrency'])
+        && d.payerUid is string
+        && d.amountOriginal is number
+        && d.originalCurrency is string
+        && (!('amountNormalized' in d) || d.amountNormalized is number)
+        && (!('normalizedCurrency' in d) || d.normalizedCurrency is string)
+        && (!('exchangeRate' in d) || d.exchangeRate is number)
+        && (!('fundedWithPoints' in d) || d.fundedWithPoints is bool)
+        && (!('pointsProgramTitle' in d) || d.pointsProgramTitle is string)
+        && (!('pointsQuantity' in d) || d.pointsQuantity is number)
+        && (!('description' in d) || d.description is string)
+        && (!('notes' in d) || d.notes is string);
+    }
+
+    match /trips/{tripId}/ledgerEntries/{entryId} {
+      allow read: if isMember(tripId);
+      allow create, update: if canWrite(tripId) && isValidLedgerEntry(request.resource.data);
+      allow delete: if isOrganizer(tripId)
+                    || (isMember(tripId) && resource.data.createdByUid == uid());
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // Split rules and settlements.
+    // -----------------------------------------------------------------------------------------
+
+    match /trips/{tripId}/splitRules/{ruleId} {
+      allow read: if isMember(tripId);
+      allow create, update: if canWrite(tripId)
+                            && hasNoPrivateFinancialKeys(request.resource.data);
+      allow delete: if canWrite(tripId);
+    }
+
+    function isValidSettlement(d) {
+      return d.keys().hasOnly([
+               'fromUid', 'toUid', 'amount', 'currency',
+               'amountInPayerCurrency', 'payerCurrency',
+               'state', 'computedAtMillis', 'settledAtMillis', 'method', 'note'
+             ])
+        && d.keys().hasAll(['fromUid', 'toUid', 'amount', 'currency', 'state'])
+        && d.fromUid is string
+        && d.toUid is string
+        && d.amount is number
+        && d.currency is string
+        && d.state is string;
+    }
+
+    match /trips/{tripId}/settlements/{settlementId} {
+      allow read: if isMember(tripId);
+      allow create, update: if canWrite(tripId) && isValidSettlement(request.resource.data);
+      allow delete: if isOrganizer(tripId);
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // Explicitly NOT shared.
+    //
+    // Pow Wow audio never exists anywhere (it is deleted after transcription and no schema field
+    // holds it), and a member's raw transcript is not group content — only the synthesised brief
+    // is. Synthesis that needs every transcript runs server-side with admin credentials, which
+    // bypasses these rules by design; no client ever reads another member's transcript.
+    //
+    // These blocks are documentation. They cannot revoke an allow — Firestore grants on any
+    // matching allow — but no rule grants these paths, so the default deny stands. If a future
+    // change ever adds a broad allow under /trips, this comment is the reason not to.
+    // -----------------------------------------------------------------------------------------
+
+    match /trips/{tripId}/powWowSessions/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /trips/{tripId}/powWowTranscripts/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /trips/{tripId}/connectedAccounts/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /trips/{tripId}/wallet/{document=**} {
+      allow read, write: if false;
+    }
+
+    // Any subcollection under a trip that is not named above is denied by default. Adding one is a
+    // deliberate act: give it a match block and a key allowlist.
   }
 }

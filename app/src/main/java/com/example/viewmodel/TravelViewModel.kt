@@ -5,7 +5,6 @@ import android.speech.tts.TextToSpeech
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ai.GeminiTravelService
-import com.example.data.local.AppDatabase
 import com.example.data.model.ChatMessageEntity
 import com.example.data.model.ConnectedAccountEntity
 import com.example.data.model.EmergencyAlertEntity
@@ -14,6 +13,7 @@ import com.example.data.model.GroupMemoryEntity
 import com.example.data.model.TripActivityEntity
 import com.example.data.model.TripEntity
 import com.example.data.model.TripStatus
+import com.example.data.model.isEligibleForAutoStart
 import com.example.data.model.isTripInProgress
 import com.example.data.model.VendorCallLogEntity
 import com.example.data.repository.TravelRepository
@@ -70,8 +70,11 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
     }
 
     init {
-        val db = AppDatabase.getInstance(application)
-        repository = TravelRepository(db.travelDao())
+        // Constructed through MarcoRepositories so feature-scoped ViewModels can obtain the same
+        // repositories without going through this class. This ViewModel is frozen as of the
+        // Phase 0 foundation: new feature state belongs in a feature ViewModel that pulls its own
+        // repository from com.example.data.di.MarcoRepositories.
+        repository = com.example.data.di.MarcoRepositories.travel(application)
         viewModelScope.launch(Dispatchers.IO) {
             repository.checkAndSeedInitialData()
         }
@@ -1676,7 +1679,13 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
     fun toggleTripStatus(tripId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             val current = repository.getTripById(tripId).firstOrNull() ?: return@launch
-            val newStatus = if (current.isTripInProgress()) TripStatus.PLANNING.value else TripStatus.IN_PROGRESS.value
+            // An EXPLORING trip commits to PLANNING first — the toggle must not take an idea
+            // straight to a live trip.
+            val newStatus = when {
+                current.isTripInProgress() -> TripStatus.PLANNING.value
+                TripStatus.fromString(current.status) == TripStatus.EXPLORING -> TripStatus.PLANNING.value
+                else -> TripStatus.IN_PROGRESS.value
+            }
             repository.updateTripStatus(tripId, newStatus)
             val updated = repository.getTripById(tripId).firstOrNull()
             if (updated != null) {
@@ -1927,9 +1936,11 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
         viewModelScope.launch(Dispatchers.IO) {
             val tripsList = repository.allTrips.firstOrNull() ?: emptyList()
             for (trip in tripsList) {
-                if (trip.status.equals("COMPLETED", ignoreCase = true)) continue
-                if (trip.isTripInProgress() && !trip.status.equals("IN_PROGRESS", ignoreCase = true)) {
-                    repository.updateTripStatus(trip.id, "IN_PROGRESS")
+                // isEligibleForAutoStart() already excludes COMPLETED, IN_PROGRESS, and EXPLORING.
+                // EXPLORING matters here: an idea sketched with a rough window covering today must
+                // not be promoted to a live trip by the calendar.
+                if (trip.isEligibleForAutoStart()) {
+                    repository.updateTripStatus(trip.id, TripStatus.IN_PROGRESS.value)
                     repository.insertChatMessage(
                         ChatMessageEntity(
                             tripId = trip.id,
@@ -2091,11 +2102,12 @@ class TravelViewModel(application: Application) : AndroidViewModel(application),
     }
 
     /**
-     * Clear all local trips, chats, and cached data
+     * Clear all local trips, chats, and cached data — including the v10 party, Pow Wow,
+     * contribution, ledger, and pricing tables. See MarcoRepositories.eraseAllLocalData.
      */
     fun clearAllLocalData() {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.clearAllLocalData()
+            com.example.data.di.MarcoRepositories.eraseAllLocalData(getApplication())
             _selectedTripId.value = 0L
             _activities.value = emptyList()
             _expenses.value = emptyList()
