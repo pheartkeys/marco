@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -105,7 +106,7 @@ fun ChatVintageParchmentMapCard(
 
                 IconButton(onClick = onPlayTts) {
                     Icon(
-                        imageVector = Icons.Default.VolumeUp,
+                        imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Filled.VolumeUp,
                         contentDescription = "Listen",
                         tint = TextSecondary,
                         modifier = Modifier.size(18.dp)

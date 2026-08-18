@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -150,9 +151,9 @@ fun ChatWeeklyBudgetSummaryCard(
                     modifier = Modifier.testTag("weekly_summary_tts_btn")
                 ) {
                     Icon(
-                        imageVector = Icons.Default.VolumeUp,
+                        imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Filled.VolumeUp,
                         contentDescription = "Listen to weekly summary",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = ChampagneGold
                     )
                 }
             }
@@ -324,9 +325,9 @@ fun ChatWeeklyBudgetSummaryCard(
                     verticalAlignment = Alignment.Top
                 ) {
                     Icon(
-                        imageVector = Icons.Default.TrendingUp,
+                        imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Filled.TrendingUp,
                         contentDescription = null,
-                        tint = WayfinderEmerald,
+                        tint = StatusEmerald,
                         modifier = Modifier.size(18.dp)
                     )
                     Column {

@@ -11,6 +11,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,11 +29,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Explore
-import androidx.compose.material.icons.filled.Flight
 import androidx.compose.material.icons.filled.Navigation
-import androidx.compose.material.icons.filled.Sailing
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -50,7 +48,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
@@ -90,7 +87,7 @@ val FamousTravelersQuotes = listOf(
     HistoricalTravelerQuote(
         explorerName = "Ibn Battuta",
         epithet = "The Great Medieval Wayfarer",
-        workOrJourney = "A Gift to Those Who Contemplate the Wonders of Cities (The Rihla)",
+        workOrJourney = "The Rihla",
         quote = "Traveling. It leaves you speechless, then turns you into a storyteller.",
         yearOrEra = "1325-1354 CE",
         routeSummary = "Tangier → Mecca → Samarkand → Maldives → Beijing",
@@ -107,73 +104,44 @@ val FamousTravelersQuotes = listOf(
     ),
     HistoricalTravelerQuote(
         explorerName = "Phileas Fogg & Passepartout",
-        epithet = "Jules Verne's Legendary Globetrotters",
+        epithet = "Legendary Globetrotters",
         workOrJourney = "Around the World in Eighty Days",
         quote = "A true gentleman doesn't joke when he is talking about so serious a thing as a journey.",
-        yearOrEra = "1872 CE (Literary Classic)",
+        yearOrEra = "1872 CE",
         routeSummary = "London → Suez → Bombay → Calcutta → Hong Kong → Yokohama",
         iconEmoji = "🎈"
     ),
     HistoricalTravelerQuote(
-        explorerName = "Odysseus",
-        epithet = "Homer's Cunning Wanderer",
-        workOrJourney = "The Odyssey by Homer",
-        quote = "There is a time for many words, and there is also a time for sleep. But first, let the journey unfold.",
-        yearOrEra = "c. 8th Century BCE",
-        routeSummary = "Troy → Lotus-Eaters → Aeaea → Phaeacia → Ithaca",
-        iconEmoji = "⛵"
-    ),
-    HistoricalTravelerQuote(
         explorerName = "Xuanzang (Tripitaka)",
         epithet = "Pilgrim of the Great Tang",
-        workOrJourney = "Great Tang Records on the Western Regions / Journey to the West",
-        quote = "The mind is the origin of all things; from fearless steps is the path across the desert forged.",
+        workOrJourney = "Great Tang Records on the Western Regions",
+        quote = "From fearless steps is the path across the wonders of the world forged.",
         yearOrEra = "627-645 CE",
         routeSummary = "Chang'an → Taklamakan Desert → Tian Shan → Nalanda",
         iconEmoji = "🏯"
     ),
     HistoricalTravelerQuote(
         explorerName = "Isabella Bird",
-        epithet = "Victorian Wilderness Pioneer & Geographer",
-        workOrJourney = "A Lady's Life in the Rocky Mountains & Unbeaten Tracks in Japan",
-        quote = "I have only one ambition: to see as much of the wondrous world as I can before I leave it.",
+        epithet = "Wilderness Pioneer & Geographer",
+        workOrJourney = "Unbeaten Tracks",
+        quote = "I have only one ambition: to see as much of the wondrous world as I can.",
         yearOrEra = "1873-1897 CE",
         routeSummary = "Rocky Mountains → Hawaii → Hokkaido → Yangtze River",
         iconEmoji = "🏔️"
-    ),
-    HistoricalTravelerQuote(
-        explorerName = "Captain Nemo",
-        epithet = "Commander of the Nautilus",
-        workOrJourney = "Twenty Thousand Leagues Under the Seas by Jules Verne",
-        quote = "The sea is everything. It covers seven tenths of the terrestrial globe... It is an immense reservoir of nature.",
-        yearOrEra = "1870 CE (Literary Classic)",
-        routeSummary = "Pacific depths → Red Sea tunnel → South Pole → Atlantis",
-        iconEmoji = "🌊"
-    ),
-    HistoricalTravelerQuote(
-        explorerName = "Ernest Shackleton",
-        epithet = "Legend of the Endurance",
-        workOrJourney = "Imperial Trans-Antarctic Expedition (South)",
-        quote = "Difficulties are just things to overcome, after all. By endurance we conquer.",
-        yearOrEra = "1914-1917 CE",
-        routeSummary = "Weddell Sea → Elephant Island → South Georgia Crossing",
-        iconEmoji = "❄️"
     )
 )
 
 /**
  * Marco Astrolabe Celestial Loading Animation
- * A detailed Canvas drawing inspired by medieval brass astrolabes, armillary spheres, and navigational compass roses.
  */
 @Composable
 fun MarcoAstrolabeLoadingAnimation(
     modifier: Modifier = Modifier,
     sizeDp: Int = 110,
-    accentColor: Color = VenetianGold
+    accentColor: Color = GoldenSun
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "marcoAstrolabe")
 
-    // Continuous rotation for outer astrolabe rete ring
     val reteAngle by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
@@ -184,7 +152,6 @@ fun MarcoAstrolabeLoadingAnimation(
         label = "reteRotation"
     )
 
-    // Reverse rotation for inner zodiac/celestial coordinates
     val innerAngle by infiniteTransition.animateFloat(
         initialValue = 360f,
         targetValue = 0f,
@@ -195,7 +162,6 @@ fun MarcoAstrolabeLoadingAnimation(
         label = "innerRotation"
     )
 
-    // Gentle oscillation for compass needle
     val needleRocking by infiniteTransition.animateFloat(
         initialValue = -25f,
         targetValue = 25f,
@@ -206,7 +172,6 @@ fun MarcoAstrolabeLoadingAnimation(
         label = "needleRocking"
     )
 
-    // Star sparkle pulse
     val starPulse by infiniteTransition.animateFloat(
         initialValue = 0.5f,
         targetValue = 1.0f,
@@ -229,12 +194,12 @@ fun MarcoAstrolabeLoadingAnimation(
             val midRadius = outerRadius * 0.72f
             val innerRadius = outerRadius * 0.45f
 
-            // Outer Brass Mater Ring
+            // Outer Brass Ring
             drawCircle(
-                color = accentColor.copy(alpha = 0.25f),
+                color = accentColor.copy(alpha = 0.35f),
                 radius = outerRadius,
                 center = center,
-                style = Stroke(width = 4.dp.toPx())
+                style = Stroke(width = 3.dp.toPx())
             )
 
             // Outer Degree Ticks
@@ -242,7 +207,7 @@ fun MarcoAstrolabeLoadingAnimation(
             for (i in 0 until tickCount) {
                 val angleRad = Math.toRadians((i * 360f / tickCount).toDouble())
                 val isMajor = i % 6 == 0
-                val tickLength = if (isMajor) 7.dp.toPx() else 3.5.dp.toPx()
+                val tickLength = if (isMajor) 6.dp.toPx() else 3.dp.toPx()
                 val startX = (center.x + (outerRadius - tickLength) * cos(angleRad)).toFloat()
                 val startY = (center.y + (outerRadius - tickLength) * sin(angleRad)).toFloat()
                 val endX = (center.x + outerRadius * cos(angleRad)).toFloat()
@@ -257,24 +222,22 @@ fun MarcoAstrolabeLoadingAnimation(
                 )
             }
 
-            // Rotating Rete (Star-pointer circle with eccentric offset)
+            // Rotating Rete with Sun Highlights
             rotate(reteAngle, center) {
                 drawCircle(
-                    color = VenetianGoldLight.copy(alpha = 0.35f),
+                    color = GoldenSunLight.copy(alpha = 0.4f),
                     radius = midRadius,
                     center = center,
-                    style = Stroke(width = 1.8.dp.toPx())
+                    style = Stroke(width = 1.5.dp.toPx())
                 )
 
-                // Eccentric Tropic Circle
                 drawCircle(
-                    color = VenetianGoldLight.copy(alpha = 0.22f),
+                    color = VoyagerSkyLight.copy(alpha = 0.3f),
                     radius = midRadius * 0.75f,
                     center = Offset(center.x + midRadius * 0.25f, center.y),
-                    style = Stroke(width = 1.2.dp.toPx())
+                    style = Stroke(width = 1.dp.toPx())
                 )
 
-                // Star Point Pointers on Rete
                 for (j in 0 until 4) {
                     val starRad = Math.toRadians((j * 90.0))
                     val starCenter = Offset(
@@ -282,42 +245,41 @@ fun MarcoAstrolabeLoadingAnimation(
                         (center.y + midRadius * sin(starRad)).toFloat()
                     )
                     drawCircle(
-                        color = VenetianGoldLight,
+                        color = GoldenSunLight,
                         radius = (2.5f * starPulse).dp.toPx(),
                         center = starCenter
                     )
                 }
             }
 
-            // Inner Zodiac & Cardinal Ring (Reverse Spin)
+            // Inner Celestial Ring (Reverse Spin)
             rotate(innerAngle, center) {
                 drawCircle(
-                    color = AntiqueBrass.copy(alpha = 0.4f),
+                    color = VoyagerSkyLight.copy(alpha = 0.4f),
                     radius = innerRadius,
                     center = center,
-                    style = Stroke(width = 1.5.dp.toPx())
+                    style = Stroke(width = 1.2.dp.toPx())
                 )
-                // Rhumb line cross
                 drawLine(
-                    color = AntiqueBrass.copy(alpha = 0.3f),
+                    color = VoyagerSkyLight.copy(alpha = 0.3f),
                     start = Offset(center.x - innerRadius, center.y),
                     end = Offset(center.x + innerRadius, center.y),
                     strokeWidth = 1.dp.toPx()
                 )
                 drawLine(
-                    color = AntiqueBrass.copy(alpha = 0.3f),
+                    color = VoyagerSkyLight.copy(alpha = 0.3f),
                     start = Offset(center.x, center.y - innerRadius),
                     end = Offset(center.x, center.y + innerRadius),
                     strokeWidth = 1.dp.toPx()
                 )
             }
 
-            // Compass Alidade / Needle with magnetic oscillation
+            // Compass Needle with Coral & Sky pointers
             rotate(needleRocking, center) {
                 val needleLength = outerRadius * 0.85f
                 val needleWidth = 5.dp.toPx()
 
-                // North Pointer (Golden Venetian Brass)
+                // North Pointer (Vibrant Coral)
                 val northPath = Path().apply {
                     moveTo(center.x, center.y - needleLength)
                     lineTo(center.x + needleWidth, center.y - 3.dp.toPx())
@@ -325,9 +287,9 @@ fun MarcoAstrolabeLoadingAnimation(
                     lineTo(center.x - needleWidth, center.y - 3.dp.toPx())
                     close()
                 }
-                drawPath(path = northPath, color = VenetianGold)
+                drawPath(path = northPath, color = MarcoCoral)
 
-                // South Pointer (Antique Terracotta / Parchment)
+                // South Pointer (Sky Blue)
                 val southPath = Path().apply {
                     moveTo(center.x, center.y + needleLength)
                     lineTo(center.x + needleWidth, center.y + 3.dp.toPx())
@@ -335,17 +297,17 @@ fun MarcoAstrolabeLoadingAnimation(
                     lineTo(center.x - needleWidth, center.y + 3.dp.toPx())
                     close()
                 }
-                drawPath(path = southPath, color = TerracottaMap)
+                drawPath(path = southPath, color = VoyagerSkyLight)
             }
 
-            // Central Pivot Brass Pin
+            // Central Golden Sun Pin
             drawCircle(
-                color = VenetianGoldLight,
-                radius = 4.5.dp.toPx(),
+                color = GoldenSunLight,
+                radius = 4.dp.toPx(),
                 center = center
             )
             drawCircle(
-                color = CelestialLapis,
+                color = LuxuryDarkBase,
                 radius = 2.dp.toPx(),
                 center = center
             )
@@ -355,13 +317,11 @@ fun MarcoAstrolabeLoadingAnimation(
 
 /**
  * ExplorerVoyageLoadingCard
- * Full interactive loading card that cycles through famous historical and literary travelers,
- * displaying their route, era, book title, and quote while loading itineraries, AI replies, or concierge actions.
  */
 @Composable
 fun ExplorerVoyageLoadingCard(
-    statusMessage: String = "Marco AI Concierge Navigating...",
-    subStatus: String = "Plotting multi-modal voyage routes & coordinates",
+    statusMessage: String = "Marco is charting your adventure...",
+    subStatus: String = "Finding the most exciting sights, food & stays 🌴✨",
     modifier: Modifier = Modifier
 ) {
     var currentQuoteIndex by remember { mutableIntStateOf(0) }
@@ -376,23 +336,17 @@ fun ExplorerVoyageLoadingCard(
     val quoteItem = FamousTravelersQuotes[currentQuoteIndex]
 
     Card(
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = LuxuryCard),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = modifier
             .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = LuxuryBorder,
-                shape = RoundedCornerShape(20.dp)
-            )
             .testTag("explorer_voyage_loading_card")
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header Bar: "MARCO • EXPEDITION CONCIERGE"
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -401,40 +355,28 @@ fun ExplorerVoyageLoadingCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "Marco",
-                        style = MaterialTheme.typography.labelMedium.copy(
+                        style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            color = VenetianGold
+                            color = MarcoCoral
                         )
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Surface(
-                        shape = RoundedCornerShape(6.dp),
-                        color = VenetianGold.copy(alpha = 0.15f)
-                    ) {
-                        Text(
-                            text = "Expeditions",
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = VenetianGold
-                            ),
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                        )
-                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    ExpeditionBadge(text = "Voyage Radar", color = MarcoCoral)
                 }
 
-                // Shimmering Compass Indicator
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.Explore,
                         contentDescription = null,
-                        tint = VenetianGold,
+                        tint = GoldenSunLight,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Navigating",
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            color = VenetianGoldLight
+                        text = "Discovering",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = GoldenSunLight,
+                            fontWeight = FontWeight.Bold
                         )
                     )
                 }
@@ -442,25 +384,25 @@ fun ExplorerVoyageLoadingCard(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Animated Astrolabe Canvas & Sailing Wave Loader
             Box(
                 modifier = Modifier
                     .size(96.dp)
                     .clip(CircleShape)
-                    .background(LuxuryCardElevated),
+                    .background(LuxuryCardElevated)
+                    .border(1.dp, LuxuryBorder, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                MarcoAstrolabeLoadingAnimation(sizeDp = 90)
+                MarcoAstrolabeLoadingAnimation(sizeDp = 88)
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            // Live Action Status
             Text(
                 text = statusMessage,
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = TextPrimary,
+                    fontSize = 15.sp
                 ),
                 textAlign = TextAlign.Center
             )
@@ -468,69 +410,64 @@ fun ExplorerVoyageLoadingCard(
             Text(
                 text = subStatus,
                 style = MaterialTheme.typography.bodySmall.copy(
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = TextSecondary,
+                    fontSize = 12.sp
                 ),
                 textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Great Travelers Literary Quote Carousel
             AnimatedContent(
                 targetState = quoteItem,
                 transitionSpec = { fadeIn(tween(400)) togetherWith fadeOut(tween(300)) },
                 label = "travelerQuoteTransition"
             ) { traveler ->
                 Surface(
-                    shape = RoundedCornerShape(14.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(16.dp),
+                    color = LuxurySurface,
+                    border = BorderStroke(1.dp, LuxuryBorder),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(
-                        modifier = Modifier.padding(12.dp),
+                        modifier = Modifier.padding(14.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Explore,
-                                contentDescription = null,
-                                tint = VenetianGold,
-                                modifier = Modifier.size(16.dp)
-                            )
+                            Text(text = traveler.iconEmoji, fontSize = 14.sp)
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = traveler.explorerName,
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = FontWeight.Bold,
-                                    color = VenetianGold
+                                    color = GoldenSunLight
                                 )
                             )
                             Text(
                                 text = " • ${traveler.yearOrEra}",
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = TextSecondary
                                 )
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
 
                         Text(
                             text = "“${traveler.quote}”",
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontStyle = FontStyle.Italic,
-                                lineHeight = 16.sp,
-                                textAlign = TextAlign.Center
-                            ),
-                            color = MaterialTheme.colorScheme.onSurface
+                                lineHeight = 18.sp,
+                                textAlign = TextAlign.Center,
+                                color = TextPrimary
+                            )
                         )
 
-                        Spacer(modifier = Modifier.height(6.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                        // Route / Work Badge
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center,
@@ -539,15 +476,16 @@ fun ExplorerVoyageLoadingCard(
                             Icon(
                                 imageVector = Icons.Default.Navigation,
                                 contentDescription = null,
-                                tint = TealAccent,
-                                modifier = Modifier.size(10.dp)
+                                tint = VoyagerSkyLight,
+                                modifier = Modifier.size(12.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = traveler.routeSummary,
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = TealAccent
+                                    fontWeight = FontWeight.Medium,
+                                    color = VoyagerSkyLight,
+                                    fontSize = 10.5.sp
                                 )
                             )
                         }
@@ -560,13 +498,12 @@ fun ExplorerVoyageLoadingCard(
 
 /**
  * CaravelSailingLoadingIndicator
- * A lightweight sailing caravel & waves animation for quick in-line progress indicators.
  */
 @Composable
 fun CaravelSailingLoadingIndicator(
     modifier: Modifier = Modifier,
-    widthDp: Int = 120,
-    heightDp: Int = 40
+    widthDp: Int = 130,
+    heightDp: Int = 44
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "caravelSailing")
 
@@ -601,7 +538,6 @@ fun CaravelSailingLoadingIndicator(
             val h = size.height
             val midY = h * 0.65f
 
-            // Oscillating Ocean Waves
             val wavePath1 = Path()
             val wavePath2 = Path()
 
@@ -619,21 +555,19 @@ fun CaravelSailingLoadingIndicator(
 
             drawPath(
                 path = wavePath1,
-                color = MediterraneanAzure.copy(alpha = 0.7f),
+                color = VoyagerSkyLight.copy(alpha = 0.7f),
                 style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round)
             )
             drawPath(
                 path = wavePath2,
-                color = TealAccent.copy(alpha = 0.4f),
+                color = LagoonTealLight.copy(alpha = 0.4f),
                 style = Stroke(width = 1.5.dp.toPx(), cap = StrokeCap.Round)
             )
 
-            // Ship at center oscillating with rocking angle
             val shipCenterX = w * 0.5f
             val shipCenterY = midY - 3.dp.toPx() + sin(wavePhase.toDouble() + Math.PI).toFloat() * 3.dp.toPx()
 
             rotate(shipRocking, Offset(shipCenterX, shipCenterY)) {
-                // Caravel Hull
                 val hullPath = Path().apply {
                     moveTo(shipCenterX - 14.dp.toPx(), shipCenterY + 2.dp.toPx())
                     lineTo(shipCenterX + 14.dp.toPx(), shipCenterY + 2.dp.toPx())
@@ -641,24 +575,22 @@ fun CaravelSailingLoadingIndicator(
                     lineTo(shipCenterX - 10.dp.toPx(), shipCenterY + 8.dp.toPx())
                     close()
                 }
-                drawPath(path = hullPath, color = AntiqueBrass)
+                drawPath(path = hullPath, color = MarcoCoral)
 
-                // Mast
                 drawLine(
-                    color = VenetianGoldDeep,
+                    color = GoldenSun,
                     start = Offset(shipCenterX, shipCenterY + 2.dp.toPx()),
                     end = Offset(shipCenterX, shipCenterY - 14.dp.toPx()),
                     strokeWidth = 1.8.dp.toPx()
                 )
 
-                // Sails (Parchment White)
                 val mainSailPath = Path().apply {
                     moveTo(shipCenterX, shipCenterY - 12.dp.toPx())
                     lineTo(shipCenterX + 9.dp.toPx(), shipCenterY - 3.dp.toPx())
                     lineTo(shipCenterX, shipCenterY - 3.dp.toPx())
                     close()
                 }
-                drawPath(path = mainSailPath, color = ParchmentSand)
+                drawPath(path = mainSailPath, color = Color.White)
 
                 val foreSailPath = Path().apply {
                     moveTo(shipCenterX, shipCenterY - 10.dp.toPx())
@@ -666,7 +598,7 @@ fun CaravelSailingLoadingIndicator(
                     lineTo(shipCenterX, shipCenterY - 3.dp.toPx())
                     close()
                 }
-                drawPath(path = foreSailPath, color = VenetianGoldLight)
+                drawPath(path = foreSailPath, color = GoldenSunLight)
             }
         }
     }
@@ -674,7 +606,6 @@ fun CaravelSailingLoadingIndicator(
 
 /**
  * MarcoConciergeTypingIndicator
- * A refined typing bubble with rotating celestial compass rose and golden wave pulses.
  */
 @Composable
 fun MarcoConciergeTypingIndicator(
@@ -685,7 +616,7 @@ fun MarcoConciergeTypingIndicator(
         initialValue = 0.3f,
         targetValue = 1.0f,
         animationSpec = infiniteRepeatable(
-            animation = tween(700, easing = FastOutSlowInEasing),
+            animation = tween(600, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "dotScale"
@@ -702,39 +633,54 @@ fun MarcoConciergeTypingIndicator(
     )
 
     Surface(
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+        shape = RoundedCornerShape(20.dp),
+        color = LuxuryCard,
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = modifier.testTag("marco_typing_indicator")
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 11.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Default.Explore,
-                contentDescription = null,
-                tint = VenetianGold,
+            Box(
                 modifier = Modifier
-                    .size(16.dp)
-                    .rotate(spinAngle)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
+                    .size(26.dp)
+                    .clip(CircleShape)
+                    .background(LuxuryCardElevated),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Explore,
+                    contentDescription = null,
+                    tint = MarcoCoral,
+                    modifier = Modifier
+                        .size(16.dp)
+                        .rotate(spinAngle)
+                )
+            }
+            Spacer(modifier = Modifier.width(10.dp))
             Text(
-                text = "Marco is charting response...",
+                text = "Marco is charting your adventure...",
                 style = MaterialTheme.typography.bodySmall.copy(
-                    fontWeight = FontWeight.Medium,
-                    color = VenetianGoldLight
+                    fontWeight = FontWeight.SemiBold,
+                    color = TextPrimary
                 )
             )
-            Spacer(modifier = Modifier.width(6.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+            Spacer(modifier = Modifier.width(8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 for (i in 0..2) {
                     val pulse = ((dotScale + i * 0.25f) % 1.0f).coerceIn(0.3f, 1.0f)
                     Box(
                         modifier = Modifier
-                            .size((4 * pulse).dp)
+                            .size((6 * pulse).dp)
                             .clip(CircleShape)
-                            .background(VenetianGold)
+                            .background(
+                                when (i) {
+                                    0 -> MarcoCoral
+                                    1 -> GoldenSunLight
+                                    else -> VoyagerSkyLight
+                                }
+                            )
                     )
                 }
             }

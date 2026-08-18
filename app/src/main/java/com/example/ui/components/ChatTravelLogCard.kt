@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -75,7 +76,7 @@ fun ChatTravelLogCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Default.MenuBook,
+                            imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Filled.MenuBook,
                             contentDescription = null,
                             tint = ChampagneGold,
                             modifier = Modifier.size(20.dp)
@@ -95,13 +96,13 @@ fun ChatTravelLogCard(
                             )
                             Surface(
                                 shape = RoundedCornerShape(6.dp),
-                                color = AntiqueBrass.copy(alpha = 0.15f)
+                                color = ChampagneGold.copy(alpha = 0.15f)
                             ) {
                                 Text(
                                     text = "Chronicle",
                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        color = VenetianGoldLight,
+                                        color = ChampagneGold,
                                         fontWeight = FontWeight.Bold
                                     )
                                 )
@@ -110,7 +111,7 @@ fun ChatTravelLogCard(
                         Text(
                             text = "Daily Journal & AI Reflection",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = TextSecondary
                             )
                         )
                     }
@@ -118,9 +119,9 @@ fun ChatTravelLogCard(
 
                 IconButton(onClick = onPlayTts) {
                     Icon(
-                        imageVector = Icons.Default.VolumeUp,
+                        imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Filled.VolumeUp,
                         contentDescription = "Recite travel log entry",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = ChampagneGold
                     )
                 }
             }

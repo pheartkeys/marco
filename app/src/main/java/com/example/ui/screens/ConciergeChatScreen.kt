@@ -5,20 +5,25 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Accessible
+import androidx.compose.material.icons.automirrored.filled.EventNote
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,24 +31,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.data.model.BriefTension
 import com.example.data.model.ChatMessageEntity
 import com.example.data.model.ConnectedAccountEntity
 import com.example.data.model.GroupMemoryEntity
 import com.example.data.model.TripActivityEntity
 import com.example.data.model.TripBriefEntity
-import com.example.data.model.BriefTension
 import com.example.data.model.TripEntity
-import com.example.data.model.isTripInProgress
-import com.example.data.model.TripStatus
 import com.example.data.model.UserPreferenceEntity
 import com.example.data.model.VendorCallLogEntity
+import com.example.data.model.isTripInProgress
 import com.example.ui.components.*
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.ui.input.pointer.pointerInput
 import com.example.ui.theme.*
 import com.example.viewmodel.TravelViewModel
 
@@ -85,7 +90,7 @@ fun ConciergeChatScreen(
     var inputText by remember { mutableStateOf("") }
     var isQuickActionSheetOpen by remember { mutableStateOf(false) }
     var isTripMenuExpanded by remember { mutableStateOf(false) }
-    var selectedActivityForSnippetDetail by remember { mutableStateOf<com.example.data.model.TripActivityEntity?>(null) }
+    var selectedActivityForSnippetDetail by remember { mutableStateOf<TripActivityEntity?>(null) }
     val listState = rememberLazyListState()
 
     val currentTrip = tripsList.find { it.id == selectedTripId } ?: tripsList.firstOrNull()
@@ -112,19 +117,6 @@ fun ConciergeChatScreen(
     }
 
     val isTripActive = currentTrip?.isTripInProgress() == true
-    val suggestionChips = remember(isTripActive) {
-        buildList {
-            add("Show Current Itinerary")
-            add("Real-Time Budget & FX Tracker")
-            add("AI Activity & Excursion Radar")
-            add("Pre-Trip Safety & Offline Pack")
-            if (isTripActive) {
-                add("Emergency SOS Beacon")
-            }
-            add("Plan New Trip")
-            add("My Traveler DNA & Profile")
-        }
-    }
 
     LaunchedEffect(messages.size, isTyping) {
         if (messages.isNotEmpty()) {
@@ -135,7 +127,7 @@ fun ConciergeChatScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(LuxuryDarkBase)
             .statusBarsPadding()
             .navigationBarsPadding()
             .imePadding()
@@ -151,7 +143,7 @@ fun ConciergeChatScreen(
     ) {
         // TOP APP BAR: AI Status + Active Trip Selector + Clear Chat
         Surface(
-            color = MaterialTheme.colorScheme.surface,
+            color = LuxurySurface,
             tonalElevation = 0.dp,
             border = BorderStroke(1.dp, LuxuryBorder),
             modifier = Modifier.fillMaxWidth()
@@ -169,25 +161,42 @@ fun ConciergeChatScreen(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(CircleShape)
-                            .background(LuxuryCardElevated),
+                            .background(
+                                Brush.linearGradient(
+                                    colors = listOf(
+                                        LuxuryCardElevated,
+                                        LuxuryCard
+                                    )
+                                )
+                            )
+                            .border(1.dp, LuxuryBorder, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Explore,
                             contentDescription = "Marco Expedition Concierge",
                             tint = ChampagneGold,
-                            modifier = Modifier.size(22.dp)
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
-                        Text(
-                            text = "Marco",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = TextPrimary
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Text(
+                                text = "Marco",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = TextPrimary
+                                )
                             )
-                        )
+                            ExpeditionBadge(
+                                text = "Expeditions",
+                                color = ChampagneGold
+                            )
+                        }
                     }
                 }
 
@@ -196,21 +205,22 @@ fun ConciergeChatScreen(
                     // Active Trip Dropdown Pill
                     Box {
                         Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = OceanBlue.copy(alpha = 0.12f),
+                            shape = RoundedCornerShape(10.dp),
+                            color = LuxuryCard,
+                            border = BorderStroke(1.dp, LuxuryBorder),
                             modifier = Modifier
                                 .clickable { isTripMenuExpanded = true }
                                 .testTag("trip_context_selector")
                         ) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 val destLabel = currentTrip?.destination?.split(",")?.firstOrNull()?.trim() ?: "Plan Trip"
                                 Text(
                                     text = destLabel,
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        color = WaypointCyan,
+                                        color = ChampagneGold,
                                         fontWeight = FontWeight.Bold
                                     )
                                 )
@@ -218,7 +228,7 @@ fun ConciergeChatScreen(
                                 Icon(
                                     imageVector = Icons.Default.ExpandMore,
                                     contentDescription = "Switch Trip",
-                                    tint = WaypointCyan,
+                                    tint = ChampagneGold,
                                     modifier = Modifier.size(14.dp)
                                 )
                             }
@@ -231,7 +241,7 @@ fun ConciergeChatScreen(
                             if (tripsList.isEmpty()) {
                                 DropdownMenuItem(
                                     text = {
-                                        Text("Plan New AI Trip...", fontWeight = FontWeight.Bold, color = WaypointCyan)
+                                        Text("Plan New Voyage...", fontWeight = FontWeight.Bold, color = ChampagneGold)
                                     },
                                     onClick = {
                                         isTripMenuExpanded = false
@@ -245,25 +255,16 @@ fun ConciergeChatScreen(
                                         text = {
                                             Column {
                                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                                    Text(trip.title, fontWeight = FontWeight.Bold)
-                                                    Spacer(modifier = Modifier.width(4.dp))
-                                                    Surface(
-                                                        shape = RoundedCornerShape(4.dp),
-                                                        color = if (active) EmeraldGreen.copy(alpha = 0.15f) else OceanBlue.copy(alpha = 0.15f)
-                                                    ) {
-                                                        Text(
-                                                            text = if (active) "On-trip" else "Planning",
-                                                            style = MaterialTheme.typography.labelSmall.copy(
-                                                                color = if (active) EmeraldGreen else WaypointCyan,
-                                                                fontWeight = FontWeight.Bold
-                                                            ),
-                                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
-                                                        )
-                                                    }
+                                                    Text(trip.title, fontWeight = FontWeight.Bold, color = TextPrimary)
+                                                    Spacer(modifier = Modifier.width(6.dp))
+                                                    ExpeditionBadge(
+                                                        text = if (active) "On-trip" else "Planning",
+                                                        color = if (active) StatusEmerald else ChampagneGold
+                                                    )
                                                 }
                                                 Text(
                                                     "${trip.destination} • ${trip.startDate}",
-                                                    style = MaterialTheme.typography.bodySmall.copy(color = TextAtlasSecondary)
+                                                    style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                                                 )
                                             }
                                         },
@@ -278,9 +279,9 @@ fun ConciergeChatScreen(
                                     DropdownMenuItem(
                                         text = {
                                             Text(
-                                                text = if (trip.isTripInProgress()) "Switch to Planning Mode (Hide SOS)" else "Start Vacation / On-Trip Mode (Activate SOS)",
+                                                text = if (trip.isTripInProgress()) "Switch to Planning Mode" else "Start Vacation (Activate SOS)",
                                                 fontWeight = FontWeight.Bold,
-                                                color = if (trip.isTripInProgress()) WaypointCyan else EmeraldGreen
+                                                color = if (trip.isTripInProgress()) ChampagneGold else StatusEmerald
                                             )
                                         },
                                         onClick = {
@@ -292,7 +293,7 @@ fun ConciergeChatScreen(
                                 HorizontalDivider(color = LuxuryBorder)
                                 DropdownMenuItem(
                                     text = {
-                                        Text("Plan Another Trip...", fontWeight = FontWeight.Medium, color = WaypointCyan)
+                                        Text("Plan Another Trip...", fontWeight = FontWeight.Medium, color = ChampagneGold)
                                     },
                                     onClick = {
                                         isTripMenuExpanded = false
@@ -303,27 +304,27 @@ fun ConciergeChatScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
 
-                    // Emergency SOS Beacon Button (Strictly only visible while actively on an actual trip)
+                    // Emergency SOS Beacon Button
                     if (isTripActive) {
                         IconButton(
                             onClick = { viewModel.triggerEmergencySos() },
                             modifier = Modifier
-                                .minimumInteractiveComponentSize()
                                 .size(34.dp)
                                 .clip(CircleShape)
-                                .background(WaxSealCrimson.copy(alpha = 0.15f))
+                                .background(StatusCrimson.copy(alpha = 0.2f))
+                                .border(1.dp, StatusCrimson, CircleShape)
                                 .testTag("sos_beacon_top_button")
                         ) {
                             Icon(
                                 imageVector = Icons.Default.HealthAndSafety,
                                 contentDescription = "Emergency SOS",
-                                tint = WaxSealCrimson,
+                                tint = StatusCrimson,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
-                        Spacer(modifier = Modifier.width(2.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
                     }
 
                     // Account / Profile Button
@@ -336,51 +337,44 @@ fun ConciergeChatScreen(
                             }
                         },
                         modifier = Modifier
-                            .minimumInteractiveComponentSize()
                             .size(34.dp)
                             .testTag("top_bar_account_button")
                     ) {
                         Icon(
                             imageVector = Icons.Default.AccountCircle,
                             contentDescription = if (firebaseUser != null) "Account: ${firebaseUser?.displayName ?: firebaseUser?.email}" else "Sign In",
-                            tint = if (firebaseUser != null) VenetianGold else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(18.dp)
+                            tint = if (firebaseUser != null) ChampagneGold else TextSecondary,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
-
-                    Spacer(modifier = Modifier.width(2.dp))
 
                     // Settings Button
                     IconButton(
                         onClick = onOpenSettings,
                         modifier = Modifier
-                            .minimumInteractiveComponentSize()
                             .size(34.dp)
                             .testTag("open_settings_top_button")
                     ) {
                         Icon(
                             imageVector = Icons.Default.Settings,
                             contentDescription = "Settings & Voices",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(18.dp)
+                            tint = TextSecondary,
+                            modifier = Modifier.size(19.dp)
                         )
                     }
-
-                    Spacer(modifier = Modifier.width(2.dp))
 
                     // Reset / Clear Chat Button
                     IconButton(
                         onClick = { viewModel.clearChat() },
                         modifier = Modifier
-                            .minimumInteractiveComponentSize()
                             .size(34.dp)
                             .testTag("clear_chat_button")
                     ) {
                         Icon(
                             imageVector = Icons.Default.DeleteSweep,
                             contentDescription = "Clear Chat",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(18.dp)
+                            tint = TextSecondary,
+                            modifier = Modifier.size(19.dp)
                         )
                     }
                 }
@@ -390,19 +384,19 @@ fun ConciergeChatScreen(
         // ACTIVE ITINERARY HORIZONTAL PAGER (Swipeable between multiple expeditions)
         if (tripsList.isNotEmpty()) {
             Surface(
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                color = LuxurySurface,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp)
+                        .padding(vertical = 6.dp)
                 ) {
                     HorizontalPager(
                         state = tripPagerState,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(64.dp),
+                            .height(68.dp),
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         pageSpacing = 8.dp
                     ) { page ->
@@ -412,9 +406,9 @@ fun ConciergeChatScreen(
                             Card(
                                 shape = RoundedCornerShape(16.dp),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = LuxuryCard
+                                    containerColor = if (isSelected) LuxuryCardElevated else LuxuryCard
                                 ),
-                                border = BorderStroke(1.dp, LuxuryBorder),
+                                border = BorderStroke(1.dp, if (isSelected) ChampagneGold.copy(alpha = 0.5f) else LuxuryBorder),
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .clickable {
@@ -424,80 +418,69 @@ fun ConciergeChatScreen(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                                        .padding(horizontal = 14.dp, vertical = 8.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(10.dp),
                                         modifier = Modifier.weight(1f)
                                     ) {
                                         Box(
                                             modifier = Modifier
-                                                .size(34.dp)
+                                                .size(36.dp)
                                                 .clip(CircleShape)
-                                                .background(LuxuryCardElevated),
+                                                .background(LuxurySurface)
+                                                .border(1.dp, LuxuryBorder, CircleShape),
                                             contentAlignment = Alignment.Center
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.FlightTakeoff,
                                                 contentDescription = null,
                                                 tint = ChampagneGold,
-                                                modifier = Modifier.size(16.dp)
+                                                modifier = Modifier.size(18.dp)
                                             )
                                         }
 
                                         Column {
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                            ) {
                                                 Text(
                                                     text = trip.title,
-                                                    style = MaterialTheme.typography.titleSmall.copy(
-                                                        fontWeight = FontWeight.SemiBold,
+                                                    style = MaterialTheme.typography.labelMedium.copy(
+                                                        fontWeight = FontWeight.Bold,
                                                         color = TextPrimary
                                                     ),
                                                     maxLines = 1
                                                 )
-                                                Spacer(modifier = Modifier.width(6.dp))
-                                                val inProgress = trip.isTripInProgress()
-                                                Surface(
-                                                    shape = RoundedCornerShape(4.dp),
-                                                    color = LuxuryCardElevated,
-                                                    border = BorderStroke(1.dp, LuxuryBorder)
-                                                ) {
-                                                    Text(
-                                                        text = if (inProgress) "Active" else "Planning",
-                                                        style = MaterialTheme.typography.labelSmall.copy(
-                                                            color = TextSecondary,
-                                                            fontWeight = FontWeight.Medium
-                                                        ),
-                                                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
+                                                if (trip.isTripInProgress()) {
+                                                    ExpeditionBadge(
+                                                        text = "Active",
+                                                        color = StatusEmerald,
+                                                        isFilled = true
                                                     )
                                                 }
                                             }
                                             Text(
-                                                text = "${trip.destination} • ${trip.startDate} to ${trip.endDate}",
-                                                style = MaterialTheme.typography.bodySmall.copy(
-                                                    color = TextSecondary
+                                                text = "${trip.destination} • ${trip.startDate} - ${trip.endDate}",
+                                                style = MaterialTheme.typography.labelSmall.copy(
+                                                    color = TextSecondary,
+                                                    fontSize = 10.5.sp
                                                 ),
                                                 maxLines = 1
                                             )
                                         }
                                     }
 
-                                    IconButton(
-                                        onClick = onOpenItinerary,
-                                        modifier = Modifier
-                                            .minimumInteractiveComponentSize()
-                                            .size(28.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Tune,
-                                            contentDescription = "Open Full Itinerary",
-                                            tint = TextSecondary,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                    }
+                                    Icon(
+                                        imageVector = Icons.Default.ChevronRight,
+                                        contentDescription = null,
+                                        tint = TextMuted,
+                                        modifier = Modifier.size(18.dp)
+                                    )
                                 }
                             }
                         }
@@ -515,10 +498,10 @@ fun ConciergeChatScreen(
                                 val isCurrent = tripPagerState.currentPage == index
                                 Box(
                                     modifier = Modifier
-                                        .padding(horizontal = 4.dp)
-                                        .size(if (isCurrent) 14.dp else 5.dp, 5.dp)
-                                        .clip(RoundedCornerShape(3.dp))
-                                        .background(if (isCurrent) ChampagneGold else TextMuted.copy(alpha = 0.35f))
+                                        .padding(horizontal = 3.dp)
+                                        .size(if (isCurrent) 14.dp else 5.dp, 4.dp)
+                                        .clip(RoundedCornerShape(2.dp))
+                                        .background(if (isCurrent) ChampagneGold else LuxuryBorder)
                                 )
                             }
                         }
@@ -530,12 +513,16 @@ fun ConciergeChatScreen(
         // Offline Banner if active
         if (!offlineMsg.isNullOrBlank()) {
             Surface(
-                color = EmeraldGreen.copy(alpha = 0.15f),
+                color = StatusEmerald.copy(alpha = 0.15f),
+                border = BorderStroke(1.dp, StatusEmerald.copy(alpha = 0.3f)),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = offlineMsg ?: "",
-                    style = MaterialTheme.typography.labelSmall.copy(color = EmeraldGreen, fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        color = StatusEmerald,
+                        fontWeight = FontWeight.Bold
+                    ),
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                 )
             }
@@ -545,7 +532,7 @@ fun ConciergeChatScreen(
         SingleChoiceSegmentedButtonRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp)
+                .padding(horizontal = 16.dp, vertical = 6.dp)
         ) {
             SegmentedButton(
                 selected = activeChatStreamTab == 0,
@@ -558,7 +545,7 @@ fun ConciergeChatScreen(
                         modifier = Modifier.size(16.dp)
                     )
                 },
-                label = { Text("Marco") }
+                label = { Text("Marco Concierge") }
             )
             SegmentedButton(
                 selected = activeChatStreamTab == 1,
@@ -566,7 +553,7 @@ fun ConciergeChatScreen(
                 shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
                 icon = {
                     Icon(
-                        imageVector = Icons.Default.NaturePeople,
+                        imageVector = Icons.Default.Groups,
                         contentDescription = "Travel Crew",
                         modifier = Modifier.size(16.dp)
                     )
@@ -596,47 +583,55 @@ fun ConciergeChatScreen(
             if (displayedMessages.isEmpty()) {
                 item {
                     Card(
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(containerColor = LuxuryCard),
                         border = BorderStroke(1.dp, LuxuryBorder),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 12.dp)
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
+                        Column(modifier = Modifier.padding(20.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Box(
                                     modifier = Modifier
-                                        .size(36.dp)
+                                        .size(42.dp)
                                         .clip(CircleShape)
-                                        .background(LuxuryCardElevated),
+                                        .background(LuxuryCardElevated)
+                                        .border(1.dp, LuxuryBorder, CircleShape),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
-                                        imageVector = if (activeChatStreamTab == 1) Icons.Default.NaturePeople else Icons.Default.Explore,
+                                        imageVector = if (activeChatStreamTab == 1) Icons.Default.Groups else Icons.Default.Explore,
                                         contentDescription = null,
                                         tint = ChampagneGold,
-                                        modifier = Modifier.size(20.dp)
+                                        modifier = Modifier.size(22.dp)
                                     )
                                 }
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Text(
-                                        text = if (activeChatStreamTab == 1) "Travel Crew" else "Marco Concierge",
+                                        text = if (activeChatStreamTab == 1) "Travel Crew Expedition Hub" else "Marco Expedition Concierge",
                                         style = MaterialTheme.typography.titleMedium.copy(
                                             fontWeight = FontWeight.Bold,
                                             color = TextPrimary
                                         )
                                     )
+                                    Text(
+                                        text = if (activeChatStreamTab == 1) "Collaborate with friends & family" else "Named after history's most famous globetrotter",
+                                        style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
+                                    )
                                 }
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(14.dp))
                             Text(
                                 text = if (activeChatStreamTab == 1)
-                                    "Coordinate activities, share trip memories, and plan with your travel party.\n\nTap '+' below to share a group photo."
+                                    "Plan adventures together, align on itineraries, vote on excursions, and share live vacation moments with your loved ones.\n\nTap '+' below to share a trip photo or review party alignments."
                                 else
-                                    "Research destinations, check loyalty rewards, arrange accessible itineraries, and coordinate travel safety.\n\nType a message or tap '+' below to begin.",
-                                style = MaterialTheme.typography.bodyMedium.copy(color = TextSecondary)
+                                    "Dream up unforgettable vacations, optimize loyalty points, find hidden cultural gems, and coordinate seamless travel with your loved ones.\n\nType your dream destination or tap a prompt chip below to begin charting your course.",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    color = TextSecondary,
+                                    lineHeight = 20.sp
+                                )
                             )
                         }
                     }
@@ -762,7 +757,6 @@ fun ConciergeChatScreen(
                         )
                     }
                     "CARD_MEMORY" -> {
-
                         ChatGroupMemoryCard(
                             message = msg,
                             memories = memoriesList,
@@ -828,7 +822,7 @@ fun ConciergeChatScreen(
                                 viewModel.addGroupMemory("You", "Stunning coastal vista with family", currentTrip?.destination ?: "Wailea Point")
                             },
                             onLikeClick = { memory ->
-                                // Trigger positive like interaction
+                                // Positive like reaction
                             },
                             onPlayTts = { viewModel.playAudioTranscript(msg.text) },
                             onOpenFullMemories = onOpenMemories
@@ -896,7 +890,6 @@ fun ConciergeChatScreen(
                         )
                     }
                     else -> {
-                        // Standard AI Assistant text response
                         AiAssistantMessageBubble(
                             message = msg,
                             onPlayTts = { viewModel.playAudioTranscript(msg.text) }
@@ -913,40 +906,7 @@ fun ConciergeChatScreen(
             }
         }
 
-        // QUICK-ACTION PROMPT CHIPS
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 6.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(suggestionChips) { chip ->
-                Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    modifier = Modifier
-                        .clickable {
-                            if (chip.contains("Settings", ignoreCase = true)) {
-                                onOpenSettings()
-                            } else {
-                                viewModel.sendChatMessage(chip)
-                            }
-                        }
-                        .testTag("suggestion_chip_${chip.take(8)}")
-                ) {
-                    Text(
-                        text = chip,
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-                    )
-                }
-            }
-        }
-
-        // CHAT INPUT BAR (Unified Full-Width Papercraft Composer)
+        // CHAT INPUT BAR (Unified Floating Capsule Composer)
         Surface(
             color = LuxurySurface,
             modifier = Modifier.fillMaxWidth()
@@ -958,27 +918,27 @@ fun ConciergeChatScreen(
             ) {
                 Surface(
                     color = LuxuryCard,
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(22.dp),
                     border = BorderStroke(1.dp, LuxuryBorder),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .padding(horizontal = 16.dp, vertical = 10.dp)
                     ) {
-                        // Multi-line Text Input Area (spans full width)
+                        // Multi-line Text Input Area
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .heightIn(min = 36.dp, max = 130.dp)
+                                .heightIn(min = 38.dp, max = 130.dp)
                         ) {
                             if (inputText.isEmpty()) {
                                 Text(
                                     text = if (activeChatStreamTab == 1)
                                         "Message travel crew..."
                                     else
-                                        "Message Marco or plan a trip...",
+                                        "Ask Marco anything or plan a trip... 🌴",
                                     style = MaterialTheme.typography.bodyMedium.copy(
                                         color = TextMuted
                                     ),
@@ -991,7 +951,7 @@ fun ConciergeChatScreen(
                                 textStyle = MaterialTheme.typography.bodyMedium.copy(
                                     color = TextPrimary
                                 ),
-                                cursorBrush = androidx.compose.ui.graphics.SolidColor(ChampagneGold),
+                                cursorBrush = androidx.compose.ui.graphics.SolidColor(MarcoCoral),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .testTag("chat_input_field")
@@ -1000,7 +960,7 @@ fun ConciergeChatScreen(
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        // Bottom Actions Row (Contained inside the text input box)
+                        // Bottom Actions Row
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -1014,10 +974,10 @@ fun ConciergeChatScreen(
                                 // '+' Quick Action Button
                                 Box(
                                     modifier = Modifier
-                                        .size(34.dp)
+                                        .size(36.dp)
                                         .clip(CircleShape)
-                                        .background(LuxuryCardElevated)
-                                        .border(1.dp, LuxuryBorder, CircleShape)
+                                        .background(VoyagerSkyPastel)
+                                        .border(1.dp, VoyagerSky.copy(alpha = 0.35f), CircleShape)
                                         .clickable { isQuickActionSheetOpen = true }
                                         .testTag("open_quick_actions_button"),
                                     contentAlignment = Alignment.Center
@@ -1025,8 +985,8 @@ fun ConciergeChatScreen(
                                     Icon(
                                         imageVector = Icons.Default.Add,
                                         contentDescription = "Quick Actions",
-                                        tint = ChampagneGold,
-                                        modifier = Modifier.size(18.dp)
+                                        tint = VoyagerSky,
+                                        modifier = Modifier.size(20.dp)
                                     )
                                 }
 
@@ -1034,15 +994,15 @@ fun ConciergeChatScreen(
                                 var isListeningVoice by remember { mutableStateOf(false) }
                                 Box(
                                     modifier = Modifier
-                                        .size(34.dp)
+                                        .size(36.dp)
                                         .clip(CircleShape)
                                         .background(
-                                            if (isListeningVoice) ChampagneGold.copy(alpha = 0.25f)
-                                             else LuxuryCardElevated
+                                            if (isListeningVoice) GoldenSunPastel
+                                            else LightCardElevated
                                         )
                                         .border(
                                             1.dp,
-                                            if (isListeningVoice) ChampagneGold else LuxuryBorder,
+                                            if (isListeningVoice) GoldenSun else LightBorder,
                                             CircleShape
                                         )
                                         .clickable {
@@ -1057,8 +1017,8 @@ fun ConciergeChatScreen(
                                     Icon(
                                         imageVector = if (isListeningVoice) Icons.Default.Mic else Icons.Default.MicOff,
                                         contentDescription = "Voice Input",
-                                        tint = if (isListeningVoice) ChampagneGold else TextSecondary,
-                                        modifier = Modifier.size(16.dp)
+                                        tint = if (isListeningVoice) GoldenSunDark else TextSecondary,
+                                        modifier = Modifier.size(18.dp)
                                     )
                                 }
                             }
@@ -1067,14 +1027,14 @@ fun ConciergeChatScreen(
                             val canSend = inputText.isNotBlank() && !isTyping
                             Box(
                                 modifier = Modifier
-                                    .size(36.dp)
+                                    .size(38.dp)
                                     .clip(CircleShape)
                                     .background(
-                                        if (canSend) LuxuryCardElevated else LuxuryCard
+                                        if (canSend) MarcoCoral else LightCardElevated
                                     )
                                     .border(
                                         1.dp,
-                                        if (canSend) ChampagneGold else LuxuryBorder,
+                                        if (canSend) MarcoCoralLight else LightBorder,
                                         CircleShape
                                     )
                                     .clickable(enabled = canSend) {
@@ -1090,8 +1050,8 @@ fun ConciergeChatScreen(
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.Send,
                                     contentDescription = "Send Message",
-                                    tint = if (canSend) TextPrimary else TextMuted,
-                                    modifier = Modifier.size(16.dp)
+                                    tint = if (canSend) Color.White else TextMuted,
+                                    modifier = Modifier.size(18.dp)
                                 )
                             }
                         }
@@ -1101,78 +1061,274 @@ fun ConciergeChatScreen(
         }
     }
 
-    // Quick Actions Modal Bottom Sheet
+    // Quick Actions Modal Bottom Sheet (2-Column Large Icon Tiles Grid)
     if (isQuickActionSheetOpen) {
+        data class QuickActionTileItem(
+            val title: String,
+            val subtitle: String,
+            val prompt: String,
+            val icon: androidx.compose.ui.graphics.vector.ImageVector,
+            val iconColor: Color,
+            val containerColor: Color
+        )
+
+        val quickActionTiles = remember(isTripActive) {
+            buildList {
+                add(
+                    QuickActionTileItem(
+                        title = "Itinerary",
+                        subtitle = "Flights, stays & stops",
+                        prompt = "Show itinerary snippets and cards",
+                        icon = Icons.AutoMirrored.Filled.EventNote,
+                        iconColor = VoyagerSky,
+                        containerColor = VoyagerSkyPastel
+                    )
+                )
+                add(
+                    QuickActionTileItem(
+                        title = "Plan New Trip",
+                        subtitle = "Bespoke 5-day route",
+                        prompt = "Plan trip to Tokyo & Kyoto, Japan",
+                        icon = Icons.Default.FlightTakeoff,
+                        iconColor = MarcoCoral,
+                        containerColor = MarcoCoralPastel
+                    )
+                )
+                add(
+                    QuickActionTileItem(
+                        title = "Group Memories",
+                        subtitle = "Photo reel & moments",
+                        prompt = "Show group photo carousel",
+                        icon = Icons.Default.Collections,
+                        iconColor = BerryOrchid,
+                        containerColor = BerryOrchidPastel
+                    )
+                )
+                add(
+                    QuickActionTileItem(
+                        title = "Budget & FX",
+                        subtitle = "Spend & live exchange",
+                        prompt = "Check my budget, expenses, and currency conversion",
+                        icon = Icons.Default.AccountBalanceWallet,
+                        iconColor = PalmEmerald,
+                        containerColor = PalmEmeraldPastel
+                    )
+                )
+                add(
+                    QuickActionTileItem(
+                        title = "Savings Summary",
+                        subtitle = "Points vs cash savings",
+                        prompt = "Show weekly budget summary and savings vs spend",
+                        icon = Icons.Default.Savings,
+                        iconColor = GoldenSunDark,
+                        containerColor = GoldenSunPastel
+                    )
+                )
+                add(
+                    QuickActionTileItem(
+                        title = "Accessibility",
+                        subtitle = "Dietary, wheelchair, ages",
+                        prompt = "Open family and accessibility planner studio",
+                        icon = Icons.AutoMirrored.Filled.Accessible,
+                        iconColor = LagoonTeal,
+                        containerColor = LagoonTealPastel
+                    )
+                )
+                add(
+                    QuickActionTileItem(
+                        title = "Call Hotel Desk",
+                        subtitle = "AI voice inquiry",
+                        prompt = "Call hotel front desk for heated pool hours & ADA access",
+                        icon = Icons.Default.PhoneInTalk,
+                        iconColor = VoyagerSky,
+                        containerColor = VoyagerSkyPastel
+                    )
+                )
+                add(
+                    QuickActionTileItem(
+                        title = "Rewards Wallet",
+                        subtitle = "SkyMiles & Bonvoy",
+                        prompt = "Check my points and timeshare wallet",
+                        icon = Icons.Default.CardMembership,
+                        iconColor = GoldenSunDark,
+                        containerColor = GoldenSunPastel
+                    )
+                )
+                add(
+                    QuickActionTileItem(
+                        title = "Traveler DNA",
+                        subtitle = "Your explorer profile",
+                        prompt = "Show my traveler DNA and learned profile",
+                        icon = Icons.Default.Fingerprint,
+                        iconColor = BerryOrchid,
+                        containerColor = BerryOrchidPastel
+                    )
+                )
+                add(
+                    QuickActionTileItem(
+                        title = if (isTripActive) "Emergency SOS" else "Safety & Offline",
+                        subtitle = if (isTripActive) "Broadcast live GPS" else "Offline medical guide",
+                        prompt = if (isTripActive) "Broadcast emergency SOS beacon" else "Show offline safety, hospital and emergency info",
+                        icon = Icons.Default.HealthAndSafety,
+                        iconColor = StatusCrimson,
+                        containerColor = StatusCrimsonMuted
+                    )
+                )
+                add(
+                    QuickActionTileItem(
+                        title = "Cloud Account",
+                        subtitle = "Sync trips & wallet",
+                        prompt = "__OPEN_AUTH__",
+                        icon = Icons.Default.CloudSync,
+                        iconColor = VoyagerSky,
+                        containerColor = VoyagerSkyPastel
+                    )
+                )
+                add(
+                    QuickActionTileItem(
+                        title = "Settings",
+                        subtitle = "Voice & AI models",
+                        prompt = "__OPEN_SETTINGS__",
+                        icon = Icons.Default.Settings,
+                        iconColor = TextSecondary,
+                        containerColor = LightCardElevated
+                    )
+                )
+            }
+        }
+
         ModalBottomSheet(
             onDismissRequest = { isQuickActionSheetOpen = false },
-            sheetState = rememberModalBottomSheetState()
+            sheetState = rememberModalBottomSheetState(),
+            containerColor = LightSurface
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
-                    .padding(20.dp)
+                    .padding(horizontal = 20.dp, vertical = 12.dp)
             ) {
-                Text(
-                    text = "Quick Actions",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                val actions = buildList {
-                    add(Triple("Group Photo Reel", "Collaborative photo reel with AI scene tags & 1-tap likes", "Show group photo carousel"))
-                    add(Triple("Structured Itinerary Snippets", "Quick-scan cards for flights, hotels, and vouchers", "Show itinerary snippets and cards"))
-                    if (isTripActive) {
-                        add(Triple("Emergency SOS Beacon", "Transmit live GPS telemetry to contacts and 911 dispatch", "Broadcast emergency SOS beacon"))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "Travel Tools & Actions",
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary,
+                                fontSize = 20.sp
+                            )
+                        )
+                        Text(
+                            text = "Select an action to explore or plan",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = TextSecondary
+                            )
+                        )
                     }
-                    add(Triple("Budget & Currency Tracker", "Live balances, encrypted tokens, and zero-fee FX converter", "Check my budget, expenses, and currency conversion"))
-                    add(Triple("Weekly Budget & Arbitrage Summary", "Spend vs loyalty savings comparison & category breakdown", "Show weekly budget summary and savings vs spend"))
-                    add(Triple("Family & Accessibility Planner", "Dietary restrictions, wheelchair needs, and family age pacing", "Open family and accessibility planner studio"))
-                    add(Triple("Plan New Itinerary", "Generate tailored 5-day trip with points & pacing", "Plan trip to Tokyo & Kyoto, Japan"))
-                    add(Triple("Call Hotel Front Desk", "Simulate live phone inquiry for pool hours & check-in", "Call hotel front desk for heated pool hours & ADA access"))
-                    add(Triple("Rewards & Timeshare Wallet", "View SkyMiles, Bonvoy, and RCI Trading Power", "Check my points and timeshare wallet"))
-                    add(Triple("My Traveler DNA", "View learned preferences and rate past trips", "Show my traveler DNA and learned profile"))
-                    if (isTripActive) {
-                        add(Triple("Offline Safety & Live SOS", "Live GPS telemetry, hospital ER & emergency dispatch", "Show offline safety, hospital and emergency info"))
-                    } else {
-                        add(Triple("Pre-Trip Safety & Preparation", "Emergency directory, hospital & consular guide", "Show offline safety, hospital and emergency info"))
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(MarcoCoralPastel)
+                            .clickable { isQuickActionSheetOpen = false },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = MarcoCoral,
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
-                    add(Triple("Cloud Account & Sign In", "Sign in to sync itineraries, wallet, and traveler DNA", "__OPEN_AUTH__"))
-                    add(Triple("Vacation Memories", "View shared photos and vacation notes", "Show vacation memories and moments"))
-                    add(Triple("Settings & Voice Concierge", "Switch narrator voice, BYOK API keys, and model parameters", "__OPEN_SETTINGS__"))
                 }
 
-                actions.forEach { (title, subtitle, prompt) ->
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                            .clickable {
-                                isQuickActionSheetOpen = false
-                                if (prompt == "__OPEN_SETTINGS__") {
-                                    onOpenSettings()
-                                } else if (prompt == "__OPEN_AUTH__") {
-                                    onOpenAuth()
-                                } else {
-                                    viewModel.sendChatMessage(prompt)
+                Spacer(modifier = Modifier.height(18.dp))
+
+                // 2-Column Grid of Large Icon Tiles
+                val pairs = quickActionTiles.chunked(2)
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    pairs.forEach { pair ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            pair.forEach { tile ->
+                                Surface(
+                                    shape = RoundedCornerShape(18.dp),
+                                    color = LightCard,
+                                    border = BorderStroke(1.dp, LightBorder),
+                                    shadowElevation = 1.dp,
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(130.dp)
+                                        .clickable {
+                                            isQuickActionSheetOpen = false
+                                            if (tile.prompt == "__OPEN_SETTINGS__") {
+                                                onOpenSettings()
+                                            } else if (tile.prompt == "__OPEN_AUTH__") {
+                                                onOpenAuth()
+                                            } else {
+                                                viewModel.sendChatMessage(tile.prompt)
+                                            }
+                                        }
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(14.dp),
+                                        verticalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(42.dp)
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(tile.containerColor),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = tile.icon,
+                                                contentDescription = tile.title,
+                                                tint = tile.iconColor,
+                                                modifier = Modifier.size(22.dp)
+                                            )
+                                        }
+
+                                        Column {
+                                            Text(
+                                                text = tile.title,
+                                                style = MaterialTheme.typography.titleSmall.copy(
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = TextPrimary,
+                                                    fontSize = 14.sp
+                                                ),
+                                                maxLines = 1
+                                            )
+                                            Spacer(modifier = Modifier.height(2.dp))
+                                            Text(
+                                                text = tile.subtitle,
+                                                style = MaterialTheme.typography.labelSmall.copy(
+                                                    color = TextSecondary,
+                                                    fontSize = 11.sp,
+                                                    lineHeight = 14.sp
+                                                ),
+                                                maxLines = 2
+                                            )
+                                        }
+                                    }
                                 }
                             }
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(title, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
-                                Text(subtitle, style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant))
+                            if (pair.size == 1) {
+                                Spacer(modifier = Modifier.weight(1f))
                             }
-                            Icon(Icons.Default.Send, null, tint = WaypointCyan, modifier = Modifier.size(16.dp))
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(24.dp))
+
+                Spacer(modifier = Modifier.height(28.dp))
             }
         }
     }
@@ -1213,13 +1369,13 @@ fun ChatItineraryCard(
     var selectedDay by remember { mutableIntStateOf(1) }
 
     Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = LuxuryCard),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -1229,43 +1385,55 @@ fun ChatItineraryCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(38.dp)
                             .clip(CircleShape)
-                            .background(OceanBlue.copy(alpha = 0.15f)),
+                            .background(LuxuryCardElevated)
+                            .border(1.dp, LuxuryBorder, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.FlightTakeoff, null, tint = OceanBlue, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.FlightTakeoff, null, tint = ChampagneGold, modifier = Modifier.size(18.dp))
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
                             text = trip?.title ?: "Tailored Journey",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
+                            )
                         )
                         Text(
                             text = "${trip?.destination ?: "Active Trip"} • ${trip?.travelStyle ?: "Points & Luxury"}",
-                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                         )
                     }
                 }
 
-                IconButton(
-                    onClick = { isExpanded = !isExpanded },
-                    modifier = Modifier
-                        .minimumInteractiveComponentSize()
-                        .size(28.dp)
-                ) {
-                    Icon(
-                        imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = "Toggle",
-                        tint = WaypointCyan
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = onPlayTts, modifier = Modifier.size(28.dp)) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                            contentDescription = "Listen",
+                            tint = TextSecondary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = { isExpanded = !isExpanded },
+                        modifier = Modifier.size(28.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                            contentDescription = "Toggle",
+                            tint = ChampagneGold
+                        )
+                    }
                 }
             }
 
             Text(
                 text = message.text,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium.copy(color = TextPrimary),
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
@@ -1282,17 +1450,18 @@ fun ChatItineraryCard(
                         for (d in 1..daysCount) {
                             val isDaySelected = selectedDay == d
                             Surface(
-                                shape = RoundedCornerShape(8.dp),
-                                color = if (isDaySelected) OceanBlue else MaterialTheme.colorScheme.surfaceVariant,
+                                shape = RoundedCornerShape(10.dp),
+                                color = if (isDaySelected) ChampagneGold else LuxurySurface,
+                                border = BorderStroke(1.dp, if (isDaySelected) ChampagneGold else LuxuryBorder),
                                 modifier = Modifier.clickable { selectedDay = d }
                             ) {
                                 Text(
                                     text = "Day $d",
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        color = if (isDaySelected) CartographyDarkBase else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        color = if (isDaySelected) LuxuryDarkBase else TextSecondary,
                                         fontWeight = FontWeight.Bold
                                     ),
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                                 )
                             }
                         }
@@ -1306,35 +1475,28 @@ fun ChatItineraryCard(
                     ) {
                         dayActs.forEach { act ->
                             Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                                shape = RoundedCornerShape(14.dp),
+                                color = LuxurySurface,
+                                border = BorderStroke(1.dp, LuxuryBorder),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(8.dp),
+                                    modifier = Modifier.padding(12.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Icon(
-                                        imageVector = when (act.category) {
-                                            "FLIGHT" -> Icons.Default.AirplanemodeActive
-                                            "HOTEL", "TIMESHARE" -> Icons.Default.Hotel
-                                            "DINING" -> Icons.Default.Restaurant
-                                            "TRANSIT" -> Icons.Default.DirectionsBus
-                                            else -> Icons.Default.NaturePeople
-                                        },
-                                        contentDescription = null,
-                                        tint = OceanBlue,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
+                                    CategoryIconBadge(category = act.category, size = 34)
+                                    Spacer(modifier = Modifier.width(10.dp))
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(
                                             text = "${act.timeSlot} • ${act.title}",
-                                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                                            style = MaterialTheme.typography.labelMedium.copy(
+                                                fontWeight = FontWeight.Bold,
+                                                color = TextPrimary
+                                            )
                                         )
                                         Text(
                                             text = "${act.location} • ${act.accessibilityBadge}",
-                                            style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary)
                                         )
                                     }
                                 }
@@ -1342,48 +1504,62 @@ fun ChatItineraryCard(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     // Action Buttons Row
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Surface(
                             shape = RoundedCornerShape(12.dp),
-                            color = AmberGold.copy(alpha = 0.15f),
+                            color = LuxurySurface,
+                            border = BorderStroke(1.dp, LuxuryBorder),
                             modifier = Modifier
                                 .weight(1f)
-                                .heightIn(min = 48.dp)
+                                .heightIn(min = 44.dp)
                                 .clickable { onTriggerCall() }
                         ) {
                             Row(
-                                modifier = Modifier.padding(vertical = 8.dp),
+                                modifier = Modifier.padding(vertical = 10.dp),
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(Icons.Default.PhoneInTalk, null, tint = AmberGold, modifier = Modifier.size(14.dp))
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text("Call Hotel", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = AmberGold))
+                                Icon(Icons.Default.PhoneInTalk, null, tint = ChampagneGold, modifier = Modifier.size(15.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    "Call Hotel",
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = ChampagneGold
+                                    )
+                                )
                             }
                         }
 
                         Surface(
                             shape = RoundedCornerShape(12.dp),
-                            color = EmeraldGreen.copy(alpha = 0.15f),
+                            color = LuxurySurface,
+                            border = BorderStroke(1.dp, LuxuryBorder),
                             modifier = Modifier
                                 .weight(1f)
-                                .heightIn(min = 48.dp)
+                                .heightIn(min = 44.dp)
                                 .clickable { onToggleOffline() }
                         ) {
                             Row(
-                                modifier = Modifier.padding(vertical = 8.dp),
+                                modifier = Modifier.padding(vertical = 10.dp),
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(Icons.Default.CloudDownload, null, tint = EmeraldGreen, modifier = Modifier.size(14.dp))
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text("Sync Offline", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = EmeraldGreen))
+                                Icon(Icons.Default.CloudDownload, null, tint = StatusEmerald, modifier = Modifier.size(15.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    "Sync Offline",
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = StatusEmerald
+                                    )
+                                )
                             }
                         }
                     }
@@ -1405,13 +1581,13 @@ fun ChatVoiceCallCard(
     var isTranscriptOpen by remember { mutableStateOf(false) }
 
     Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = AmberGold.copy(alpha = 0.08f)),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = LuxuryCard),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -1421,66 +1597,76 @@ fun ChatVoiceCallCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(38.dp)
                             .clip(CircleShape)
-                            .background(AmberGold.copy(alpha = 0.2f)),
+                            .background(LuxuryCardElevated)
+                            .border(1.dp, LuxuryBorder, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.PhoneInTalk, null, tint = AmberGold, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.PhoneInTalk, null, tint = ChampagneGold, modifier = Modifier.size(18.dp))
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
                     Column {
-                        Text(
-                            text = "AI Voice Telephony Dispatch",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = AmberGold)
-                        )
+                        ExpeditionBadge(text = "AI Voice Dispatch", color = ChampagneGold)
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = callLog?.vendorName ?: "Lodging Front Desk",
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
+                            )
                         )
                     }
                 }
 
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = EmeraldGreen.copy(alpha = 0.2f)
+                    shape = RoundedCornerShape(8.dp),
+                    color = StatusEmerald.copy(alpha = 0.18f),
+                    border = BorderStroke(1.dp, StatusEmerald.copy(alpha = 0.4f))
                 ) {
                     Text(
                         text = "Completed",
-                        style = MaterialTheme.typography.labelSmall.copy(color = EmeraldGreen, fontWeight = FontWeight.Bold),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = StatusEmerald,
+                            fontWeight = FontWeight.Bold
+                        ),
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Confirmed Details Highlight Box
             Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(14.dp),
+                color = LuxurySurface,
+                border = BorderStroke(1.dp, LuxuryBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(12.dp)) {
+                Column(modifier = Modifier.padding(14.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Check, null, tint = EmeraldGreen, modifier = Modifier.size(14.dp))
+                        Icon(Icons.Default.Check, null, tint = StatusEmerald, modifier = Modifier.size(15.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = callLog?.callSummaryOutcome ?: "Pool open daily 7am-10pm with ADA chair lift verified.",
-                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.SemiBold,
+                                color = TextPrimary
+                            )
                         )
                     }
                     if (!callLog?.confirmedDetails.isNullOrBlank()) {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "Note: ${callLog?.confirmedDetails}",
-                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Action Row: Listen TTS + View Transcript
             Row(
@@ -1490,27 +1676,36 @@ fun ChatVoiceCallCard(
             ) {
                 Text(
                     text = if (isTranscriptOpen) "Hide Transcript" else "View Call Transcript",
-                    style = MaterialTheme.typography.labelSmall.copy(color = WaypointCyan, fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.labelSmall.copy(color = ChampagneGold, fontWeight = FontWeight.Bold),
                     modifier = Modifier
-                        .minimumInteractiveComponentSize()
                         .clickable { isTranscriptOpen = !isTranscriptOpen }
                         .padding(vertical = 4.dp)
                 )
 
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = AmberGold,
+                    shape = RoundedCornerShape(10.dp),
+                    color = ChampagneGold,
                     modifier = Modifier
-                        .heightIn(min = 48.dp)
                         .clickable { onPlayAudio() }
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.VolumeUp, null, tint = CartographyDarkBase, modifier = Modifier.size(14.dp))
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                            contentDescription = null,
+                            tint = LuxuryDarkBase,
+                            modifier = Modifier.size(14.dp)
+                        )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Play Audio", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = CartographyDarkBase))
+                        Text(
+                            "Play Audio",
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = LuxuryDarkBase
+                            )
+                        )
                     }
                 }
             }
@@ -1519,13 +1714,14 @@ fun ChatVoiceCallCard(
                 Column(modifier = Modifier.padding(top = 8.dp)) {
                     Surface(
                         shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
+                        color = LuxurySurface,
+                        border = BorderStroke(1.dp, LuxuryBorder),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
                             text = callLog?.audioTranscript ?: "AI Agent: 'Inquiring regarding pool operating hours.'\nVendor: 'Pool open 7am to 10pm daily.'",
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(8.dp)
+                            style = MaterialTheme.typography.bodySmall.copy(color = TextPrimary),
+                            modifier = Modifier.padding(10.dp)
                         )
                     }
                 }
@@ -1545,13 +1741,13 @@ fun ChatRewardsCard(
     onPlayTts: () -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = LuxuryCard),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -1561,33 +1757,42 @@ fun ChatRewardsCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(38.dp)
                             .clip(CircleShape)
-                            .background(TealAccent.copy(alpha = 0.2f)),
+                            .background(LuxuryCardElevated)
+                            .border(1.dp, LuxuryBorder, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.AccountBalanceWallet, null, tint = TealAccent, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.AccountBalanceWallet, null, tint = ChampagneGold, modifier = Modifier.size(18.dp))
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         val totalValuation = accounts.sumOf { it.rewardsEstimatedValuationUsd }
                         Text(
-                            text = "Rewards & Timeshare Portfolio",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                            text = "Rewards & Loyalty Portfolio",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
+                            )
                         )
                         Text(
                             text = if (accounts.isNotEmpty()) "${accounts.size} Connected Accounts • $${totalValuation.toInt()} Est. Value" else "0 Connected Accounts • Link points & timeshares",
-                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                         )
                     }
                 }
 
                 IconButton(onClick = onPlayTts, modifier = Modifier.size(28.dp)) {
-                    Icon(Icons.Default.VolumeUp, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                        contentDescription = "Listen",
+                        tint = TextSecondary,
+                        modifier = Modifier.size(16.dp)
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Account Badges Grid
             if (accounts.isNotEmpty()) {
@@ -1595,30 +1800,40 @@ fun ChatRewardsCard(
                     accounts.take(4).forEach { acc ->
                         Surface(
                             shape = RoundedCornerShape(12.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+                            color = LuxurySurface,
+                            border = BorderStroke(1.dp, LuxuryBorder),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column {
-                                    Text(acc.providerName, style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold))
-                                    Text(acc.accountNumberMasked, style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant))
+                                    Text(
+                                        text = acc.providerName,
+                                        style = MaterialTheme.typography.labelMedium.copy(
+                                            fontWeight = FontWeight.Bold,
+                                            color = TextPrimary
+                                        )
+                                    )
+                                    Text(
+                                        text = acc.accountNumberMasked,
+                                        style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary)
+                                    )
                                 }
                                 Column(horizontalAlignment = Alignment.End) {
                                     Text(
                                         text = "${acc.balanceValue} ${acc.unitLabel}",
                                         style = MaterialTheme.typography.labelMedium.copy(
                                             fontWeight = FontWeight.Bold,
-                                            color = WaypointCyan
+                                            color = ChampagneGold
                                         )
                                     )
                                     Text(
                                         text = "≈ $${acc.rewardsEstimatedValuationUsd.toInt()}",
                                         style = MaterialTheme.typography.labelSmall.copy(
-                                            color = EmeraldGreen,
+                                            color = StatusEmerald,
                                             fontWeight = FontWeight.Bold
                                         )
                                     )
@@ -1630,37 +1845,33 @@ fun ChatRewardsCard(
             } else {
                 Surface(
                     shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    color = LuxurySurface,
+                    border = BorderStroke(1.dp, LuxuryBorder),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = "No loyalty or timeshare accounts linked yet. Link your Delta, Marriott, Hilton, or RCI accounts to optimize points.",
-                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
-                        modifier = Modifier.padding(12.dp)
+                        style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary),
+                        modifier = Modifier.padding(14.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Point Optimization Button
-            Surface(
+            Button(
+                onClick = onRunOptimizer,
                 shape = RoundedCornerShape(12.dp),
-                color = OceanBlue,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp)
-                    .clickable { onRunOptimizer() }
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = ChampagneGold,
+                    contentColor = LuxuryDarkBase
+                ),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Default.AutoAwesome, null, tint = CartographyDarkBase, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Optimize Points & Timeshare Swaps", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = CartographyDarkBase))
-                }
+                Icon(Icons.Default.AutoAwesome, null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Optimize Points & Timeshare Swaps", fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -1697,13 +1908,13 @@ fun ChatOfflineSafetyCard(
     onPlayTts: () -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = LuxuryCard),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -1713,72 +1924,80 @@ fun ChatOfflineSafetyCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(38.dp)
                             .clip(CircleShape)
-                            .background(WaxSealCrimson.copy(alpha = 0.15f)),
+                            .background(LuxuryCardElevated)
+                            .border(1.dp, LuxuryBorder, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.Shield, null, tint = WaxSealCrimson, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.Shield, null, tint = ChampagneGold, modifier = Modifier.size(18.dp))
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
-                            text = "Emergency Safety & Medical Radar",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = WaxSealCrimson)
+                            text = "Safety & Emergency Radar",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
+                            )
                         )
                         Text(
-                            text = "${trip?.destination ?: "Active Destination"} • Monitored",
-                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            text = "${trip?.destination ?: "Active Destination"} • Offline Packet",
+                            style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                         )
                     }
                 }
 
                 IconButton(onClick = onPlayTts, modifier = Modifier.size(28.dp)) {
-                    Icon(Icons.Default.VolumeUp, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                        contentDescription = "Listen",
+                        tint = TextSecondary,
+                        modifier = Modifier.size(16.dp)
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Safety details
             Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+                shape = RoundedCornerShape(14.dp),
+                color = LuxurySurface,
+                border = BorderStroke(1.dp, LuxuryBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(12.dp)) {
+                Column(modifier = Modifier.padding(14.dp)) {
                     Text(
                         text = "Local Emergency SOS: Dial 911 (US) / 112 (EU) / 110 (JP)",
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = TextPrimary
+                        )
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Emergency Medical Care: 24/7 Local Trauma ER & Regional Citizen Consular Services",
-                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Offline Sync Button
-            Surface(
+            Button(
+                onClick = onToggleOffline,
                 shape = RoundedCornerShape(12.dp),
-                color = EmeraldGreen,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp)
-                    .clickable { onToggleOffline() }
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = StatusEmerald,
+                    contentColor = LuxuryDarkBase
+                ),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Default.CloudDownload, null, tint = CartographyDarkBase, modifier = Modifier.size(14.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Toggle Offline Emergency Vector Pack", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = CartographyDarkBase))
-                }
+                Icon(Icons.Default.CloudDownload, null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Toggle Offline Emergency Vector Pack", fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -1797,13 +2016,13 @@ fun ChatGroupMemoryCard(
     var isAdding by remember { mutableStateOf(false) }
 
     Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = LuxuryCard),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -1812,77 +2031,88 @@ fun ChatGroupMemoryCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(38.dp)
                             .clip(CircleShape)
-                            .background(OceanBlue.copy(alpha = 0.15f)),
+                            .background(LuxuryCardElevated)
+                            .border(1.dp, LuxuryBorder, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.Favorite, null, tint = OceanBlue, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.Collections, null, tint = ChampagneGold, modifier = Modifier.size(18.dp))
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
-                            text = "Vacation Moments & Shared Log",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                            text = "Vacation Moments & Memories",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
+                            )
                         )
                         Text(
                             text = "${memories.size} Moments Recorded",
-                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Moments list
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 memories.take(3).forEach { mem ->
                     Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+                        shape = RoundedCornerShape(14.dp),
+                        color = LuxurySurface,
+                        border = BorderStroke(1.dp, LuxuryBorder),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
-                            modifier = Modifier.padding(8.dp),
+                            modifier = Modifier.padding(10.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(Color(mem.photoGradientColor)),
+                                    .size(40.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(LuxuryCardElevated),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(Icons.Default.PhotoCamera, null, tint = Color.White, modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.PhotoCamera, null, tint = ChampagneGold, modifier = Modifier.size(18.dp))
                             }
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(10.dp))
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(mem.caption, style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold))
-                                Text("${mem.authorName} • ${mem.locationTag}", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant))
+                                Text(
+                                    text = mem.caption,
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = TextPrimary
+                                    )
+                                )
+                                Text(
+                                    text = "${mem.authorName} • ${mem.locationTag}",
+                                    style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary)
+                                )
                             }
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             if (!isAdding) {
-                Surface(
+                Button(
+                    onClick = { isAdding = true },
                     shape = RoundedCornerShape(12.dp),
-                    color = OceanBlue.copy(alpha = 0.12f),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 48.dp)
-                        .clickable { isAdding = true }
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = LuxuryCardElevated,
+                        contentColor = TextPrimary
+                    ),
+                    border = BorderStroke(1.dp, LuxuryBorder),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = "+ Add New Travel Memory",
-                        style = MaterialTheme.typography.labelSmall.copy(color = WaypointCyan, fontWeight = FontWeight.Bold),
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                    )
+                    Text("+ Add New Travel Memory", fontWeight = FontWeight.Bold)
                 }
             } else {
                 Row(
@@ -1896,17 +2126,17 @@ fun ChatGroupMemoryCard(
                         modifier = Modifier.weight(1f),
                         singleLine = true
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     IconButton(
                         onClick = {
                             if (captionText.isNotBlank()) {
-                                onAddMemory(captionText, "Makena Beach")
+                                onAddMemory(captionText, "Wailea Beach")
                                 captionText = ""
                                 isAdding = false
                             }
                         }
                     ) {
-                        Icon(Icons.Default.Send, null, tint = OceanBlue)
+                        Icon(Icons.AutoMirrored.Filled.Send, null, tint = ChampagneGold)
                     }
                 }
             }
@@ -1924,15 +2154,17 @@ fun UserMessageBubble(text: String) {
         horizontalAlignment = Alignment.End
     ) {
         Surface(
-            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 16.dp, bottomEnd = 4.dp),
-            color = LuxuryCardElevated,
-            border = BorderStroke(1.dp, LuxuryBorder),
+            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomStart = 20.dp, bottomEnd = 4.dp),
+            color = MarcoCoral,
             modifier = Modifier.padding(start = 48.dp)
         ) {
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = TextPrimary
+                    color = Color.White,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.5.sp,
+                    lineHeight = 21.sp
                 ),
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
             )
@@ -1956,26 +2188,26 @@ fun AiAssistantMessageBubble(
             Icon(
                 imageVector = Icons.Default.Explore,
                 contentDescription = null,
-                tint = ChampagneGold,
-                modifier = Modifier.size(13.dp)
+                tint = MarcoCoral,
+                modifier = Modifier.size(14.dp)
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = "Marco Concierge",
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    color = ChampagneGold
+                    color = MarcoCoral
                 )
             )
         }
 
         Surface(
-            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 4.dp, bottomEnd = 16.dp),
+            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomStart = 4.dp, bottomEnd = 20.dp),
             color = LuxuryCard,
             border = BorderStroke(1.dp, LuxuryBorder),
             modifier = Modifier.padding(end = 36.dp)
         ) {
-            Column(modifier = Modifier.padding(14.dp)) {
+            Column(modifier = Modifier.padding(15.dp)) {
                 Text(
                     text = message.text,
                     style = MaterialTheme.typography.bodyMedium.copy(
@@ -1995,7 +2227,7 @@ fun AiAssistantMessageBubble(
                         modifier = Modifier.size(24.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.VolumeUp,
+                            imageVector = Icons.AutoMirrored.Filled.VolumeUp,
                             contentDescription = "Listen",
                             tint = TextSecondary,
                             modifier = Modifier.size(16.dp)
@@ -2073,14 +2305,14 @@ fun ChatFamilyAccessibilityCard(
     )
 
     Card(
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = LuxuryCard),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier
             .fillMaxWidth()
             .testTag("family_accessibility_card")
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -2092,13 +2324,14 @@ fun ChatFamilyAccessibilityCard(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(CircleShape)
-                            .background(OceanBlue.copy(alpha = 0.15f)),
+                            .background(LuxuryCardElevated)
+                            .border(1.dp, LuxuryBorder, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Accessible,
+                            imageVector = Icons.AutoMirrored.Filled.Accessible,
                             contentDescription = "Accessibility",
-                            tint = OceanBlue,
+                            tint = ChampagneGold,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -2106,11 +2339,14 @@ fun ChatFamilyAccessibilityCard(
                     Column {
                         Text(
                             text = "Family & Accessibility Studio",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
+                            )
                         )
                         Text(
                             text = "Dietary, Wheelchair & Age Pacing for ${trip?.destination ?: "Active Trip"}",
-                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                         )
                     }
                 }
@@ -2118,9 +2354,9 @@ fun ChatFamilyAccessibilityCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onPlayTts, modifier = Modifier.size(28.dp)) {
                         Icon(
-                            imageVector = Icons.Default.VolumeUp,
+                            imageVector = Icons.AutoMirrored.Filled.VolumeUp,
                             contentDescription = "Listen",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = TextSecondary,
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -2128,7 +2364,7 @@ fun ChatFamilyAccessibilityCard(
                         Icon(
                             imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                             contentDescription = "Toggle",
-                            tint = OceanBlue
+                            tint = ChampagneGold
                         )
                     }
                 }
@@ -2136,7 +2372,7 @@ fun ChatFamilyAccessibilityCard(
 
             Text(
                 text = message.text,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium.copy(color = TextPrimary),
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
@@ -2144,11 +2380,14 @@ fun ChatFamilyAccessibilityCard(
                 Column {
                     // SECTION 1: DIETARY RESTRICTIONS & ALLERGENS
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Restaurant, null, tint = OceanBlue, modifier = Modifier.size(14.dp))
+                        Icon(Icons.Default.Restaurant, null, tint = ChampagneGold, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "Dietary Restrictions & Allergies",
-                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OceanBlue, fontSize = 12.sp)
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = ChampagneGold
+                            )
                         )
                     }
                     Spacer(modifier = Modifier.height(6.dp))
@@ -2159,8 +2398,9 @@ fun ChatFamilyAccessibilityCard(
                         items(dietaryOptions) { opt ->
                             val isSelected = selectedDietary.contains(opt, ignoreCase = true)
                             Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = if (isSelected) OceanBlue else MaterialTheme.colorScheme.surfaceVariant,
+                                shape = RoundedCornerShape(10.dp),
+                                color = if (isSelected) ChampagneGold else LuxurySurface,
+                                border = BorderStroke(1.dp, if (isSelected) ChampagneGold else LuxuryBorder),
                                 modifier = Modifier
                                     .clickable {
                                         selectedDietary = if (isSelected) {
@@ -2177,15 +2417,14 @@ fun ChatFamilyAccessibilityCard(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     if (isSelected) {
-                                        Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(12.dp))
+                                        Icon(Icons.Default.Check, null, tint = LuxuryDarkBase, modifier = Modifier.size(12.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
                                     }
                                     Text(
                                         text = opt,
                                         style = MaterialTheme.typography.labelSmall.copy(
-                                            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                                            fontWeight = FontWeight.SemiBold,
-                                            fontSize = 11.sp
+                                            color = if (isSelected) LuxuryDarkBase else TextSecondary,
+                                            fontWeight = FontWeight.SemiBold
                                         )
                                     )
                                 }
@@ -2197,11 +2436,14 @@ fun ChatFamilyAccessibilityCard(
 
                     // SECTION 2: WHEELCHAIR & MOBILITY REQUIREMENTS
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Accessible, null, tint = EmeraldGreen, modifier = Modifier.size(14.dp))
+                        Icon(Icons.AutoMirrored.Filled.Accessible, null, tint = StatusEmerald, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "Wheelchair & Physical Accessibility",
-                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = EmeraldGreen, fontSize = 12.sp)
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = StatusEmerald
+                            )
                         )
                     }
                     Spacer(modifier = Modifier.height(6.dp))
@@ -2212,8 +2454,9 @@ fun ChatFamilyAccessibilityCard(
                         items(wheelchairOptions) { opt ->
                             val isSelected = selectedWheelchair.contains(opt, ignoreCase = true)
                             Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = if (isSelected) EmeraldGreen else MaterialTheme.colorScheme.surfaceVariant,
+                                shape = RoundedCornerShape(10.dp),
+                                color = if (isSelected) StatusEmerald else LuxurySurface,
+                                border = BorderStroke(1.dp, if (isSelected) StatusEmerald else LuxuryBorder),
                                 modifier = Modifier
                                     .clickable {
                                         selectedWheelchair = if (isSelected) {
@@ -2230,15 +2473,14 @@ fun ChatFamilyAccessibilityCard(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     if (isSelected) {
-                                        Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(12.dp))
+                                        Icon(Icons.Default.Check, null, tint = LuxuryDarkBase, modifier = Modifier.size(12.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
                                     }
                                     Text(
                                         text = opt,
                                         style = MaterialTheme.typography.labelSmall.copy(
-                                            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                                            fontWeight = FontWeight.SemiBold,
-                                            fontSize = 11.sp
+                                            color = if (isSelected) LuxuryDarkBase else TextSecondary,
+                                            fontWeight = FontWeight.SemiBold
                                         )
                                     )
                                 }
@@ -2250,11 +2492,14 @@ fun ChatFamilyAccessibilityCard(
 
                     // SECTION 3: FAMILY AGE DYNAMICS & PACING
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.ChildCare, null, tint = AmberGold, modifier = Modifier.size(14.dp))
+                        Icon(Icons.Default.ChildCare, null, tint = ChampagneGold, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "Family Age Groups & Activity Pacing",
-                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = AmberGold, fontSize = 12.sp)
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = ChampagneGold
+                            )
                         )
                     }
                     Spacer(modifier = Modifier.height(6.dp))
@@ -2265,8 +2510,9 @@ fun ChatFamilyAccessibilityCard(
                         items(ageBracketOptions) { opt ->
                             val isSelected = selectedFamilyAges.contains(opt, ignoreCase = true)
                             Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = if (isSelected) AmberGold else MaterialTheme.colorScheme.surfaceVariant,
+                                shape = RoundedCornerShape(10.dp),
+                                color = if (isSelected) ChampagneGold else LuxurySurface,
+                                border = BorderStroke(1.dp, if (isSelected) ChampagneGold else LuxuryBorder),
                                 modifier = Modifier
                                     .clickable {
                                         selectedFamilyAges = if (isSelected) {
@@ -2283,15 +2529,14 @@ fun ChatFamilyAccessibilityCard(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     if (isSelected) {
-                                        Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(12.dp))
+                                        Icon(Icons.Default.Check, null, tint = LuxuryDarkBase, modifier = Modifier.size(12.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
                                     }
                                     Text(
                                         text = opt,
                                         style = MaterialTheme.typography.labelSmall.copy(
-                                            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                                            fontWeight = FontWeight.SemiBold,
-                                            fontSize = 11.sp
+                                            color = if (isSelected) LuxuryDarkBase else TextSecondary,
+                                            fontWeight = FontWeight.SemiBold
                                         )
                                     )
                                 }
@@ -2315,8 +2560,8 @@ fun ChatFamilyAccessibilityCard(
                             .testTag("sensory_notes_input"),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = OceanBlue,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                            focusedBorderColor = ChampagneGold,
+                            unfocusedBorderColor = LuxuryBorder
                         ),
                         maxLines = 2
                     )
@@ -2324,75 +2569,65 @@ fun ChatFamilyAccessibilityCard(
                     Spacer(modifier = Modifier.height(14.dp))
 
                     // ACTION BUTTON 1: RECALCULATE ITINERARY
-                    Surface(
+                    Button(
+                        onClick = {
+                            onSavePreferences(
+                                selectedDietary.ifBlank { "Gluten-Free Safe" },
+                                selectedWheelchair.ifBlank { "Step-Free Ramp & ADA Access" },
+                                selectedFamilyAges.ifBlank { "Family & Kids" },
+                                customNotes,
+                                true
+                            )
+                            hasAppliedChanges = true
+                        },
                         shape = RoundedCornerShape(12.dp),
-                        color = if (hasAppliedChanges) EmeraldGreen else OceanBlue,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (hasAppliedChanges) StatusEmerald else ChampagneGold,
+                            contentColor = LuxuryDarkBase
+                        ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable {
-                                onSavePreferences(
-                                    selectedDietary.ifBlank { "Gluten-Free Safe" },
-                                    selectedWheelchair.ifBlank { "Step-Free Ramp & ADA Access" },
-                                    selectedFamilyAges.ifBlank { "Family & Kids" },
-                                    customNotes,
-                                    true
-                                )
-                                hasAppliedChanges = true
-                            }
                             .testTag("apply_accessibility_recalculate_button")
                     ) {
-                        Row(
-                            modifier = Modifier.padding(vertical = 12.dp),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = if (hasAppliedChanges) Icons.Default.Check else Icons.Default.AutoAwesome,
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = if (hasAppliedChanges) "Applied! Itinerary Recalculated" else "Apply & Recalculate Live Itinerary",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                        }
+                        Icon(
+                            imageVector = if (hasAppliedChanges) Icons.Default.Check else Icons.Default.AutoAwesome,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = if (hasAppliedChanges) "Applied! Itinerary Recalculated" else "Apply & Recalculate Live Itinerary",
+                            fontWeight = FontWeight.Bold
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // ACTION BUTTON 2: DISPATCH AI VOICE CALL FOR HOTEL ADA & ALLERGEN CHECK
-                    Surface(
+                    Button(
+                        onClick = {
+                            onVerifyVendorAda(
+                                trip?.title ?: "Lodging Front Desk",
+                                "Resort & Culinary",
+                                "Verify step-free wheelchair ramp, hydraulic ADA pool chair lift, and celiac-safe dedicated gluten-free kitchen"
+                            )
+                        },
                         shape = RoundedCornerShape(12.dp),
-                        color = AmberGold.copy(alpha = 0.15f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = LuxuryCardElevated,
+                            contentColor = TextPrimary
+                        ),
+                        border = BorderStroke(1.dp, LuxuryBorder),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable {
-                                onVerifyVendorAda(
-                                    trip?.title ?: "Lodging Front Desk",
-                                    "Resort & Culinary",
-                                    "Verify step-free wheelchair ramp, hydraulic ADA pool chair lift, and celiac-safe dedicated gluten-free kitchen"
-                                )
-                            }
                             .testTag("ai_voice_ada_verify_button")
                     ) {
-                        Row(
-                            modifier = Modifier.padding(vertical = 10.dp),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(Icons.Default.PhoneInTalk, null, tint = AmberGold, modifier = Modifier.size(14.dp))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = "AI Voice Call: Verify Hotel ADA & Kitchen Safety",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = AmberGold
-                            )
-                        }
+                        Icon(Icons.Default.PhoneInTalk, null, tint = ChampagneGold, modifier = Modifier.size(14.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "AI Voice Call: Verify Hotel ADA & Kitchen Safety",
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }
@@ -2417,13 +2652,13 @@ fun ChatActivitySuggestionsCard(
 ) {
     Card(
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        colors = CardDefaults.cardColors(containerColor = LuxuryCard),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier
             .fillMaxWidth()
             .testTag("chat_activity_suggestions_card")
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -2435,7 +2670,8 @@ fun ChatActivitySuggestionsCard(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(CircleShape)
-                            .background(LuxuryCardElevated),
+                            .background(LuxuryCardElevated)
+                            .border(1.dp, LuxuryBorder, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -2449,29 +2685,30 @@ fun ChatActivitySuggestionsCard(
                     Column {
                         Text(
                             text = "Activity Suggestions",
-                            style = MaterialTheme.typography.titleSmall.copy(
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 14.sp,
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
                                 color = TextPrimary
                             )
                         )
                         Text(
                             text = "Filtered for ${trip?.travelersCount ?: 3} travelers" +
                                 (userPref?.wheelchairRequirements?.ifBlank { null }?.let { " • $it" } ?: ""),
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontSize = 11.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                         )
                     }
                 }
 
-                Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onPlayTts, modifier = Modifier.size(28.dp)) {
-                        Icon(Icons.Default.VolumeUp, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                            contentDescription = "Listen",
+                            tint = TextSecondary,
+                            modifier = Modifier.size(16.dp)
+                        )
                     }
                     IconButton(onClick = onRefresh, modifier = Modifier.size(28.dp)) {
-                        Icon(Icons.Default.Tune, null, tint = OceanBlue, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Tune, null, tint = ChampagneGold, modifier = Modifier.size(16.dp))
                     }
                 }
             }
@@ -2480,8 +2717,8 @@ fun ChatActivitySuggestionsCard(
 
             Text(
                 text = message.text,
-                style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, lineHeight = 17.sp),
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.bodySmall.copy(lineHeight = 17.sp),
+                color = TextPrimary
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -2500,7 +2737,7 @@ fun ChatActivitySuggestionsCard(
                         text = "Marco is navigating accessible family excursions...",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
-                        color = VenetianGold
+                        color = ChampagneGold
                     )
                 }
             } else {
@@ -2510,10 +2747,11 @@ fun ChatActivitySuggestionsCard(
 
                         Surface(
                             shape = RoundedCornerShape(14.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                            color = LuxurySurface,
+                            border = BorderStroke(1.dp, LuxuryBorder),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Column(modifier = Modifier.padding(12.dp)) {
+                            Column(modifier = Modifier.padding(14.dp)) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -2524,78 +2762,44 @@ fun ChatActivitySuggestionsCard(
                                             text = item.title,
                                             style = MaterialTheme.typography.titleSmall.copy(
                                                 fontWeight = FontWeight.Bold,
-                                                fontSize = 13.sp
+                                                color = TextPrimary
                                             )
                                         )
                                         Text(
                                             text = "${item.suggestedTimeSlot} • ${item.location} • ${item.durationHours} hrs",
-                                            style = MaterialTheme.typography.bodySmall.copy(
-                                                fontSize = 11.sp,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
+                                            style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                                         )
                                     }
 
-                                    Surface(
-                                        shape = RoundedCornerShape(8.dp),
-                                        color = EmeraldGreen.copy(alpha = 0.18f)
-                                    ) {
-                                        Text(
-                                            text = "${item.matchScore}% Match",
-                                            style = MaterialTheme.typography.labelSmall.copy(
-                                                color = EmeraldGreen,
-                                                fontWeight = FontWeight.Bold,
-                                                fontSize = 10.sp
-                                            ),
-                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
-                                        )
-                                    }
+                                    ExpeditionBadge(
+                                        text = "${item.matchScore}% Match",
+                                        color = StatusEmerald,
+                                        isFilled = true
+                                    )
                                 }
 
-                                Spacer(modifier = Modifier.height(6.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
 
                                 // Badges
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                                 ) {
-                                    Surface(
-                                        shape = RoundedCornerShape(6.dp),
-                                        color = OceanBlue.copy(alpha = 0.12f)
-                                    ) {
-                                        Text(
-                                            text = item.accessibilityBadge,
-                                            style = MaterialTheme.typography.labelSmall.copy(
-                                                color = OceanBlue,
-                                                fontSize = 10.sp,
-                                                fontWeight = FontWeight.SemiBold
-                                            ),
-                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                        )
-                                    }
-
-                                    Surface(
-                                        shape = RoundedCornerShape(6.dp),
-                                        color = AmberGold.copy(alpha = 0.15f)
-                                    ) {
-                                        Text(
-                                            text = item.familySuitability,
-                                            style = MaterialTheme.typography.labelSmall.copy(
-                                                color = AmberGold,
-                                                fontSize = 10.sp,
-                                                fontWeight = FontWeight.SemiBold
-                                            ),
-                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                        )
-                                    }
+                                    ExpeditionBadge(
+                                        text = item.accessibilityBadge,
+                                        color = ChampagneGold
+                                    )
+                                    ExpeditionBadge(
+                                        text = item.familySuitability,
+                                        color = ChampagneGold
+                                    )
                                 }
 
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.height(6.dp))
                                 Text(
                                     text = "🥗 ${item.dietaryMatch}",
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        fontSize = 10.sp,
-                                        color = EmeraldGreen,
+                                        color = StatusEmerald,
                                         fontWeight = FontWeight.Medium
                                     )
                                 )
@@ -2604,13 +2808,12 @@ fun ChatActivitySuggestionsCard(
                                 Text(
                                     text = item.rationale,
                                     style = MaterialTheme.typography.bodySmall.copy(
-                                        fontSize = 11.sp,
-                                        lineHeight = 15.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        lineHeight = 16.sp,
+                                        color = TextSecondary
                                     )
                                 )
 
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(10.dp))
 
                                 // Action Row: Add to Day 1/2 or Call Vendor
                                 Row(
@@ -2618,57 +2821,50 @@ fun ChatActivitySuggestionsCard(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Surface(
-                                        shape = RoundedCornerShape(8.dp),
-                                        color = if (isAdded) EmeraldGreen else OceanBlue,
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .clickable {
-                                                if (!isAdded) {
-                                                    onAddActivity(item, 1)
-                                                    isAdded = true
-                                                }
+                                    Button(
+                                        onClick = {
+                                            if (!isAdded) {
+                                                onAddActivity(item, 1)
+                                                isAdded = true
                                             }
+                                        },
+                                        shape = RoundedCornerShape(10.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = if (isAdded) StatusEmerald else ChampagneGold,
+                                            contentColor = LuxuryDarkBase
+                                        ),
+                                        modifier = Modifier.weight(1f)
                                     ) {
-                                        Row(
-                                            modifier = Modifier.padding(vertical = 7.dp),
-                                            horizontalArrangement = Arrangement.Center,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Icon(
-                                                imageVector = if (isAdded) Icons.Default.Check else Icons.Default.Add,
-                                                contentDescription = null,
-                                                tint = Color.White,
-                                                modifier = Modifier.size(13.dp)
-                                            )
-                                            Spacer(modifier = Modifier.width(4.dp))
-                                            Text(
-                                                text = if (isAdded) "Added to Day 1" else "+ Add to Itinerary ($${item.estimatedCost.toInt()})",
-                                                fontSize = 11.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                color = Color.White
-                                            )
-                                        }
+                                        Icon(
+                                            imageVector = if (isAdded) Icons.Default.Check else Icons.Default.Add,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(14.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = if (isAdded) "Added to Day 1" else "+ Add to Itinerary ($${item.estimatedCost.toInt()})",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 11.sp
+                                        )
                                     }
 
-                                    Surface(
-                                        shape = RoundedCornerShape(8.dp),
-                                        color = AmberGold.copy(alpha = 0.15f),
-                                        modifier = Modifier.clickable {
+                                    Button(
+                                        onClick = {
                                             onVerifyVendor(
                                                 item.bookingVendor,
                                                 "Verify ramp access, stroller parking, and reservations for ${item.title}"
                                             )
-                                        }
+                                        },
+                                        shape = RoundedCornerShape(10.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = LuxuryCardElevated,
+                                            contentColor = TextPrimary
+                                        ),
+                                        border = BorderStroke(1.dp, LuxuryBorder)
                                     ) {
-                                        Row(
-                                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Icon(Icons.Default.PhoneInTalk, null, tint = AmberGold, modifier = Modifier.size(12.dp))
-                                            Spacer(modifier = Modifier.width(4.dp))
-                                            Text("Call Vendor", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = AmberGold)
-                                        }
+                                        Icon(Icons.Default.PhoneInTalk, null, tint = ChampagneGold, modifier = Modifier.size(14.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("Call Vendor", fontWeight = FontWeight.Bold, fontSize = 11.sp)
                                     }
                                 }
                             }
@@ -2696,13 +2892,13 @@ fun ChatDynamicAdjustmentCard(
 
     Card(
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        colors = CardDefaults.cardColors(containerColor = LuxuryCard),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier
             .fillMaxWidth()
             .testTag("chat_dynamic_adjustment_card")
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -2714,7 +2910,8 @@ fun ChatDynamicAdjustmentCard(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(CircleShape)
-                            .background(LuxuryCardElevated),
+                            .background(LuxuryCardElevated)
+                            .border(1.dp, LuxuryBorder, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -2728,24 +2925,25 @@ fun ChatDynamicAdjustmentCard(
                     Column {
                         Text(
                             text = "Itinerary Adjustment Notice",
-                            style = MaterialTheme.typography.titleSmall.copy(
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 14.sp,
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
                                 color = TextPrimary
                             )
                         )
                         Text(
                             text = "Weather alerts & disruption contingency",
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontSize = 11.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                         )
                     }
                 }
 
                 IconButton(onClick = onPlayTts, modifier = Modifier.size(28.dp)) {
-                    Icon(Icons.Default.VolumeUp, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                        contentDescription = "Listen",
+                        tint = TextSecondary,
+                        modifier = Modifier.size(16.dp)
+                    )
                 }
             }
 
@@ -2759,34 +2957,34 @@ fun ChatDynamicAdjustmentCard(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    MarcoAstrolabeLoadingAnimation(sizeDp = 64, accentColor = SunsetCoral)
+                    MarcoAstrolabeLoadingAnimation(sizeDp = 64, accentColor = ChampagneGold)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Marco astrolabe evaluating weather radar & contingency routes...",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
-                        color = SunsetCoral
+                        color = ChampagneGold
                     )
                 }
             } else if (adjustment != null) {
                 // Trigger Reason Alert Banner
                 Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = SunsetCoral.copy(alpha = 0.12f),
+                    shape = RoundedCornerShape(12.dp),
+                    color = StatusCrimson.copy(alpha = 0.15f),
+                    border = BorderStroke(1.dp, StatusCrimson.copy(alpha = 0.3f)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = Modifier.padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Shield, null, tint = SunsetCoral, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Shield, null, tint = StatusCrimson, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = adjustment.triggerReason,
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = SunsetCoral,
-                                fontSize = 11.sp
+                                color = StatusCrimson
                             )
                         )
                     }
@@ -2796,20 +2994,27 @@ fun ChatDynamicAdjustmentCard(
 
                 // Adjustment Replacement Box
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+                    shape = RoundedCornerShape(14.dp),
+                    color = LuxurySurface,
+                    border = BorderStroke(1.dp, LuxuryBorder),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
+                    Column(modifier = Modifier.padding(14.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = "⚠️ Compromised:",
-                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFFEF4444), fontSize = 11.sp)
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = StatusCrimson
+                                )
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = adjustment.impactedActivityTitle,
-                                style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough)
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    color = TextSecondary,
+                                    textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough
+                                )
                             )
                         }
 
@@ -2818,113 +3023,103 @@ fun ChatDynamicAdjustmentCard(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = "✨ AI Alternative:",
-                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = EmeraldGreen, fontSize = 11.sp)
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = StatusEmerald
+                                )
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = adjustment.suggestedAlternativeTitle,
-                                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold, fontSize = 12.sp, color = OceanBlue)
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = ChampagneGold
+                                )
                             )
                         }
 
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "${adjustment.replacementTimeSlot} • ${adjustment.location}",
-                            fontSize = 10.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            style = MaterialTheme.typography.labelSmall.copy(color = TextSecondary)
                         )
 
                         Spacer(modifier = Modifier.height(6.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Surface(
-                                shape = RoundedCornerShape(6.dp),
-                                color = OceanBlue.copy(alpha = 0.12f)
-                            ) {
-                                Text(
-                                    text = adjustment.accessibilityBadge,
-                                    style = MaterialTheme.typography.labelSmall.copy(color = OceanBlue, fontSize = 9.sp, fontWeight = FontWeight.SemiBold),
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                )
-                            }
-                            Surface(
-                                shape = RoundedCornerShape(6.dp),
-                                color = EmeraldGreen.copy(alpha = 0.15f)
-                            ) {
-                                Text(
-                                    text = adjustment.dietaryBadge,
-                                    style = MaterialTheme.typography.labelSmall.copy(color = EmeraldGreen, fontSize = 9.sp, fontWeight = FontWeight.SemiBold),
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                )
-                            }
+                            ExpeditionBadge(
+                                text = adjustment.accessibilityBadge,
+                                color = ChampagneGold
+                            )
+                            ExpeditionBadge(
+                                text = adjustment.dietaryBadge,
+                                color = StatusEmerald
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
                             text = adjustment.summaryExplanation,
-                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, lineHeight = 15.sp)
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = TextPrimary,
+                                lineHeight = 16.sp
+                            )
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 // Actions: 1-Tap Rebook & AI Voice Telephony Dispatch
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Surface(
+                    Button(
+                        onClick = {
+                            if (!hasApplied) {
+                                onApplyAdjustment(adjustment)
+                                hasApplied = true
+                            }
+                        },
                         shape = RoundedCornerShape(10.dp),
-                        color = if (hasApplied) EmeraldGreen else SunsetCoral,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (hasApplied) StatusEmerald else ChampagneGold,
+                            contentColor = LuxuryDarkBase
+                        ),
                         modifier = Modifier
                             .weight(1f)
-                            .clickable {
-                                if (!hasApplied) {
-                                    onApplyAdjustment(adjustment)
-                                    hasApplied = true
-                                }
-                            }
                             .testTag("apply_dynamic_adjustment_button")
                     ) {
-                        Row(
-                            modifier = Modifier.padding(vertical = 10.dp),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = if (hasApplied) Icons.Default.Check else Icons.Default.Refresh,
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier.size(14.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = if (hasApplied) "Rebooked & Updated!" else "1-Tap Auto-Rebook (${if (adjustment.costDifference <= 0) "Save $${-adjustment.costDifference.toInt()}" else "+$${adjustment.costDifference.toInt()}"})",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                        }
+                        Icon(
+                            imageVector = if (hasApplied) Icons.Default.Check else Icons.Default.Refresh,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = if (hasApplied) "Rebooked & Updated!" else "1-Tap Auto-Rebook (${if (adjustment.costDifference <= 0) "Save $${-adjustment.costDifference.toInt()}" else "+$${adjustment.costDifference.toInt()}"})",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp
+                        )
                     }
 
-                    Surface(
-                        shape = RoundedCornerShape(10.dp),
-                        color = AmberGold.copy(alpha = 0.15f),
-                        modifier = Modifier.clickable {
+                    Button(
+                        onClick = {
                             onSimulateVoiceRebook(
                                 adjustment.suggestedAlternativeTitle,
                                 "Rebook reservation due to weather alert and ensure wheelchair ramp confirmation"
                             )
-                        }
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = LuxuryCardElevated,
+                            contentColor = TextPrimary
+                        ),
+                        border = BorderStroke(1.dp, LuxuryBorder)
                     ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(Icons.Default.PhoneInTalk, null, tint = AmberGold, modifier = Modifier.size(12.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Voice Dispatch", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = AmberGold)
-                        }
+                        Icon(Icons.Default.PhoneInTalk, null, tint = ChampagneGold, modifier = Modifier.size(12.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Voice Dispatch", fontWeight = FontWeight.Bold, fontSize = 11.sp)
                     }
                 }
             }
@@ -2942,12 +3137,12 @@ fun ChatProactiveDisruptionCard(
     var isRebooked by remember { mutableStateOf(false) }
 
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = LuxuryCard),
-        border = androidx.compose.foundation.BorderStroke(1.5.dp, WaxSealCrimson),
+        border = BorderStroke(1.dp, StatusCrimson.copy(alpha = 0.6f)),
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -2956,24 +3151,18 @@ fun ChatProactiveDisruptionCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(32.dp)
+                            .size(36.dp)
                             .clip(CircleShape)
-                            .background(WaxSealCrimson.copy(alpha = 0.15f))
-                            .border(1.dp, WaxSealCrimson, CircleShape),
+                            .background(StatusCrimson.copy(alpha = 0.15f))
+                            .border(1.dp, StatusCrimson, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.Shield, contentDescription = null, tint = WaxSealCrimson, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Shield, contentDescription = null, tint = StatusCrimson, modifier = Modifier.size(18.dp))
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
-                        Text(
-                            text = "DISRUPTION ALERT",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Black,
-                                color = WaxSealCrimson,
-                                letterSpacing = 1.sp
-                            )
-                        )
+                        ExpeditionBadge(text = "Disruption Alert", color = StatusCrimson)
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = "Weather Advisory & Alternative",
                             style = MaterialTheme.typography.titleMedium.copy(
@@ -2984,35 +3173,40 @@ fun ChatProactiveDisruptionCard(
                     }
                 }
                 IconButton(onClick = onPlayTts) {
-                    Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = "Listen", tint = ChampagneGold, modifier = Modifier.size(18.dp))
-                }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = LuxuryDarkBase,
-                border = androidx.compose.foundation.BorderStroke(1.dp, LuxuryBorder),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    Text(
-                        text = "⚡ Thunderstorm & Wave Advisory Impacting Outdoor Activities",
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = TerracottaStamp
-                        )
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Text(
-                        text = "✨ Verified Alternative: Indoor Living Reef Discovery Center & Cultural Gallery\n♿ 100% Step-Free & Stroller Ramp Access • 🥗 Allergen-Safe Kitchen Verified",
-                        style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                        contentDescription = "Listen",
+                        tint = ChampagneGold,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
+
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = LuxurySurface,
+                border = BorderStroke(1.dp, LuxuryBorder),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(14.dp)) {
+                    Text(
+                        text = "⚡ Thunderstorm & Wave Advisory Impacting Outdoor Activities",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFFB923C)
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "✨ Verified Alternative: Indoor Living Reef Discovery Center & Cultural Gallery\n♿ 100% Step-Free & Stroller Ramp Access • 🥗 Allergen-Safe Kitchen Verified",
+                        style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary, lineHeight = 17.sp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
 
             if (!isRebooked) {
                 Button(
@@ -3024,7 +3218,7 @@ fun ChatProactiveDisruptionCard(
                         containerColor = ChampagneGold,
                         contentColor = LuxuryDarkBase
                     ),
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -3033,23 +3227,23 @@ fun ChatProactiveDisruptionCard(
                 }
             } else {
                 Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = WayfinderEmerald.copy(alpha = 0.15f),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, WayfinderEmerald),
+                    shape = RoundedCornerShape(12.dp),
+                    color = StatusEmerald.copy(alpha = 0.15f),
+                    border = BorderStroke(1.dp, StatusEmerald),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = Modifier.padding(12.dp),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Check, contentDescription = null, tint = WayfinderEmerald, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Check, contentDescription = null, tint = StatusEmerald, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "Itinerary Successfully Rebooked & Synced!",
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = WayfinderEmerald
+                                color = StatusEmerald
                             )
                         )
                     }
@@ -3074,12 +3268,12 @@ fun ChatJourneyCompletedCard(
     var isSubmitted by remember { mutableStateOf(false) }
 
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = LuxuryCard),
-        border = androidx.compose.foundation.BorderStroke(1.5.dp, ChampagneGold),
+        border = BorderStroke(1.dp, ChampagneGold.copy(alpha = 0.6f)),
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -3088,24 +3282,18 @@ fun ChatJourneyCompletedCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(38.dp)
                             .clip(CircleShape)
                             .background(ChampagneGold.copy(alpha = 0.2f))
                             .border(1.dp, ChampagneGold, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = "🏁", fontSize = 18.sp)
+                        Icon(Icons.Default.Flag, contentDescription = null, tint = ChampagneGold, modifier = Modifier.size(20.dp))
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
-                        Text(
-                            text = "JOURNEY COMPLETED",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Black,
-                                color = ChampagneGold,
-                                letterSpacing = 1.sp
-                            )
-                        )
+                        ExpeditionBadge(text = "Journey Completed", color = ChampagneGold)
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = "${trip?.destination ?: "Trip"} Summary",
                             style = MaterialTheme.typography.titleMedium.copy(
@@ -3116,23 +3304,28 @@ fun ChatJourneyCompletedCard(
                     }
                 }
                 IconButton(onClick = onPlayTts) {
-                    Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = "Listen", tint = ChampagneGold, modifier = Modifier.size(18.dp))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                        contentDescription = "Listen",
+                        tint = ChampagneGold,
+                        modifier = Modifier.size(18.dp)
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Action: View Story Reel
             OutlinedButton(
                 onClick = onOpenStoryReel,
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = WaypointCyan),
-                border = androidx.compose.foundation.BorderStroke(1.dp, WaypointCyan),
-                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = ChampagneGold),
+                border = BorderStroke(1.dp, ChampagneGold),
+                shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(Icons.Default.Favorite, contentDescription = null, modifier = Modifier.size(16.dp))
+                Icon(Icons.Default.Collections, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("🎬 View Story Reel & Photos", fontWeight = FontWeight.Bold)
+                Text("🎬 View Story Reel & Moments", fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -3140,18 +3333,18 @@ fun ChatJourneyCompletedCard(
             Spacer(modifier = Modifier.height(14.dp))
 
             Text(
-                text = "Rate Your Experience",
+                text = "Rate Your Expedition",
                 style = MaterialTheme.typography.titleSmall.copy(
                     fontWeight = FontWeight.Bold,
                     color = ChampagneGold
                 )
             )
             Text(
-                text = "Your feedback helps personalize future trip recommendations.",
+                text = "Your feedback fine-tunes future traveler DNA & pacing preferences.",
                 style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Question 1: Daily Pacing
             RatingRowSelector(
@@ -3178,7 +3371,7 @@ fun ChatJourneyCompletedCard(
                 onScoreChange = { diningScore = it }
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = feedbackNotes,
@@ -3191,11 +3384,11 @@ fun ChatJourneyCompletedCard(
                     focusedTextColor = TextPrimary,
                     unfocusedTextColor = TextPrimary
                 ),
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(10.dp),
                 maxLines = 3
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             if (!isSubmitted) {
                 Button(
@@ -3207,7 +3400,7 @@ fun ChatJourneyCompletedCard(
                         containerColor = ChampagneGold,
                         contentColor = LuxuryDarkBase
                     ),
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -3216,23 +3409,23 @@ fun ChatJourneyCompletedCard(
                 }
             } else {
                 Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = WayfinderEmerald.copy(alpha = 0.15f),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, WayfinderEmerald),
+                    shape = RoundedCornerShape(12.dp),
+                    color = StatusEmerald.copy(alpha = 0.15f),
+                    border = BorderStroke(1.dp, StatusEmerald),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = Modifier.padding(12.dp),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Check, contentDescription = null, tint = WayfinderEmerald, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Check, contentDescription = null, tint = StatusEmerald, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "Feedback Saved!",
+                            text = "Feedback Saved to Traveler DNA!",
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = WayfinderEmerald
+                                color = StatusEmerald
                             )
                         )
                     }
@@ -3269,4 +3462,3 @@ private fun RatingRowSelector(
         }
     }
 }
-

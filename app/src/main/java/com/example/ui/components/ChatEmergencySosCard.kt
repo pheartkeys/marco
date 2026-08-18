@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,15 +23,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.data.model.ChatMessageEntity
 import com.example.data.model.TripEntity
-import com.example.ui.theme.CartographyDarkBase
-import com.example.ui.theme.CelestialLapis
-import com.example.ui.theme.LuxuryBorder
-import com.example.ui.theme.LuxuryCard
-import com.example.ui.theme.MaritimeBlue
-import com.example.ui.theme.TextAtlasSecondary
-import com.example.ui.theme.WaxSealCrimson
+import com.example.ui.theme.*
 
 /**
  * Emergency SOS & Safety Radar Card:
@@ -46,13 +43,13 @@ fun ChatEmergencySosCard(
     val context = LocalContext.current
     var isDispatched by remember { mutableStateOf(false) }
 
-    val destination = trip?.destination ?: "Active Expedition"
+    val destination = trip?.destination ?: "Active Journey"
     val emergencyContactPhone = "911"
 
     Card(
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = LuxuryCard),
-        border = BorderStroke(1.dp, LuxuryBorder),
+        border = BorderStroke(1.dp, StatusCrimson.copy(alpha = 0.6f)),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 6.dp)
@@ -61,7 +58,7 @@ fun ChatEmergencySosCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(18.dp)
         ) {
             // Header
             Row(
@@ -69,33 +66,37 @@ fun ChatEmergencySosCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(40.dp)
                             .clip(CircleShape)
-                            .background(WaxSealCrimson),
+                            .background(StatusCrimson),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.HealthAndSafety,
                             contentDescription = null,
                             tint = Color.White,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(22.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
-                            text = "EMERGENCY SOS BEACON",
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                color = Color(0xFFFCA5A5)
+                            text = "EMERGENCY SOS & SAFETY",
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                color = Color(0xFFFCA5A5),
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 0.8.sp
                             )
                         )
                         Text(
-                            text = "Live Active Trip Safety Network",
+                            text = "Marco 24/7 Global Traveler Safety Hub",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = Color(0xFFD1D5DB)
+                                color = TextSecondary
                             )
                         )
                     }
@@ -103,10 +104,10 @@ fun ChatEmergencySosCard(
 
                 IconButton(
                     onClick = onPlayTts,
-                    modifier = Modifier.minimumInteractiveComponentSize()
+                    modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.VolumeUp,
+                        imageVector = Icons.AutoMirrored.Filled.VolumeUp,
                         contentDescription = "Read Alert",
                         tint = Color(0xFFFCA5A5),
                         modifier = Modifier.size(18.dp)
@@ -118,30 +119,31 @@ fun ChatEmergencySosCard(
 
             // Telemetry summary
             Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = CelestialLapis.copy(alpha = 0.7f),
+                shape = RoundedCornerShape(16.dp),
+                color = LuxurySurface,
+                border = BorderStroke(1.dp, LuxuryBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(12.dp)) {
+                Column(modifier = Modifier.padding(14.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Expedition:",
+                            text = "Destination:",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = TextAtlasSecondary
+                                color = TextSecondary
                             )
                         )
                         Text(
                             text = destination,
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = Color.White,
+                                color = TextPrimary,
                                 fontWeight = FontWeight.Bold
                             )
                         )
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
@@ -149,18 +151,18 @@ fun ChatEmergencySosCard(
                         Text(
                             text = "Emergency Support:",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = TextAtlasSecondary
+                                color = TextSecondary
                             )
                         )
                         Text(
-                            text = "Local 911/112 Dispatch & Trauma ER",
+                            text = "Local 911 / 112 Dispatch",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = Color.White,
+                                color = TextPrimary,
                                 fontWeight = FontWeight.Bold
                             )
                         )
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
@@ -168,13 +170,13 @@ fun ChatEmergencySosCard(
                         Text(
                             text = "Consular Assistance:",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = TextAtlasSecondary
+                                color = TextSecondary
                             )
                         )
                         Text(
-                            text = "24/7 Citizen Traveler Safety Desk",
+                            text = "24/7 Citizen Traveler Desk",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = Color.White,
+                                color = TextPrimary,
                                 fontWeight = FontWeight.Bold
                             )
                         )
@@ -182,24 +184,24 @@ fun ChatEmergencySosCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Action Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Button(
                     onClick = {
                         val dialIntent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:911"))
                         context.startActivity(dialIntent)
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = WaxSealCrimson),
-                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = StatusCrimson),
+                    shape = RoundedCornerShape(14.dp),
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(Icons.Default.Call, null, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         "Call 911 / ER",
                         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
@@ -227,18 +229,18 @@ fun ChatEmergencySosCard(
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaritimeBlue,
-                        contentColor = CartographyDarkBase
+                        containerColor = GoldenSun,
+                        contentColor = LuxuryDarkBase
                     ),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(14.dp),
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(
-                        imageVector = if (isDispatched) Icons.Default.CheckCircle else Icons.Default.Send,
+                        imageVector = if (isDispatched) Icons.Default.CheckCircle else Icons.AutoMirrored.Filled.Send,
                         contentDescription = null,
                         modifier = Modifier.size(16.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = if (isDispatched) "Sent SOS GPS" else "Broadcast SOS",
                         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)

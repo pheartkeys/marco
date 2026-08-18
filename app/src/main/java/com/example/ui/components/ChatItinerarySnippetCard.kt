@@ -1,6 +1,7 @@
 package com.example.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -9,12 +10,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.EventNote
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -22,18 +26,11 @@ import androidx.compose.ui.unit.sp
 import com.example.data.model.ChatMessageEntity
 import com.example.data.model.TripActivityEntity
 import com.example.data.model.TripEntity
-import com.example.ui.theme.CompassLilac
-import com.example.ui.theme.LuxuryBorder
-import com.example.ui.theme.LuxuryDarkBase
-import com.example.ui.theme.MaritimeBlue
-import com.example.ui.theme.SilkRoadTeal
-import com.example.ui.theme.WayfinderEmerald
-import com.example.ui.theme.WaypointCyan
-import com.example.ui.theme.WaxSealCrimson
+import com.example.ui.theme.*
 
 /**
- * Compact, horizontally scrollable cards for structured itinerary snippets
- * (flight departure/arrival, hotel check-in, timeshare exchange, tour reservations).
+ * In-Chat Itinerary Highlights & Voyage Timeline Snippets
+ * A fresh, inspiring, colorful carousel of journey stops, lodging, and excursions.
  */
 @Composable
 fun ChatItinerarySnippetCard(
@@ -48,10 +45,8 @@ fun ChatItinerarySnippetCard(
     val displayActivities = activities.take(6)
 
     Card(
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = LuxuryCard),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(1.dp, LuxuryBorder),
         modifier = modifier
@@ -62,7 +57,7 @@ fun ChatItinerarySnippetCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(18.dp)
         ) {
             // Header
             Row(
@@ -76,15 +71,16 @@ fun ChatItinerarySnippetCard(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(38.dp)
+                            .size(40.dp)
                             .clip(CircleShape)
-                            .background(MaritimeBlue.copy(alpha = 0.15f)),
+                            .background(VoyagerSkyMuted)
+                            .border(1.dp, VoyagerSkyLight.copy(alpha = 0.5f), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Default.EventNote,
+                            imageVector = Icons.AutoMirrored.Filled.EventNote,
                             contentDescription = null,
-                            tint = MaritimeBlue,
+                            tint = VoyagerSkyLight,
                             modifier = Modifier.size(22.dp)
                         )
                     }
@@ -97,27 +93,20 @@ fun ChatItinerarySnippetCard(
                             Text(
                                 text = "Itinerary Highlights",
                                 style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    color = TextPrimary
                                 )
                             )
-                            Surface(
-                                shape = RoundedCornerShape(6.dp),
-                                color = MaritimeBlue.copy(alpha = 0.15f)
-                            ) {
-                                Text(
-                                    text = "${displayActivities.size} Segments",
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        color = WaypointCyan,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                )
-                            }
+                            ExpeditionBadge(
+                                text = "${displayActivities.size} Highlights",
+                                color = GoldenSunLight,
+                                isFilled = true
+                            )
                         }
                         Text(
-                            text = trip?.title ?: "Active Expedition",
+                            text = trip?.title ?: "Trip Itinerary",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = TextSecondary
                             )
                         )
                     }
@@ -125,16 +114,17 @@ fun ChatItinerarySnippetCard(
 
                 IconButton(onClick = onPlayTts) {
                     Icon(
-                        imageVector = Icons.Default.VolumeUp,
+                        imageVector = Icons.AutoMirrored.Filled.VolumeUp,
                         contentDescription = "Listen to itinerary snippet",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = TextSecondary,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            // Horizontal Scrollable Cards
+            // Horizontal Scrollable Stops
             if (displayActivities.isNotEmpty()) {
                 Row(
                     modifier = Modifier
@@ -154,29 +144,28 @@ fun ChatItinerarySnippetCard(
                 }
             } else {
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(14.dp),
+                    color = LuxurySurface,
+                    border = BorderStroke(1.dp, LuxuryBorder),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "No activities added yet. Tap below to build or customize this itinerary.",
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        modifier = Modifier.padding(12.dp)
+                        text = "No activities added yet. Tap below to build or customize this itinerary with your travel crew!",
+                        style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary),
+                        modifier = Modifier.padding(14.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Tap-through Navigation to Full Itinerary Screen
             Button(
                 onClick = onOpenFullItinerary,
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaritimeBlue,
-                    contentColor = LuxuryDarkBase
+                    containerColor = MarcoCoral,
+                    contentColor = Color.White
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -191,7 +180,8 @@ fun ChatItinerarySnippetCard(
                 Text(
                     text = "Open Full Itinerary & Booking Details",
                     style = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
                     )
                 )
             }
@@ -204,28 +194,22 @@ private fun ItinerarySnippetItem(
     activity: TripActivityEntity,
     onClick: () -> Unit
 ) {
-    val (icon, bgCol, tintCol) = when (activity.category.uppercase()) {
-        "FLIGHT" -> Triple(Icons.Default.Flight, MaritimeBlue.copy(alpha = 0.15f), MaritimeBlue)
-        "HOTEL", "TIMESHARE" -> Triple(Icons.Default.Hotel, CompassLilac.copy(alpha = 0.15f), CompassLilac)
-        "DINING" -> Triple(Icons.Default.Restaurant, WaxSealCrimson.copy(alpha = 0.15f), WaxSealCrimson)
-        else -> Triple(Icons.Default.LocalActivity, WayfinderEmerald.copy(alpha = 0.15f), WayfinderEmerald)
-    }
-
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            containerColor = LuxurySurface
         ),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier
-            .width(220.dp)
+            .width(230.dp)
             .clickable(onClick = onClick)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp)
+                .padding(14.dp)
         ) {
-            // Category & Time slot
+            // Category Badge & Time Slot Pill
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -233,55 +217,52 @@ private fun ItinerarySnippetItem(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(26.dp)
-                            .clip(CircleShape)
-                            .background(bgCol),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = null,
-                            tint = tintCol,
-                            modifier = Modifier.size(14.dp)
-                        )
-                    }
+                    CategoryIconBadge(
+                        category = activity.category,
+                        size = 34
+                    )
                     Text(
                         text = "Day ${activity.dayNumber}",
-                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = GoldenSunLight
+                        )
                     )
                 }
 
                 Surface(
-                    shape = RoundedCornerShape(4.dp),
-                    color = MaterialTheme.colorScheme.surface
+                    shape = RoundedCornerShape(8.dp),
+                    color = LuxuryCardElevated,
+                    border = BorderStroke(1.dp, LuxuryBorder)
                 ) {
                     Text(
                         text = activity.timeSlot,
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
                         style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            color = TextSecondary,
+                            fontSize = 10.sp
                         )
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Title
             Text(
                 text = activity.title,
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    lineHeight = 17.sp
+                    color = TextPrimary,
+                    lineHeight = 18.sp
                 ),
                 maxLines = 2
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             // Location
             Row(
@@ -291,34 +272,23 @@ private fun ItinerarySnippetItem(
                 Icon(
                     imageVector = Icons.Default.LocationOn,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(12.dp)
+                    tint = TextMuted,
+                    modifier = Modifier.size(13.dp)
                 )
                 Text(
                     text = activity.location,
                     style = MaterialTheme.typography.labelSmall.copy(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = TextSecondary
                     ),
                     maxLines = 1
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Accessibility or Confirmation Badge
-            Surface(
-                shape = RoundedCornerShape(6.dp),
-                color = SilkRoadTeal.copy(alpha = 0.12f),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
+            if (activity.accessibilityBadge.isNotBlank()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                AccessibilityTagChip(
                     text = activity.accessibilityBadge,
-                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp),
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        color = SilkRoadTeal,
-                        fontWeight = FontWeight.Medium
-                    ),
-                    maxLines = 1
+                    tintColor = PalmEmeraldLight
                 )
             }
         }

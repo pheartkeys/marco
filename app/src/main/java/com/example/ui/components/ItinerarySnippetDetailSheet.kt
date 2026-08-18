@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -91,12 +92,12 @@ fun ItinerarySnippetDetailSheet(
                             "ATTRACTION" -> Icons.Default.Attractions
                             "DINING", "RESTAURANT" -> Icons.Default.Restaurant
                             "ACTIVITY", "TOUR" -> Icons.Default.Hiking
-                            else -> Icons.Default.EventNote
+                            else -> androidx.compose.material.icons.Icons.AutoMirrored.Filled.EventNote
                         }
                         Icon(
                             imageVector = icon,
                             contentDescription = null,
-                            tint = VenetianGold,
+                            tint = ChampagneGold,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -246,9 +247,9 @@ fun ItinerarySnippetDetailSheet(
                                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.Accessible,
+                                        imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Filled.Accessible,
                                         contentDescription = null,
-                                        tint = EmeraldGreen,
+                                        tint = StatusEmerald,
                                         modifier = Modifier.size(14.dp)
                                     )
                                     Text(

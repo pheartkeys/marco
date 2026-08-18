@@ -1,7 +1,9 @@
 package com.example.ui.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -26,23 +29,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.TripBriefEntity
 import com.example.data.model.TripBriefPayloads
-import com.example.ui.theme.ChampagneGold
-import com.example.ui.theme.LuxuryBorder
-import com.example.ui.theme.LuxuryCard
-import com.example.ui.theme.LuxuryCardElevated
-import com.example.ui.theme.LuxuryDarkBase
-import com.example.ui.theme.TextMuted
-import com.example.ui.theme.TextPrimary
-import com.example.ui.theme.TextSecondary
+import com.example.ui.theme.*
 
 /**
  * Chat stream card for synthesized Pow Wow Trip Brief (CARD_POW_WOW_BRIEF).
+ * Highlights shared alignment between travel crew members and readiness checklist.
  */
 @Composable
 fun ChatPowWowBriefCard(
@@ -55,12 +54,12 @@ fun ChatPowWowBriefCard(
     val isAccepted = brief.acceptedAtTimestamp > 0L
 
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = LuxuryCard),
-        border = BorderStroke(1.dp, ChampagneGold.copy(alpha = 0.6f)),
+        border = BorderStroke(1.dp, MarcoCoral.copy(alpha = 0.5f)),
         modifier = modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -68,37 +67,35 @@ fun ChatPowWowBriefCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    Text(
-                        text = "SYNTHESIZED TRIP BRIEF",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            color = ChampagneGold,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.5.sp,
-                            fontFamily = FontFamily.Monospace
-                        )
+                    ExpeditionBadge(
+                        text = "Vacation Alignment Brief",
+                        color = MarcoCoral,
+                        isFilled = true
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Expedition Alignment v${brief.version}",
+                        text = "Crew Consensus v${brief.version}",
                         style = MaterialTheme.typography.titleMedium.copy(
                             color = TextPrimary,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 17.sp
                         )
                     )
                 }
 
                 Surface(
-                    color = if (isAccepted) ChampagneGold.copy(alpha = 0.2f) else LuxuryCardElevated,
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, if (isAccepted) ChampagneGold else LuxuryBorder)
+                    color = if (isAccepted) PalmEmerald.copy(alpha = 0.2f) else LuxuryCardElevated,
+                    shape = RoundedCornerShape(10.dp),
+                    border = BorderStroke(1.dp, if (isAccepted) PalmEmerald else LuxuryBorder)
                 ) {
                     Text(
-                        text = if (isAccepted) "ACCEPTED" else "REVIEW",
+                        text = if (isAccepted) "✓ ALIGNED" else "IN REVIEW",
                         style = MaterialTheme.typography.labelSmall.copy(
-                            color = if (isAccepted) ChampagneGold else TextSecondary,
-                            fontFamily = FontFamily.Monospace,
-                            fontWeight = FontWeight.Bold
+                            color = if (isAccepted) PalmEmeraldLight else GoldenSunLight,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 10.sp
                         ),
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        modifier = Modifier.padding(horizontal = 9.dp, vertical = 5.dp)
                     )
                 }
             }
@@ -114,87 +111,103 @@ fun ChatPowWowBriefCard(
                 )
             }
 
-            // Agreements Section
+            // Shared Alignments
             if (agreements.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(14.dp))
                 Text(
-                    text = "SHARED ALIGNMENTS (${agreements.size})",
+                    text = "SHARED VIBES & ALIGNMENTS (${agreements.size})",
                     style = MaterialTheme.typography.labelSmall.copy(
-                        color = ChampagneGold,
+                        color = GoldenSunLight,
                         fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Monospace
+                        letterSpacing = 0.8.sp
                     )
                 )
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 agreements.forEach { agreement ->
-                    Row(
+                    Surface(
+                        shape = RoundedCornerShape(14.dp),
+                        color = LuxurySurface,
+                        border = BorderStroke(1.dp, LuxuryBorder),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 3.dp),
-                        verticalAlignment = Alignment.Top
+                            .padding(vertical = 3.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = "Agreed",
-                            tint = ChampagneGold,
-                            modifier = Modifier
-                                .size(14.dp)
-                                .padding(top = 2.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = agreement.statement,
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                color = TextPrimary,
-                                fontWeight = FontWeight.Medium
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.Top
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = "Agreed",
+                                tint = PalmEmeraldLight,
+                                modifier = Modifier
+                                    .size(17.dp)
+                                    .padding(top = 1.dp)
                             )
-                        )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                text = agreement.statement,
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    color = TextPrimary,
+                                    fontWeight = FontWeight.Medium,
+                                    lineHeight = 17.sp
+                                )
+                            )
+                        }
                     }
                 }
             }
 
-            // Readiness Checklist
+            // Expedition Readiness Checklist
             if (readiness.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(14.dp))
                 Text(
-                    text = "EXPEDITION READINESS",
+                    text = "EXPEDITION READINESS CHECKLIST",
                     style = MaterialTheme.typography.labelSmall.copy(
                         color = TextMuted,
-                        fontFamily = FontFamily.Monospace
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.8.sp
                     )
                 )
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 readiness.forEach { item ->
-                    Row(
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = LuxurySurface,
+                        border = BorderStroke(1.dp, LuxuryBorder),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 3.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .padding(vertical = 3.dp)
                     ) {
-                        Icon(
-                            imageVector = if (item.isSatisfied) Icons.Default.Check else Icons.Default.Warning,
-                            contentDescription = null,
-                            tint = if (item.isSatisfied) ChampagneGold else TextMuted,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Column {
-                            Text(
-                                text = item.label,
-                                style = MaterialTheme.typography.bodySmall.copy(
-                                    color = if (item.isSatisfied) TextPrimary else TextSecondary,
-                                    fontWeight = FontWeight.Medium,
-                                    fontSize = 11.sp
-                                )
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = if (item.isSatisfied) Icons.Default.Check else Icons.Default.Warning,
+                                contentDescription = null,
+                                tint = if (item.isSatisfied) PalmEmeraldLight else GoldenSunLight,
+                                modifier = Modifier.size(16.dp)
                             )
-                            if (item.detail.isNotBlank()) {
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = item.detail,
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        color = TextMuted,
-                                        fontSize = 10.sp
+                                    text = item.label,
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        color = if (item.isSatisfied) TextPrimary else TextSecondary,
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 12.sp
                                     )
                                 )
+                                if (item.detail.isNotBlank()) {
+                                    Text(
+                                        text = item.detail,
+                                        style = MaterialTheme.typography.labelSmall.copy(
+                                            color = TextMuted,
+                                            fontSize = 10.5.sp
+                                        )
+                                    )
+                                }
                             }
                         }
                     }
@@ -207,13 +220,13 @@ fun ChatPowWowBriefCard(
                 Button(
                     onClick = onAcceptBrief,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = ChampagneGold,
-                        contentColor = LuxuryDarkBase
+                        containerColor = MarcoCoral,
+                        contentColor = Color.White
                     ),
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(14.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Accept & Lock Alignment", fontWeight = FontWeight.Bold)
+                    Text("🚀 Lock In Vacation Alignment", fontWeight = FontWeight.Bold)
                 }
             }
         }

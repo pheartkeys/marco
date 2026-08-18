@@ -1,43 +1,45 @@
 package com.example.ui.theme
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val LuxuryEditorialColorScheme = darkColorScheme(
-    primary = TextPrimary,
-    onPrimary = LuxuryDarkBase,
-    primaryContainer = LuxuryCardElevated,
-    onPrimaryContainer = TextPrimary,
-    secondary = TextSecondary,
-    onSecondary = TextPrimary,
-    secondaryContainer = LuxuryCard,
-    onSecondaryContainer = TextPrimary,
-    tertiary = ChampagneGold,
-    onTertiary = LuxuryDarkBase,
-    background = LuxuryDarkBase,
+private val BrightExplorerColorScheme = lightColorScheme(
+    primary = MarcoCoral,
+    onPrimary = Color.White,
+    primaryContainer = MarcoCoralPastel,
+    onPrimaryContainer = MarcoCoralDark,
+    secondary = VoyagerSky,
+    onSecondary = Color.White,
+    secondaryContainer = VoyagerSkyPastel,
+    onSecondaryContainer = VoyagerSkyDark,
+    tertiary = GoldenSun,
+    onTertiary = Color.White,
+    tertiaryContainer = GoldenSunPastel,
+    onTertiaryContainer = GoldenSunDark,
+    background = LightCanvas,
     onBackground = TextPrimary,
-    surface = LuxurySurface,
+    surface = LightSurface,
     onSurface = TextPrimary,
-    surfaceVariant = LuxuryCard,
+    surfaceVariant = LightCardElevated,
     onSurfaceVariant = TextSecondary,
-    outline = LuxuryBorder,
-    outlineVariant = LuxuryBorderSubtle,
+    outline = LightBorder,
+    outlineVariant = LightBorderSubtle,
     error = StatusCrimson,
-    onError = TextPrimary,
-    errorContainer = Color(0xFF2B0A0A),
-    onErrorContainer = Color(0xFFFCA5A5)
+    onError = Color.White,
+    errorContainer = StatusCrimsonMuted,
+    onErrorContainer = StatusCrimson
 )
 
 @Composable
 fun MyApplicationTheme(
-    darkTheme: Boolean = true,
+    darkTheme: Boolean = false,
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     MaterialTheme(
-        colorScheme = LuxuryEditorialColorScheme,
+        colorScheme = BrightExplorerColorScheme,
         typography = Typography,
         content = content
     )

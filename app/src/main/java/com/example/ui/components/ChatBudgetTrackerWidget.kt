@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -159,7 +160,7 @@ fun ChatBudgetTrackerWidget(
                     modifier = Modifier.testTag("budget_tts_btn")
                 ) {
                     Icon(
-                        imageVector = Icons.Default.VolumeUp,
+                        imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Filled.VolumeUp,
                         contentDescription = "Read Budget Summary",
                         tint = TextSecondary
                     )
