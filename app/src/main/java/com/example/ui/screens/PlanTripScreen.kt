@@ -69,11 +69,11 @@ import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Settings
 import com.example.data.model.ProactiveSuggestionEntity
 import com.example.ui.components.ExplorerVoyageLoadingCard
-import com.example.ui.theme.CartographyDarkBase
+import com.example.ui.theme.ChampagneGold
 import com.example.ui.theme.CompassLilac
-import com.example.ui.theme.ContourBorder
+import com.example.ui.theme.LuxuryBorder
+import com.example.ui.theme.LuxuryDarkBase
 import com.example.ui.theme.MaritimeBlue
-import com.example.ui.theme.NavigationalGold
 import com.example.ui.theme.SilkRoadTeal
 import com.example.ui.theme.SunsetCoral
 import com.example.ui.theme.WayfinderEmerald
@@ -139,7 +139,7 @@ fun PlanTripDialog(
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surface,
         tonalElevation = 0.dp,
-        border = BorderStroke(1.dp, ContourBorder),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
@@ -284,7 +284,7 @@ fun PlanTripDialog(
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         text = "Save $${sug.pointsSavingsUsd.toInt()}",
-                                        style = MaterialTheme.typography.labelSmall.copy(color = NavigationalGold, fontWeight = FontWeight.Bold)
+                                        style = MaterialTheme.typography.labelSmall.copy(color = ChampagneGold, fontWeight = FontWeight.Bold)
                                     )
                                 }
                                 Text(
@@ -494,8 +494,8 @@ fun PlanTripDialog(
                         },
                         label = { Text(opt, style = MaterialTheme.typography.labelMedium) },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = NavigationalGold.copy(alpha = 0.2f),
-                            selectedLabelColor = NavigationalGold
+                            selectedContainerColor = ChampagneGold.copy(alpha = 0.2f),
+                            selectedLabelColor = ChampagneGold
                         )
                     )
                 }
@@ -534,7 +534,8 @@ fun PlanTripDialog(
                 enabled = !isGenerating && destination.isNotBlank(),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = NavigationalGold
+                    containerColor = ChampagneGold,
+                    contentColor = LuxuryDarkBase
                 ),
                 modifier = Modifier
                     .fillMaxWidth()

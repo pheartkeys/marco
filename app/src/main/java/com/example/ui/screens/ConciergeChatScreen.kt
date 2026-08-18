@@ -34,6 +34,8 @@ import com.example.data.model.ChatMessageEntity
 import com.example.data.model.ConnectedAccountEntity
 import com.example.data.model.GroupMemoryEntity
 import com.example.data.model.TripActivityEntity
+import com.example.data.model.TripBriefEntity
+import com.example.data.model.BriefTension
 import com.example.data.model.TripEntity
 import com.example.data.model.isTripInProgress
 import com.example.data.model.TripStatus
@@ -151,7 +153,7 @@ fun ConciergeChatScreen(
         Surface(
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp,
-            border = BorderStroke(1.dp, ContourBorder),
+            border = BorderStroke(1.dp, LuxuryBorder),
             modifier = Modifier.fillMaxWidth()
         ) {
             Row(
@@ -272,7 +274,7 @@ fun ConciergeChatScreen(
                                     )
                                 }
                                 currentTrip?.let { trip ->
-                                    HorizontalDivider(color = ContourBorderSubtle)
+                                    HorizontalDivider(color = LuxuryBorder)
                                     DropdownMenuItem(
                                         text = {
                                             Text(
@@ -287,7 +289,7 @@ fun ConciergeChatScreen(
                                         }
                                     )
                                 }
-                                HorizontalDivider(color = ContourBorderSubtle)
+                                HorizontalDivider(color = LuxuryBorder)
                                 DropdownMenuItem(
                                     text = {
                                         Text("Plan Another Trip...", fontWeight = FontWeight.Medium, color = WaypointCyan)
@@ -516,7 +518,7 @@ fun ConciergeChatScreen(
                                         .padding(horizontal = 4.dp)
                                         .size(if (isCurrent) 14.dp else 5.dp, 5.dp)
                                         .clip(RoundedCornerShape(3.dp))
-                                        .background(if (isCurrent) WaypointCyan else TextAtlasSubtle.copy(alpha = 0.35f))
+                                        .background(if (isCurrent) ChampagneGold else TextMuted.copy(alpha = 0.35f))
                                 )
                             }
                         }
@@ -623,7 +625,7 @@ fun ConciergeChatScreen(
                                         text = if (activeChatStreamTab == 1) "Travel Crew" else "Marco Concierge",
                                         style = MaterialTheme.typography.titleMedium.copy(
                                             fontWeight = FontWeight.Bold,
-                                            color = TextAtlasPrimary
+                                            color = TextPrimary
                                         )
                                     )
                                 }
@@ -634,7 +636,7 @@ fun ConciergeChatScreen(
                                     "Coordinate activities, share trip memories, and plan with your travel party.\n\nTap '+' below to share a group photo."
                                 else
                                     "Research destinations, check loyalty rewards, arrange accessible itineraries, and coordinate travel safety.\n\nType a message or tap '+' below to begin.",
-                                style = MaterialTheme.typography.bodyMedium.copy(color = TextAtlasPrimary)
+                                style = MaterialTheme.typography.bodyMedium.copy(color = TextSecondary)
                             )
                         }
                     }
@@ -868,6 +870,31 @@ fun ConciergeChatScreen(
                             onPlayTts = { viewModel.playAudioTranscript(msg.text) }
                         )
                     }
+                    "CARD_POW_WOW_BRIEF" -> {
+                        val brief = TripBriefEntity(
+                            tripId = currentTrip?.id ?: 0L,
+                            summaryText = msg.text
+                        )
+                        ChatPowWowBriefCard(
+                            brief = brief,
+                            onAcceptBrief = {
+                                viewModel.sendChatMessage("Brief accepted. Alignment locked for this expedition.")
+                            }
+                        )
+                    }
+                    "CARD_TENSION" -> {
+                        val tension = BriefTension(
+                            tensionId = "tension_${msg.id}",
+                            topic = msg.text.substringBefore("\n").ifBlank { "Planning Tension" },
+                            stakes = msg.text.substringAfter("\n", "")
+                        )
+                        ChatTensionCard(
+                            tension = tension,
+                            onAcceptResolution = {
+                                viewModel.sendChatMessage("Adopted proposed resolution for: ${tension.topic}")
+                            }
+                        )
+                    }
                     else -> {
                         // Standard AI Assistant text response
                         AiAssistantMessageBubble(
@@ -921,7 +948,7 @@ fun ConciergeChatScreen(
 
         // CHAT INPUT BAR (Unified Full-Width Papercraft Composer)
         Surface(
-            color = CartographySurface,
+            color = LuxurySurface,
             modifier = Modifier.fillMaxWidth()
         ) {
             Box(
@@ -930,9 +957,9 @@ fun ConciergeChatScreen(
                     .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 Surface(
-                    color = CartographyCard,
+                    color = LuxuryCard,
                     shape = RoundedCornerShape(18.dp),
-                    border = BorderStroke(1.dp, ContourBorder),
+                    border = BorderStroke(1.dp, LuxuryBorder),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(
@@ -953,7 +980,7 @@ fun ConciergeChatScreen(
                                     else
                                         "Message Marco or plan a trip...",
                                     style = MaterialTheme.typography.bodyMedium.copy(
-                                        color = TextAtlasSubtle
+                                        color = TextMuted
                                     ),
                                     modifier = Modifier.padding(top = 4.dp)
                                 )
@@ -962,9 +989,9 @@ fun ConciergeChatScreen(
                                 value = inputText,
                                 onValueChange = { inputText = it },
                                 textStyle = MaterialTheme.typography.bodyMedium.copy(
-                                    color = TextAtlasPrimary
+                                    color = TextPrimary
                                 ),
-                                cursorBrush = androidx.compose.ui.graphics.SolidColor(NavigationalGold),
+                                cursorBrush = androidx.compose.ui.graphics.SolidColor(ChampagneGold),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .testTag("chat_input_field")
@@ -989,8 +1016,8 @@ fun ConciergeChatScreen(
                                     modifier = Modifier
                                         .size(34.dp)
                                         .clip(CircleShape)
-                                        .background(CartographyCardElevated)
-                                        .border(1.dp, ContourBorderSubtle, CircleShape)
+                                        .background(LuxuryCardElevated)
+                                        .border(1.dp, LuxuryBorder, CircleShape)
                                         .clickable { isQuickActionSheetOpen = true }
                                         .testTag("open_quick_actions_button"),
                                     contentAlignment = Alignment.Center
@@ -998,7 +1025,7 @@ fun ConciergeChatScreen(
                                     Icon(
                                         imageVector = Icons.Default.Add,
                                         contentDescription = "Quick Actions",
-                                        tint = NavigationalGold,
+                                        tint = ChampagneGold,
                                         modifier = Modifier.size(18.dp)
                                     )
                                 }
@@ -1010,12 +1037,12 @@ fun ConciergeChatScreen(
                                         .size(34.dp)
                                         .clip(CircleShape)
                                         .background(
-                                            if (isListeningVoice) NavigationalGold.copy(alpha = 0.25f)
-                                            else CartographyCardElevated
+                                            if (isListeningVoice) ChampagneGold.copy(alpha = 0.25f)
+                                             else LuxuryCardElevated
                                         )
                                         .border(
                                             1.dp,
-                                            if (isListeningVoice) NavigationalGold else ContourBorderSubtle,
+                                            if (isListeningVoice) ChampagneGold else LuxuryBorder,
                                             CircleShape
                                         )
                                         .clickable {
@@ -1189,7 +1216,7 @@ fun ChatItineraryCard(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, ContourBorder),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -1381,7 +1408,7 @@ fun ChatVoiceCallCard(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = AmberGold.copy(alpha = 0.08f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, ContourBorder),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -1521,7 +1548,7 @@ fun ChatRewardsCard(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, ContourBorder),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -1673,7 +1700,7 @@ fun ChatOfflineSafetyCard(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, ContourBorder),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -1773,7 +1800,7 @@ fun ChatGroupMemoryCard(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, ContourBorder),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -2916,7 +2943,7 @@ fun ChatProactiveDisruptionCard(
 
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = CartographyCard),
+        colors = CardDefaults.cardColors(containerColor = LuxuryCard),
         border = androidx.compose.foundation.BorderStroke(1.5.dp, WaxSealCrimson),
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
     ) {
@@ -2951,13 +2978,13 @@ fun ChatProactiveDisruptionCard(
                             text = "Weather Advisory & Alternative",
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = TextAtlasPrimary
+                                color = TextPrimary
                             )
                         )
                     }
                 }
                 IconButton(onClick = onPlayTts) {
-                    Icon(Icons.Default.VolumeUp, contentDescription = "Listen", tint = NavigationalGold, modifier = Modifier.size(18.dp))
+                    Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = "Listen", tint = ChampagneGold, modifier = Modifier.size(18.dp))
                 }
             }
 
@@ -2965,8 +2992,8 @@ fun ChatProactiveDisruptionCard(
 
             Surface(
                 shape = RoundedCornerShape(10.dp),
-                color = CartographyDarkBase,
-                border = androidx.compose.foundation.BorderStroke(1.dp, ContourBorderSubtle),
+                color = LuxuryDarkBase,
+                border = androidx.compose.foundation.BorderStroke(1.dp, LuxuryBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(12.dp)) {
@@ -2980,7 +3007,7 @@ fun ChatProactiveDisruptionCard(
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = "✨ Verified Alternative: Indoor Living Reef Discovery Center & Cultural Gallery\n♿ 100% Step-Free & Stroller Ramp Access • 🥗 Allergen-Safe Kitchen Verified",
-                        style = MaterialTheme.typography.bodySmall.copy(color = TextAtlasSecondary)
+                        style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                     )
                 }
             }
@@ -2994,8 +3021,8 @@ fun ChatProactiveDisruptionCard(
                         onAutoRebook()
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = NavigationalGold,
-                        contentColor = CartographyDarkBase
+                        containerColor = ChampagneGold,
+                        contentColor = LuxuryDarkBase
                     ),
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -3048,8 +3075,8 @@ fun ChatJourneyCompletedCard(
 
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = CartographyCard),
-        border = androidx.compose.foundation.BorderStroke(1.5.dp, NavigationalGold),
+        colors = CardDefaults.cardColors(containerColor = LuxuryCard),
+        border = androidx.compose.foundation.BorderStroke(1.5.dp, ChampagneGold),
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -3063,8 +3090,8 @@ fun ChatJourneyCompletedCard(
                         modifier = Modifier
                             .size(36.dp)
                             .clip(CircleShape)
-                            .background(NavigationalGold.copy(alpha = 0.2f))
-                            .border(1.dp, NavigationalGold, CircleShape),
+                            .background(ChampagneGold.copy(alpha = 0.2f))
+                            .border(1.dp, ChampagneGold, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(text = "🏁", fontSize = 18.sp)
@@ -3075,7 +3102,7 @@ fun ChatJourneyCompletedCard(
                             text = "JOURNEY COMPLETED",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Black,
-                                color = NavigationalGold,
+                                color = ChampagneGold,
                                 letterSpacing = 1.sp
                             )
                         )
@@ -3083,13 +3110,13 @@ fun ChatJourneyCompletedCard(
                             text = "${trip?.destination ?: "Trip"} Summary",
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = TextAtlasPrimary
+                                color = TextPrimary
                             )
                         )
                     }
                 }
                 IconButton(onClick = onPlayTts) {
-                    Icon(Icons.Default.VolumeUp, contentDescription = "Listen", tint = NavigationalGold, modifier = Modifier.size(18.dp))
+                    Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = "Listen", tint = ChampagneGold, modifier = Modifier.size(18.dp))
                 }
             }
 
@@ -3109,19 +3136,19 @@ fun ChatJourneyCompletedCard(
             }
 
             Spacer(modifier = Modifier.height(14.dp))
-            Divider(color = ContourBorderSubtle)
+            HorizontalDivider(color = LuxuryBorder)
             Spacer(modifier = Modifier.height(14.dp))
 
             Text(
                 text = "Rate Your Experience",
                 style = MaterialTheme.typography.titleSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    color = NavigationalGold
+                    color = ChampagneGold
                 )
             )
             Text(
                 text = "Your feedback helps personalize future trip recommendations.",
-                style = MaterialTheme.typography.bodySmall.copy(color = TextAtlasSecondary)
+                style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -3156,13 +3183,13 @@ fun ChatJourneyCompletedCard(
             OutlinedTextField(
                 value = feedbackNotes,
                 onValueChange = { feedbackNotes = it },
-                placeholder = { Text("What did you love or what should be adjusted next time?", fontSize = 12.sp, color = TextAtlasSubtle) },
+                placeholder = { Text("What did you love or what should be adjusted next time?", fontSize = 12.sp, color = TextMuted) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = NavigationalGold,
-                    unfocusedBorderColor = ContourBorder,
-                    focusedTextColor = TextAtlasPrimary,
-                    unfocusedTextColor = TextAtlasPrimary
+                    focusedBorderColor = ChampagneGold,
+                    unfocusedBorderColor = LuxuryBorder,
+                    focusedTextColor = TextPrimary,
+                    unfocusedTextColor = TextPrimary
                 ),
                 shape = RoundedCornerShape(8.dp),
                 maxLines = 3
@@ -3177,8 +3204,8 @@ fun ChatJourneyCompletedCard(
                         onSubmitRating(pacingScore, lodgingScore, diningScore, feedbackNotes)
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = NavigationalGold,
-                        contentColor = CartographyDarkBase
+                        containerColor = ChampagneGold,
+                        contentColor = LuxuryDarkBase
                     ),
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -3226,13 +3253,13 @@ private fun RatingRowSelector(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = label, style = MaterialTheme.typography.bodySmall.copy(color = TextAtlasPrimary))
+        Text(text = label, style = MaterialTheme.typography.bodySmall.copy(color = TextPrimary))
         Row {
             for (i in 1..5) {
                 Icon(
                     imageVector = Icons.Default.Star,
                     contentDescription = "$i Stars",
-                    tint = if (i <= score) NavigationalGold else ContourBorder,
+                    tint = if (i <= score) ChampagneGold else LuxuryBorder,
                     modifier = Modifier
                         .size(20.dp)
                         .clickable { onScoreChange(i) }

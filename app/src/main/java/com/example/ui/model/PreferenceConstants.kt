@@ -201,4 +201,36 @@ object PreferenceConstants {
         ComfortOption("Elevator & Priority Boarding Access", ComfortTarget.MOBILITY),
         ComfortOption("Dietary Allergy-Aware Dining (Gluten/Nut/Dairy)", ComfortTarget.DIETARY)
     )
+
+    // Track C: Taxonomy Additions
+    val TRANSPORT_TAXONOMY = listOf(
+        TaxonomyItem("bicycle", "Bicycle & Micro-Mobility", "Eco-friendly, urban bike paths, e-bikes"),
+        TaxonomyItem("rail", "High-Speed & Regional Rail", "Scenic trains, intercity express, sleeper cabins"),
+        TaxonomyItem("economy_flight", "Commercial Economy Flight", "Standard seating, mainline carriers"),
+        TaxonomyItem("business_flight", "Premium & Business Class Flight", "Lie-flat suites, airport lounge access"),
+        TaxonomyItem("charter", "Private Charter Flight", "Flexible regional group charters"),
+        TaxonomyItem("private_jet", "Private Jet Aviation", "Ultra-long range executive private aircraft")
+    )
+
+    val LODGING_TAXONOMY = listOf(
+        TaxonomyItem("hostel", "Boutique Hostel & Co-Living", "Shared social spaces, private pod rooms"),
+        TaxonomyItem("timeshare", "Vacation Club & Timeshare Suite", "Multi-bedroom condos with kitchens"),
+        TaxonomyItem("boutique_hotel", "Boutique Heritage Hotel", "Curated design, local culture, personalized service"),
+        TaxonomyItem("luxury_resort", "5-Star Luxury Resort", "Full-service spa, beachfront, fine dining amenities"),
+        TaxonomyItem("private_villa", "Private Estate & Villa", "Exclusive buyout, private pool, dedicated concierge")
+    )
+
+    val DINING_TAXONOMY = listOf(
+        TaxonomyItem("street_food", "Authentic Street Food & Night Markets", "Local stalls, culinary heritage, food walks"),
+        TaxonomyItem("casual_dining", "Casual Neighborhood Bistro", "Warm ambiance, regional farm-to-table menus"),
+        TaxonomyItem("notable_bistro", "Notable Michelin Bib Gourmand", "Celebrated chefs, creative regional cuisine"),
+        TaxonomyItem("fine_dining", "Michelin-Starred Fine Dining", "Multi-course tasting menus, wine pairing")
+    )
 }
+
+data class TaxonomyItem(
+    val id: String,
+    val label: String,
+    val description: String
+)
+

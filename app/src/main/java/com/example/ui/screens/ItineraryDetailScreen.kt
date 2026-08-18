@@ -220,7 +220,7 @@ fun ItineraryDetailScreen(
                 Surface(
                     shape = RoundedCornerShape(16.dp),
                     color = MaterialTheme.colorScheme.surfaceVariant,
-                    border = BorderStroke(1.dp, ContourBorder),
+                    border = BorderStroke(1.dp, LuxuryBorder),
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { isPreferenceDialogOpen = true }
@@ -239,13 +239,13 @@ fun ItineraryDetailScreen(
                                 modifier = Modifier
                                     .size(36.dp)
                                     .clip(CircleShape)
-                                    .background(CartographyCardElevated),
+                                    .background(LuxuryCardElevated),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     Icons.Default.Psychology,
                                     contentDescription = null,
-                                    tint = NavigationalGold,
+                                    tint = ChampagneGold,
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
@@ -273,11 +273,11 @@ fun ItineraryDetailScreen(
                         }
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Star, null, tint = NavigationalGold, modifier = Modifier.size(14.dp))
+                            Icon(Icons.Default.Star, null, tint = ChampagneGold, modifier = Modifier.size(14.dp))
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = "Preferences",
-                                style = MaterialTheme.typography.labelSmall.copy(color = NavigationalGold, fontWeight = FontWeight.Bold)
+                                style = MaterialTheme.typography.labelSmall.copy(color = ChampagneGold, fontWeight = FontWeight.Bold)
                             )
                         }
                     }
@@ -331,7 +331,7 @@ fun ItineraryDetailScreen(
                             Icon(
                                 imageVector = Icons.Default.AutoAwesome,
                                 contentDescription = null,
-                                tint = NavigationalGold,
+                                tint = ChampagneGold,
                                 modifier = Modifier.size(36.dp)
                             )
                             Spacer(modifier = Modifier.height(8.dp))
@@ -418,7 +418,7 @@ fun TripHeroCard(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, ContourBorder),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -427,7 +427,7 @@ fun TripHeroCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                    .background(CartographyCardElevated)
+                    .background(LuxuryCardElevated)
                     .padding(16.dp)
             ) {
                 Column {

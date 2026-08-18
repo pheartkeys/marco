@@ -383,7 +383,7 @@ fun ExplorerVoyageLoadingCard(
             .fillMaxWidth()
             .border(
                 width = 1.dp,
-                color = ContourBorder,
+                color = LuxuryBorder,
                 shape = RoundedCornerShape(20.dp)
             )
             .testTag("explorer_voyage_loading_card")

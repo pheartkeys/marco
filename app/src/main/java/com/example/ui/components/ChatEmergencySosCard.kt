@@ -25,7 +25,8 @@ import com.example.data.model.ChatMessageEntity
 import com.example.data.model.TripEntity
 import com.example.ui.theme.CartographyDarkBase
 import com.example.ui.theme.CelestialLapis
-import com.example.ui.theme.ContourBorder
+import com.example.ui.theme.LuxuryBorder
+import com.example.ui.theme.LuxuryCard
 import com.example.ui.theme.MaritimeBlue
 import com.example.ui.theme.TextAtlasSecondary
 import com.example.ui.theme.WaxSealCrimson
@@ -50,11 +51,8 @@ fun ChatEmergencySosCard(
 
     Card(
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, ContourBorder),
+        colors = CardDefaults.cardColors(containerColor = LuxuryCard),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 6.dp)

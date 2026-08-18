@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import java.util.Locale
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -253,7 +254,8 @@ fun AccountsAndRewardsView(
         item {
             Card(
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Navy900),
+                colors = CardDefaults.cardColors(containerColor = LuxurySurface),
+                border = BorderStroke(1.dp, LuxuryBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -267,16 +269,16 @@ fun AccountsAndRewardsView(
                                 modifier = Modifier
                                     .size(36.dp)
                                     .clip(CircleShape)
-                                    .background(AmberGold.copy(alpha = 0.2f)),
+                                    .background(ChampagneGold.copy(alpha = 0.2f)),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(Icons.Default.AutoAwesome, null, tint = AmberGold, modifier = Modifier.size(20.dp))
+                                Icon(Icons.Default.AutoAwesome, null, tint = ChampagneGold, modifier = Modifier.size(20.dp))
                             }
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "AI Rewards & Timeshare Optimizer",
                                 style = MaterialTheme.typography.titleMedium.copy(
-                                    color = TextAtlasPrimary,
+                                    color = TextPrimary,
                                     fontWeight = FontWeight.Bold
                                 )
                             )
@@ -287,7 +289,7 @@ fun AccountsAndRewardsView(
                     Text(
                         text = "Gemini analyzes all connected airline miles, hotel points, timeshare trading power (RCI/II), and credit card rewards to calculate optimal redemption sweet spots.",
                         style = MaterialTheme.typography.bodySmall.copy(
-                            color = TextAtlasPrimary.copy(alpha = 0.85f)
+                            color = TextSecondary
                         )
                     )
 
@@ -393,7 +395,7 @@ fun AccountsAndRewardsView(
                         Icon(
                             Icons.Default.CreditCard,
                             contentDescription = null,
-                            tint = OceanBlue,
+                            tint = ChampagneGold,
                             modifier = Modifier.size(32.dp)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -405,7 +407,7 @@ fun AccountsAndRewardsView(
                         Text(
                             text = "Link your airline miles, hotel points, timeshare contracts, or credit cards to let Marco optimize your redemptions.",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = TextSecondary,
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
                         )
@@ -426,9 +428,9 @@ fun AccountItemCard(
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = LuxuryCard),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, ContourBorder),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onEdit() }
@@ -446,7 +448,7 @@ fun AccountItemCard(
                 Column {
                     Text(
                         text = account.providerName,
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = TextPrimary)
                     )
                     Text(
                         text = run {
@@ -457,7 +459,7 @@ fun AccountItemCard(
                                 "${account.accountNumberMasked} • $tierLabel"
                             }
                         },
-                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                     )
                     if (account.balanceValue.isNotBlank()) {
                         Text(
@@ -520,7 +522,7 @@ fun AccountItemCard(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete",
-                        tint = MaterialTheme.colorScheme.outline,
+                        tint = TextMuted,
                         modifier = Modifier.size(16.dp)
                     )
                 }
@@ -545,8 +547,8 @@ fun ExpensesAndWalletView(
         item {
             Card(
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = CartographyCardElevated),
-                border = BorderStroke(1.dp, ContourBorder),
+                colors = CardDefaults.cardColors(containerColor = LuxuryCard),
+                border = BorderStroke(1.dp, LuxuryBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
@@ -558,11 +560,11 @@ fun ExpensesAndWalletView(
                         Text(
                             text = "Marco Multi-Currency Pass",
                             style = MaterialTheme.typography.titleSmall.copy(
-                                color = MaterialTheme.colorScheme.onSurface,
+                                color = TextPrimary,
                                 fontWeight = FontWeight.Bold
                             )
                         )
-                        Icon(Icons.Default.Nfc, null, tint = AmberGold, modifier = Modifier.size(24.dp))
+                        Icon(Icons.Default.Nfc, null, tint = ChampagneGold, modifier = Modifier.size(24.dp))
                     }
 
                     Spacer(modifier = Modifier.height(20.dp))
@@ -575,12 +577,12 @@ fun ExpensesAndWalletView(
                             Text(
                                 text = "Total recorded spend",
                                 style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = TextSecondary
                             )
                             Text(
-                                text = "$${String.format("%.2f", totalSpentUsd)} USD",
+                                text = "$${String.format(Locale.US, "%.2f", totalSpentUsd)} USD",
                                 style = MaterialTheme.typography.titleMedium.copy(
-                                    color = TextAtlasPrimary,
+                                    color = TextPrimary,
                                     fontWeight = FontWeight.Bold
                                 )
                             )
@@ -589,7 +591,7 @@ fun ExpensesAndWalletView(
                         Text(
                             text = "Zero FX Fee Auto-Lock",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                color = TextAtlasPrimary,
+                                color = ChampagneGold,
                                 fontWeight = FontWeight.Bold
                             )
                         )
@@ -607,18 +609,19 @@ fun ExpensesAndWalletView(
             ) {
                 Text(
                     text = "Live Expense Receipts (${expenses.size})",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = TextPrimary)
                 )
 
                 Button(
                     onClick = onAddExpense,
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = OceanBlue,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
+                        containerColor = LuxuryCardElevated,
+                        contentColor = TextPrimary
+                    ),
+                    border = BorderStroke(1.dp, LuxuryBorder)
                 ) {
-                    Icon(Icons.Default.Receipt, null, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.Receipt, null, tint = ChampagneGold, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
                     Text("Log Expense", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                 }
@@ -644,19 +647,19 @@ fun ExpensesAndWalletView(
                         Icon(
                             Icons.Default.Receipt,
                             contentDescription = null,
-                            tint = OceanBlue,
+                            tint = ChampagneGold,
                             modifier = Modifier.size(32.dp)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "No Expenses Logged",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = TextPrimary)
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "Tap 'Log Expense' to track multi-currency expenses, exchange rates, and points savings on your trip.",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = TextSecondary,
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
                         )
@@ -676,9 +679,9 @@ fun ExpenseItemCard(
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = LuxuryCard),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, ContourBorder),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -694,11 +697,11 @@ fun ExpenseItemCard(
                 Column {
                     Text(
                         text = expense.title,
-                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = TextPrimary)
                     )
                     Text(
                         text = "${expense.category} • Paid with ${expense.paidBy}",
-                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                     )
                 }
             }
@@ -707,13 +710,13 @@ fun ExpenseItemCard(
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
                         text = "${expense.amountOriginal} ${expense.originalCurrency}",
-                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = TextPrimary)
                     )
                     if (expense.originalCurrency != "USD") {
                         Text(
-                            text = "≈ $${String.format("%.2f", expense.amountUsd)} USD",
+                            text = "≈ $${String.format(Locale.US, "%.2f", expense.amountUsd)} USD",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                color = EmeraldGreen
+                                color = ChampagneGold
                             )
                         )
                     }
@@ -726,7 +729,7 @@ fun ExpenseItemCard(
                         .size(24.dp)
                         .minimumInteractiveComponentSize()
                 ) {
-                    Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.Delete, null, tint = TextMuted, modifier = Modifier.size(16.dp))
                 }
             }
         }

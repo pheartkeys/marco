@@ -63,10 +63,10 @@ import com.example.data.model.VendorCallLogEntity
 import com.example.ui.components.CategoryIconBadge
 import com.example.ui.components.LiveAudioWaveform
 import com.example.ui.theme.AmberGold
-import com.example.ui.theme.CartographyCardElevated
-import com.example.ui.theme.ContourBorder
 import com.example.ui.theme.DarkSurfaceCard
 import com.example.ui.theme.EmeraldGreen
+import com.example.ui.theme.LuxuryBorder
+import com.example.ui.theme.LuxuryCardElevated
 import com.example.ui.theme.Navy900
 import com.example.ui.theme.OceanBlue
 import com.example.ui.theme.SkyBlueLight
@@ -162,8 +162,8 @@ fun VendorCallScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .background(CartographyCardElevated)
-                    .border(1.dp, ContourBorder, RoundedCornerShape(16.dp))
+                    .background(LuxuryCardElevated)
+                    .border(1.dp, LuxuryBorder, RoundedCornerShape(16.dp))
                     .padding(20.dp)
             ) {
                 Column {
@@ -292,7 +292,7 @@ fun VendorCallScreen(
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                border = BorderStroke(1.dp, ContourBorder),
+                border = BorderStroke(1.dp, LuxuryBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -435,7 +435,7 @@ fun CallLogCard(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, ContourBorder),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

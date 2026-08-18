@@ -98,7 +98,7 @@ fun TravelerPreferenceDialog(
     Surface(
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, ContourBorder),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier
             .fillMaxSize()
             .padding(12.dp)

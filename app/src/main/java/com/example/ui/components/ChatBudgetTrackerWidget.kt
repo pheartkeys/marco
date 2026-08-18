@@ -73,7 +73,7 @@ fun ChatBudgetTrackerWidget(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, ContourBorder),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 6.dp)

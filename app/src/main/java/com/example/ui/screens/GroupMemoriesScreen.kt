@@ -171,8 +171,8 @@ fun GroupMemoriesScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(CartographyCardElevated)
-                        .border(1.dp, ContourBorder, RoundedCornerShape(16.dp))
+                        .background(LuxuryCardElevated)
+                        .border(1.dp, LuxuryBorder, RoundedCornerShape(16.dp))
                         .padding(16.dp)
                 ) {
                     Column {
@@ -261,7 +261,7 @@ fun GroupMemoriesScreen(
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                border = BorderStroke(1.dp, ContourBorder),
+                border = BorderStroke(1.dp, LuxuryBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -391,7 +391,7 @@ fun GroupMemoryCard(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, ContourBorder),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -455,7 +455,7 @@ fun GroupMemoryCard(
                         },
                         colors = AssistChipDefaults.assistChipColors(
                             containerColor = SunsetCoral.copy(alpha = 0.12f),
-                            labelColor = TextAtlasPrimary,
+                            labelColor = TextPrimary,
                             leadingIconContentColor = SunsetCoral
                         ),
                         border = null

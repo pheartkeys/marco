@@ -5,6 +5,7 @@ import androidx.annotation.VisibleForTesting
 import com.example.data.local.AppDatabase
 import com.example.data.repository.CachedOnlyPricingRepository
 import com.example.data.repository.LedgerRepository
+import com.example.data.repository.LivePricingRepository
 import com.example.data.repository.PartyRepository
 import com.example.data.repository.PowWowRepository
 import com.example.data.repository.PricingRepository
@@ -72,13 +73,12 @@ object MarcoRepositories {
         }
 
     /**
-     * Pricing. Until the pricing service ships, this is [CachedOnlyPricingRepository], which
-     * answers from cache and otherwise reports the quote as unavailable. The pricing track swaps
-     * the implementation here and nothing else in the app changes.
+     * Pricing. Uses [LivePricingRepository], which queries the pricing normalization service and
+     * caches quotes locally via [com.example.data.local.PricingDao] for offline access and auditability.
      */
     fun pricing(context: Context): PricingRepository =
         pricingRepository ?: synchronized(this) {
-            pricingRepository ?: CachedOnlyPricingRepository(database(context).pricingDao())
+            pricingRepository ?: LivePricingRepository(database(context).pricingDao())
                 .also { pricingRepository = it }
         }
 

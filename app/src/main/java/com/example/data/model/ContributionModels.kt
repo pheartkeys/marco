@@ -200,6 +200,25 @@ fun ContributionEntity.withRecordedAgreement(
 }
 
 /**
+ * Attach a labelled proposal to a contribution offer.
+ */
+fun ContributionEntity.withProposedValue(
+    amount: Double,
+    currency: String,
+    source: ContributionProposalSource,
+    timestamp: Long = System.currentTimeMillis()
+): ContributionEntity {
+    require(amount > 0.0) { "A proposal amount must be positive." }
+    require(currency.isNotBlank()) { "A proposal needs a currency." }
+    return copy(
+        proposedValueAmount = amount,
+        proposedValueCurrency = currency,
+        proposalSource = source.value,
+        proposedAtTimestamp = timestamp
+    )
+}
+
+/**
  * The **only** fields of a linked account that may cross into shared trip content: the program's
  * title and its type. Nothing here is a number.
  */

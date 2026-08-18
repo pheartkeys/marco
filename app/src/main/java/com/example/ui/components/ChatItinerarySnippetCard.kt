@@ -22,9 +22,9 @@ import androidx.compose.ui.unit.sp
 import com.example.data.model.ChatMessageEntity
 import com.example.data.model.TripActivityEntity
 import com.example.data.model.TripEntity
-import com.example.ui.theme.CartographyDarkBase
 import com.example.ui.theme.CompassLilac
-import com.example.ui.theme.ContourBorder
+import com.example.ui.theme.LuxuryBorder
+import com.example.ui.theme.LuxuryDarkBase
 import com.example.ui.theme.MaritimeBlue
 import com.example.ui.theme.SilkRoadTeal
 import com.example.ui.theme.WayfinderEmerald
@@ -53,7 +53,7 @@ fun ChatItinerarySnippetCard(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, ContourBorder),
+        border = BorderStroke(1.dp, LuxuryBorder),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 6.dp)
@@ -176,7 +176,7 @@ fun ChatItinerarySnippetCard(
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaritimeBlue,
-                    contentColor = CartographyDarkBase
+                    contentColor = LuxuryDarkBase
                 ),
                 modifier = Modifier
                     .fillMaxWidth()

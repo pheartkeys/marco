@@ -200,7 +200,7 @@ fun ItinerarySnippetDetailSheet(
                                 shape = RoundedCornerShape(8.dp),
                                 color = MaterialTheme.colorScheme.surface,
                                 tonalElevation = 0.dp,
-                                border = BorderStroke(1.dp, ContourBorder)
+                                border = BorderStroke(1.dp, LuxuryBorder)
                             ) {
                                 Row(
                                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
